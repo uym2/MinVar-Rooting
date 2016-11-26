@@ -20,16 +20,75 @@ def deroot_tree(tree,parent_side):
 	else:
 		left_child.add_child(right_child,edge_length=combined_edge)
 	
-def reroot_at_edge(tree,edge,length1,length2,parent_side):
+def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	head = edge.head_node
 	tail = edge.tail_node
-	new_root = Node()
-	new_root.add_child(head,length2)
-	new_root.add_child(tail,length1)
+	
+	#left_child,right_child = [child for child in opt_root.child_node_iter()]
+	#print left_child,right_child
+
+	#print head.child_node_iter()
+	#print head.child_node_iter()
+	#print head.label
+	#print tail.label
+
+	if not new_root:
+		#new_root = tree.node_factory()
+		new_root = Node()		
+
 	tail.remove_child(head)
-	if tail != tree.seed_node:
-		deroot_tree(tree,parent_side)
-	tree.seed_node = new_root		
+		
+	new_root.add_child(head)
+	head.edge_length=length2
+	head.edge.length = length2
+
+	p = tail.parent_node
+	l = tail.edge_length
+
+	new_root.add_child(tail)
+	tail.edge_length=length1
+	tail.edge.length=length1
+	#print p.label
+        	
+	while tail.label != tree.seed_node.label:
+		print l	
+		head = tail
+		tail = p
+		#print tail.label
+		if tail.label == tree.seed_node.label:
+			break
+
+		tail.remove_child(head)
+
+		p = tail.parent_node
+		l1 = tail.edge_length
+
+		head.add_child(tail)
+		tail.edge.length=l
+		tail.edge_length=l
+	
+		l = l1
+		#left_child,right_child = [child for child in head.child_node_iter()]
+		#print left_child,right_child
+	
+	# out of while loop: tail IS now tree.seed_node
+	#print tail.label
+	#print head.label
+	sis = [child for child in tail.child_node_iter() if child.label != head.label][0]
+	#print sis.label
+	l1 = sis.edge_length
+	print l,l1
+	tail.remove_child(head)
+	tail.remove_child(sis)	
+	head.add_child(sis)
+	sis.edge.length=l+l1
+	sis.edge_length=l+l1	
+
+	tree.seed_node = new_root
+	#tree.update_bipartitions()
+	#tree.write(path="rooted.tre",schema="newick")	
+	tree.print_plot()
+	print tree.as_string("newick")
 
 a_tree = Tree.get_from_path(tree_file,"newick")
 
@@ -50,10 +109,12 @@ for node in a_tree.postorder_node_iter():
 		node_record = record(max_left=max_left,max_right=max_right)
 		record_arr.append(node_record)
 	i = i+1
-print a_tree.seed_node.label
+#print a_tree.seed_node.label
 record_arr[a_tree.seed_node.label].max_outside = 0
 max_distance = 0
 opt_root = a_tree.seed_node
+#left_child,right_child = [child for child in opt_root.child_node_iter()]
+#print left_child,right_child
 opt_x = 0
 
 for node in a_tree.preorder_node_iter():
@@ -77,15 +138,26 @@ for node in a_tree.preorder_node_iter():
 			opt_root = child
 		child_idx = child_idx+1
 
-for node in a_tree.postorder_node_iter():
-	print str(node.label) + " " + str(node.edge_length) + " " + str(record_arr[node.label].max_left) + " " + str(record_arr[node.label].max_right) + " " + str(record_arr[node.label].max_outside)
+#for node in a_tree.postorder_node_iter():
+	#print str(node.label) + " " + str(node.edge_length) + " " + str(record_arr[node.label].max_left) + " " + str(record_arr[node.label].max_right) + " " + str(record_arr[node.label].max_outside)
 	#print max_left[edge.label]
 	#print max_right[edge.label]
-print max_distance
-print opt_x
+#print max_distance
+#print opt_x
 opt_idx = opt_root.label
-print str(opt_root.label) + " " + str(opt_root.edge_length) + " " + str(record_arr[opt_idx].max_left) + " "+ str(record_arr[opt_idx].max_right) + " " + str(record_arr[opt_idx].max_outside)
+#print str(opt_root.label) + " " + str(opt_root.edge_length) + " " + str(record_arr[opt_idx].max_left) + " "+ str(record_arr[opt_idx].max_right) + " " + str(record_arr[opt_idx].max_outside)
+#print a_tree.seed_node.label
+reroot_at_edge(a_tree,opt_root.edge,opt_root.edge_length-opt_x,opt_x)
 
-a_tree.reroot_at_edge(opt_root.edge,length1=opt_root.edge_length-2,length2=2,update_bipartitions=False)
+for node in a_tree.preorder_node_iter():
+	print node.label, node.edge.length, node.taxon
+	#print node.taxon
+	#if not node.is_leaf():
+	#	print [child.label for child in node.child_node_iter()]
+		
+#p = opt_root.parent_node
+#a_tree.reroot_at_edge(opt_root.edge)
+
+#a_tree.update_bipartitions()
 
 a_tree.write(path=tree_file.split(".tre")[0]+"_rooted.tre",schema="newick")
