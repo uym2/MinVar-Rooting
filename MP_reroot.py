@@ -1,5 +1,5 @@
 from dendropy import Tree,Node
-from sys import argv
+from sys import argv,stdout
 
 tree_file = argv[1]
 
@@ -8,6 +8,36 @@ class record(object):
 		self.max_left = max_left
 		self.max_right = max_right
 		self.max_outside = max_outside
+
+def tree_as_newick(tree,outfile=None):
+	if outfile:
+		outstream = open(outfile,'w')
+	else:
+		outstream = stdout
+	
+	_write_newick(tree.seed_node,outstream)
+	outstream.write(";")
+
+	if outfile:
+		outstream.close()	
+
+def _write_newick(node,outstream):
+	if node.is_leaf():
+			outstream.write(str(node.taxon))
+	else:
+		outstream.write('(')
+		is_first_child = True
+		for child in node.child_node_iter():
+			if is_first_child:
+				is_first_child = False
+			else:
+				outstream.write(',')
+			_write_newick(child,outstream)
+		outstream.write(')')
+	if not node.is_leaf() and node.label:
+		outstream.write(str(node.label))
+	if node.edge_length:
+		outstream.write(":"+str(node.edge_length))
 
 def deroot_tree(tree,parent_side):
 	root = tree.seed_node
@@ -49,14 +79,22 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	tail.edge_length=length1
 	tail.edge.length=length1
 	#print p.label
-        	
+	is_root_edge = False
+	if tail.label == tree.seed_node.label:
+		head = new_root
+        	is_root_edge = True
+		l = tail.edge_length
+
 	while tail.label != tree.seed_node.label:
-		print l	
+		#print l	
 		head = tail
 		tail = p
+		p = tail.parent_node
+		
 		#print tail.label
 		if tail.label == tree.seed_node.label:
 			break
+		l1 = tail.edge_length
 
 		tail.remove_child(head)
 
@@ -66,11 +104,9 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 		head.add_child(tail)
 		tail.edge.length=l
 		tail.edge_length=l
-	
+		
 		l = l1
-		#left_child,right_child = [child for child in head.child_node_iter()]
-		#print left_child,right_child
-	
+		
 	# out of while loop: tail IS now tree.seed_node
 	#print tail.label
 	#print head.label
@@ -78,7 +114,8 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	#print sis.label
 	l1 = sis.edge_length
 	print l,l1
-	tail.remove_child(head)
+	if not is_root_edge:
+		tail.remove_child(head)
 	tail.remove_child(sis)	
 	head.add_child(sis)
 	sis.edge.length=l+l1
@@ -87,8 +124,9 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	tree.seed_node = new_root
 	#tree.update_bipartitions()
 	#tree.write(path="rooted.tre",schema="newick")	
-	tree.print_plot()
-	print tree.as_string("newick")
+	
+	#tree.print_plot()
+	#print tree.as_string("newick")
 
 a_tree = Tree.get_from_path(tree_file,"newick")
 
@@ -149,15 +187,26 @@ opt_idx = opt_root.label
 #print a_tree.seed_node.label
 reroot_at_edge(a_tree,opt_root.edge,opt_root.edge_length-opt_x,opt_x)
 
-for node in a_tree.preorder_node_iter():
-	print node.label, node.edge.length, node.taxon
-	#print node.taxon
+'''
+for node in a_tree.levelorder_node_iter():
 	#if not node.is_leaf():
+	#	print node._as_newick_string()
+	#print node.label, node.edge.length, node.taxon
+	#print node.taxon
+	print node.label
+	if not node.is_leaf():
+		left,right = [child for child in node.child_node_iter()]
+		print left.label, left.edge_length
+		print  right.label, right.edge_length
+	else:
+		print node.taxon
 	#	print [child.label for child in node.child_node_iter()]
-		
+'''		
 #p = opt_root.parent_node
 #a_tree.reroot_at_edge(opt_root.edge)
 
 #a_tree.update_bipartitions()
 
-a_tree.write(path=tree_file.split(".tre")[0]+"_rooted.tre",schema="newick")
+#a_tree.write(path=tree_file.split(".tre")[0]+"_rooted.tre",schema="newick")
+
+tree_as_newick(a_tree,outfile=tree_file.split(".tre")[0]+"_rooted.tre")
