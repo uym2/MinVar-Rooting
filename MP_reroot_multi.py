@@ -4,10 +4,9 @@ from sys import argv,stdout
 tree_file = argv[1]
 
 class record(object):
-	def __init__(self,max_left=0,max_right=0,max_outside=0):
-		self.max_left = max_left
-		self.max_right = max_right
-		self.max_outside = max_outside
+	def __init__(self,max_in=[0,0],max_out=0):
+		self.max_in = max_in
+		self.max_out = max_out
 
 def tree_as_newick(tree,outfile=None):
 	if outfile:
@@ -119,32 +118,27 @@ for node in a_tree.postorder_node_iter():
 		node_record = record()
 		record_arr.append(node_record)
 	else:
-		left_child,right_child = [child for child in node.child_node_iter()]
-		max_left = max(record_arr[left_child.label].max_left,record_arr[left_child.label].max_right)+left_child.edge_length
-		max_right = max(record_arr[right_child.label].max_left,record_arr[right_child.label].max_right)+right_child.edge_length
-		node_record = record(max_left=max_left,max_right=max_right)
+		max_in = []
+		for child in node.child_node_iter():
+			max_in.append(max(record_arr[child.label].max_in) + child.edge_length)	
+		node_record = record(max_in=max_in)
 		record_arr.append(node_record)
 	i = i+1
+
 record_arr[a_tree.seed_node.label].max_outside = 0
 max_distance = 0
 opt_root = a_tree.seed_node
 opt_x = 0
 
 for node in a_tree.preorder_node_iter():
-	child_idx = 1
+	child_idx = 0
 	node_record = record_arr[node.label]
-	node_maxl = node_record.max_left
-	node_maxr = node_record.max_right
-	node_maxo = node_record.max_outside
 
 	for child in node.child_node_iter():
-		if child_idx == 1:
-			record_arr[child.label].max_outside = max(node_maxr,node_maxo)+child.edge_length
-		else:
-			record_arr[child.label].max_outside = max(node_maxl,node_maxo)+child.edge_length
-		m = max(record_arr[child.label].max_left,record_arr[child.label].max_right) 
-		curr_max_distance = m + record_arr[child.label].max_outside
-		x = (record_arr[child.label].max_outside - m)/2
+		record_arr[child.label].max_out = max([node_record.max_out]+[node_record.max_in[k] for k in range(len(node_record.max_in)) if k != child_idx])+child.edge_length
+		m = max(record_arr[child.label].max_in) 
+		curr_max_distance = m + record_arr[child.label].max_out
+		x = (record_arr[child.label].max_out - m)/2
 		if curr_max_distance > max_distance and x >= 0 and x <= child.edge_length:
 			max_distance = curr_max_distance
 			opt_x = x
