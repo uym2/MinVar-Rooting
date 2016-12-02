@@ -77,20 +77,22 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 
 	if tail.label == tree.seed_node.label:
 		head = new_root
-        	is_root_edge = True
-		l = tail.edge_length
+        	#is_root_edge = True
+		#l = tail.edge_length
 
 	while tail.label != tree.seed_node.label:
 		head = tail
 		tail = p
 		p = tail.parent_node
 
+		l1 = tail.edge_length
 		tail.remove_child(head)
 
 		head.add_child(tail)
 		tail.edge.length=l
 		tail.edge_length=l
-	
+		l = l1
+			
 	# out of while loop: tail IS now tree.seed_node
 	if tail.num_child_nodes() < 2:
 		# merge the 2 branches of the old root and adjust the branch length
@@ -98,7 +100,7 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 		l = sis.edge_length
 		tail.remove_child(sis)	
 		head.add_child(sis)
-		sis.edge.length=l+tail.edge_length
+		sis.edge_length=l+tail.edge_length
 		head.remove_child(tail)
 	
 	tree.seed_node = new_root
