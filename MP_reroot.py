@@ -1,29 +1,30 @@
-from dendropy4 import Tree,Node
+from dendropy import Tree,Node
 from sys import argv,stdout
 
 tree_file = argv[1]
 
 class record(object):
-	def __init__(self,max_left=0,max_right=0,max_outside=0):
-		self.max_left = max_left
-		self.max_right = max_right
-		self.max_outside = max_outside
-
-def tree_as_newick(tree,outfile=None):
+	def __init__(self,max_in=[0,0],max_out=0,old_label=None):
+		self.max_in = max_in
+		self.max_out = max_out
+		self.old_label = old_label	
+	
+def tree_as_newick(tree,outfile=None,record_arr=None):
+# dendropy's method to write newick seems to have problem ...
 	if outfile:
 		outstream = open(outfile,'w')
 	else:
 		outstream = stdout
 	
-	_write_newick(tree.seed_node,outstream)
+	_write_newick(tree.seed_node,outstream,record_arr=record_arr)
 	outstream.write(";")
 
 	if outfile:
 		outstream.close()	
 
-def _write_newick(node,outstream):
+def _write_newick(node,outstream,record_arr=None):
 	if node.is_leaf():
-			outstream.write(str(node.taxon))
+			outstream.write(node.taxon.label)
 	else:
 		outstream.write('(')
 		is_first_child = True
@@ -32,12 +33,14 @@ def _write_newick(node,outstream):
 				is_first_child = False
 			else:
 				outstream.write(',')
-			_write_newick(child,outstream)
+			_write_newick(child,outstream,record_arr=record_arr)
 		outstream.write(')')
-	if not node.is_leaf() and node.label:
-		outstream.write(str(node.label))
+	if record_arr and node.label and not record_arr[node.label].old_label is None and not node.is_leaf():
+		outstream.write(str(record_arr[node.label].old_label))
 	if node.edge_length:
 		outstream.write(":"+str(node.edge_length))
+'''
+# don't see any useful apply. This function will soon be removed ...
 
 def deroot_tree(tree,parent_side):
 	root = tree.seed_node
@@ -49,8 +52,10 @@ def deroot_tree(tree,parent_side):
 		right_child.add_child(left_child,edge_length=combined_edge)
 	else:
 		left_child.add_child(right_child,edge_length=combined_edge)
+'''
 	
 def reroot_at_edge(tree,edge,length1,length2,new_root=None):
+# the method provided by dendropy DOESN'T seem to work ...
 	head = edge.head_node
 	tail = edge.tail_node
 	
@@ -69,7 +74,7 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	new_root.add_child(tail)
 	tail.edge_length=length1
 	tail.edge.length=length1
-	is_root_edge = False
+
 	if tail.label == tree.seed_node.label:
 		head = new_root
         	is_root_edge = True
@@ -79,32 +84,23 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 		head = tail
 		tail = p
 		p = tail.parent_node
-		
-		if tail.label == tree.seed_node.label:
-			break
-		l1 = tail.edge_length
 
 		tail.remove_child(head)
-
-		p = tail.parent_node
-		l1 = tail.edge_length
 
 		head.add_child(tail)
 		tail.edge.length=l
 		tail.edge_length=l
-		
-		l = l1
-		
+	
 	# out of while loop: tail IS now tree.seed_node
-	sis = [child for child in tail.child_node_iter() if child.label != head.label][0]
-	l1 = sis.edge_length
-	if not is_root_edge:
-		tail.remove_child(head)
-	tail.remove_child(sis)	
-	head.add_child(sis)
-	sis.edge.length=l+l1
-	sis.edge_length=l+l1	
-
+	if tail.num_child_nodes() < 2:
+		# merge the 2 branches of the old root and adjust the branch length
+		sis = [child for child in tail.child_node_iter()][0]
+		l = sis.edge_length
+		tail.remove_child(sis)	
+		head.add_child(sis)
+		sis.edge.length=l+tail.edge_length
+		head.remove_child(tail)
+	
 	tree.seed_node = new_root
 
 a_tree = Tree.get_from_path(tree_file,"newick")
@@ -112,39 +108,38 @@ a_tree = Tree.get_from_path(tree_file,"newick")
 i = 0
 record_arr = []
 
-
+# bottom-up
 for node in a_tree.postorder_node_iter():
+	# store old label
+	node_record = record(old_label=node.label)
+	# assign new label
 	node.label = i
 	if node.is_leaf():
 		node_record = record()
 		record_arr.append(node_record)
 	else:
-		left_child,right_child = [child for child in node.child_node_iter()]
-		max_left = max(record_arr[left_child.label].max_left,record_arr[left_child.label].max_right)+left_child.edge_length
-		max_right = max(record_arr[right_child.label].max_left,record_arr[right_child.label].max_right)+right_child.edge_length
-		node_record = record(max_left=max_left,max_right=max_right)
+		max_in = []
+		for child in node.child_node_iter():
+			max_in.append(max(record_arr[child.label].max_in) + child.edge_length)	
+		node_record.max_in=max_in
 		record_arr.append(node_record)
 	i = i+1
+
 record_arr[a_tree.seed_node.label].max_outside = 0
 max_distance = 0
 opt_root = a_tree.seed_node
 opt_x = 0
 
+# top-down
 for node in a_tree.preorder_node_iter():
-	child_idx = 1
+	child_idx = 0
 	node_record = record_arr[node.label]
-	node_maxl = node_record.max_left
-	node_maxr = node_record.max_right
-	node_maxo = node_record.max_outside
 
 	for child in node.child_node_iter():
-		if child_idx == 1:
-			record_arr[child.label].max_outside = max(node_maxr,node_maxo)+child.edge_length
-		else:
-			record_arr[child.label].max_outside = max(node_maxl,node_maxo)+child.edge_length
-		m = max(record_arr[child.label].max_left,record_arr[child.label].max_right) 
-		curr_max_distance = m + record_arr[child.label].max_outside
-		x = (record_arr[child.label].max_outside - m)/2
+		record_arr[child.label].max_out = max([node_record.max_out]+[node_record.max_in[k] for k in range(len(node_record.max_in)) if k != child_idx])+child.edge_length
+		m = max(record_arr[child.label].max_in) 
+		curr_max_distance = m + record_arr[child.label].max_out
+		x = (record_arr[child.label].max_out - m)/2
 		if curr_max_distance > max_distance and x >= 0 and x <= child.edge_length:
 			max_distance = curr_max_distance
 			opt_x = x
@@ -154,4 +149,4 @@ for node in a_tree.preorder_node_iter():
 opt_idx = opt_root.label
 reroot_at_edge(a_tree,opt_root.edge,opt_root.edge_length-opt_x,opt_x)
 
-tree_as_newick(a_tree,outfile=tree_file.split(".tre")[0]+"_rooted.tre")
+tree_as_newick(a_tree,outfile=tree_file.split(".tre")[0]+"_rooted.tre",record_arr=record_arr)
