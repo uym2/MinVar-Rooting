@@ -68,7 +68,7 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 	new_root.add_child(tail)
 	tail.edge_length=length1
 	tail.edge.length=length1
-	is_root_edge = False
+	#is_root_edge = False
 	if tail.label == tree.seed_node.label:
 		head = new_root
         	is_root_edge = True
@@ -79,31 +79,29 @@ def reroot_at_edge(tree,edge,length1,length2,new_root=None):
 		tail = p
 		p = tail.parent_node
 		
-		if tail.label == tree.seed_node.label:
-			break
-		l1 = tail.edge_length
+		#l1 = tail.edge_length
 
 		tail.remove_child(head)
-
-		p = tail.parent_node
-		l1 = tail.edge_length
 
 		head.add_child(tail)
 		tail.edge.length=l
 		tail.edge_length=l
 		
-		l = l1
-		
+		#l = l1
+	
 	# out of while loop: tail IS now tree.seed_node
-	sis = [child for child in tail.child_node_iter() if child.label != head.label][0]
-	l1 = sis.edge_length
-	if not is_root_edge:
-		tail.remove_child(head)
-	tail.remove_child(sis)	
-	head.add_child(sis)
-	sis.edge.length=l+l1
-	sis.edge_length=l+l1	
-
+	print tail.label
+	print tree.seed_node.label
+	print tail.num_child_nodes()
+	if tail.num_child_nodes() < 2:
+		# merge the 2 branches of the old root and adjust the branch length
+		sis = [child for child in tail.child_node_iter()][0]
+		l = sis.edge_length
+		tail.remove_child(sis)	
+		head.add_child(sis)
+		sis.edge.length=l+tail.edge_length
+		head.remove_child(tail)
+	
 	tree.seed_node = new_root
 
 a_tree = Tree.get_from_path(tree_file,"newick")
