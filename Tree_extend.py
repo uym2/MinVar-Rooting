@@ -12,14 +12,12 @@ class Tree_extend(object):
 		self.Tree_records = Tree_records
 
 	def New_record(self,old_label=None):
-		print "Abstract method!"
-		return Node_record(old_label=old_label)
+		print "Abstract method! Should never be called!"
 
 	def Bottomup_update(self):
 		i = 0
 		for node in self.ddpTree.postorder_node_iter():
 		# store old label
-			#node_record = Node_record(old_label=node.label)
 			node_record = self.New_record(old_label=node.label)
 		# assign new label
 			node.label = i
@@ -31,12 +29,11 @@ class Tree_extend(object):
 		for node in self.ddpTree.preorder_node_iter():
 			self.Tree_records[node.label].Topdown_update(node,self.Tree_records,self.Opt_function)
 
-
 	def Reroot(self):
-		print "Abstract method!"
+		print "Abstract method! Should never be called!"
 
 	def Opt_function(self,node):
-		print "Abstract method!"
+		print "Abstract method! Should never be called"
 
 
 	def tree_as_newick(self,outfile=None,restore_label=False):
@@ -44,7 +41,7 @@ class Tree_extend(object):
 		if outfile:
 			outstream = open(outfile,'w')
 		else:
-			outstream = stdout
+			outstream = VARout
 	
 		self.__write_newick(self.ddpTree.seed_node,outstream,restore_label)
 		outstream.write(";")
@@ -122,6 +119,12 @@ class Tree_extend(object):
 	
 		self.ddpTree.seed_node = new_root
 
+	def get_root_idx(self):
+		return self.ddpTree.seed_node.label
+
+	def get_root(self):
+		return self.ddpTree.seed_node
+
 class MPR_Tree(Tree_extend):
 # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
 	def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
@@ -151,6 +154,62 @@ class MPR_Tree(Tree_extend):
 		self.Topdown_update()
 		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 
+class VAR_Tree(Tree_extend):
+# supportive class to implement VAR-reroot, hence the name
+	def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+		if tree_file:
+			self.ddpTree = Tree.get_from_path(tree_file,schema)
+		else:
+			self.ddpTree = ddpTree
+		self.Tree_records = Tree_records
+		self.minVAR = None
+		self.opt_root = self.ddpTree.seed_node
+		self.opt_x = -1
+
+	def New_record(self,old_label=None):
+		return VAR_Node_record(old_label=old_label)
+
+	def Opt_function(self,node,a,b,c):
+		#print a,b,c
+		x = -b/(2*a)
+		if x >= 0 and x <= node.edge_length:
+			curr_minVAR = a*x*x + b*x + c
+			if self.minVAR is None or curr_minVAR < self.minVAR:
+				self.minVar = curr_minVAR
+				self.opt_root = node
+				self.opt_x = node.edge_length-x
+
+	def compute_dRoot_VAR(self):
+		cumm = {'ssq':0,'sum':0}
+		def compute_dRoot(node,cumm_l):
+			if node.is_leaf():
+				cumm['ssq'] += cumm_l**2
+				cumm['sum'] += cumm_l
+			else:
+				for child in node.child_node_iter():
+					compute_dRoot(child,cumm_l+child.edge_length)
+
+		compute_dRoot(self.get_root(),0)
+		N = self.Tree_records[self.get_root_idx()].nleaf
+		root_var = cumm['ssq']/N-(cumm['sum']/N)**2	
+		self.Tree_records[self.get_root_idx()].var = root_var
+		self.minVar = root_var
+		print root_var
+
+	def prepare_root(self):
+		self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
+		self.compute_dRoot_VAR()
+	
+	def Reroot(self):
+		self.Bottomup_update()
+		self.prepare_root()
+		self.Topdown_update()
+		print self.Tree_records[self.get_root_idx()].sum_total
+		print self.Tree_records[self.get_root_idx()].sum_in
+		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+		print self.minVar
+				
+
 class Node_record(object):
 	def __init__(self,old_label=None):
 		self.old_label = old_label
@@ -179,8 +238,41 @@ class MPR_Node_record(Node_record):
 			child_idx = child_idx+1
 
 
-class STD_Node_record(Node_record):
-# supportive class to implement std-reroot, hence the name
-	def __init__(self,sum_in=0,sum_out=0):
+class VAR_Node_record(Node_record):
+# supportive class to implement VAR-reroot, hence the name
+	total_leaves = 0
+	def __init__(self,old_label=None,nleaf=1,sum_in=0,sum_total=0,var=-1):
+		self.old_label=old_label
 		self.sum_in = sum_in
-		self.sum_out = sum_out1
+		self.sum_total = sum_total
+		self.nleaf = nleaf
+		self.var = var
+
+	def Bottomup_update(self,node,Tree_records):
+		if node.is_leaf():
+			self.nleaf = 1
+			self.sum_in = 0
+		else:
+			self.nleaf = 0
+			self.sum_in = 0
+			for child in node.child_node_iter():
+				self.nleaf += Tree_records[child.label].nleaf
+				self.sum_in += Tree_records[child.label].sum_in + Tree_records[child.label].nleaf*child.edge_length
+			VAR_Node_record.total_leaves = max(VAR_Node_record.total_leaves,self.nleaf)	
+	
+	def Update_var(self,p_record,edge_length):
+		alpha = 2*( p_record.sum_total-2*(self.sum_in+self.nleaf*edge_length) )/VAR_Node_record.total_leaves
+		#print alpha
+		#print self.nleaf,VAR_Node_record.total_leaves
+		beta = 1-2*float(self.nleaf)/VAR_Node_record.total_leaves
+		a = 1-beta*beta
+		b = alpha-2*p_record.sum_total*beta/VAR_Node_record.total_leaves
+		c = p_record.var
+		self.var = a*edge_length*edge_length + b*edge_length + c
+		return a,b,c
+
+	def Topdown_update(self,node,Tree_records,opt_function):
+		for child in node.child_node_iter():	
+			Tree_records[child.label].sum_total = Tree_records[node.label].sum_total + (VAR_Node_record.total_leaves-2*Tree_records[child.label].nleaf)*child.edge_length
+			a,b,c = Tree_records[child.label].Update_var(self,child.edge_length)
+			opt_function(child,a,b,c)
