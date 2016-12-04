@@ -1,3 +1,5 @@
+# usage: python MP_reroot.py <tree_file>
+
 from Tree_extend import MPR_Tree
 from sys import argv
 

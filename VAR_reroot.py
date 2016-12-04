@@ -1,3 +1,5 @@
+# usage: python VAR_reroot.py <tree_file>
+
 from Tree_extend import VAR_Tree
 from sys import argv
 
