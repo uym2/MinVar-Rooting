@@ -1,5 +1,6 @@
 # MP_reroot
 This is a fast implementation of the midpoint rerooting. The code was designed to be reusable for implementation of a new idea of rerooting, called the minVar reroot, which reroots the tree at the point that minimizes variances of the root to tip distances.
+
 Complexity: both rerooting methods are linear (with the number of tips) in time and memory.
 
 
