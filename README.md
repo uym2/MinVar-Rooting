@@ -8,8 +8,8 @@ Installation:
 Work out of the box. All you need is python 2.7
 
 Usage:
-python MP_reroot.py <<tree_file_in_newick>>
-python minVAR_reroot.py <<tree_file_in_newick>>
+python MP_reroot.py \<tree_file_in_newick\>
+python minVAR_reroot.py \<tree_file_in_newick\>
 
 Output:
 In the same directory as the input tree, you will see the output tree with the same name as the input added suffix MP_rooted or VAR_rooted
