@@ -9,6 +9,7 @@ Work out of the box. All you need is python 2.7
 
 Usage:
 python MP_reroot.py \<tree_file_in_newick\>
+
 python minVAR_reroot.py \<tree_file_in_newick\>
 
 Output:
