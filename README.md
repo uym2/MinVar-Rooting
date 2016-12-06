@@ -13,4 +13,4 @@ python MP_reroot.py \<tree_file_in_newick\>
 python minVAR_reroot.py \<tree_file_in_newick\>
 
 Output:
-In the same directory as the input tree, you will see the output tree with the same name as the input added suffix MP_rooted or minVAR_rooted
+In the same directory as the input tree you will find the (re)rooted tree with the same name as the input with suffix MP_rooted or minVAR_rooted added.
