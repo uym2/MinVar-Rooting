@@ -188,7 +188,7 @@ class minVAR_Tree(Tree_extend):
 		if x >= 0 and x <= node.edge_length:
 			curr_minVAR = a*x*x + b*x + c
 			if self.minVAR is None or curr_minVAR < self.minVAR:
-				self.minVar = curr_minVAR
+				self.minVAR = curr_minVAR
 				self.opt_root = node
 				self.opt_x = node.edge_length-x
 
@@ -206,7 +206,7 @@ class minVAR_Tree(Tree_extend):
 		N = self.Tree_records[self.get_root_idx()].nleaf
 		root_var = cumm['ssq']/N-(cumm['sum']/N)**2	
 		self.Tree_records[self.get_root_idx()].var = root_var
-		self.minVar = root_var
+		self.minVAR = root_var
 
 	def prepare_root(self):
 		self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
