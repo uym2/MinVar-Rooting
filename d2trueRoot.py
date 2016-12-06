@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 # Usage: python d2NewRoot.py <d_head> <d_tail> <edge_length> <x>
 
 from sys import argv
