@@ -30,7 +30,16 @@ class Tree_extend(object):
 			self.Tree_records[node.label].Topdown_update(node,self.Tree_records,self.Opt_function)
 
 	def Reroot(self):
-		print "Abstract method! Should never be called!"
+		self.Bottomup_update()
+		self.prepare_root()
+		self.Topdown_update()
+
+		head_id = self.Tree_records[self.opt_root.label].old_label
+		tail_id = self.Tree_records[self.opt_root.parent_node.label].old_label
+		edge_length = self.opt_root.edge_length		
+
+		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+		return head_id, tail_id, edge_length, self.opt_x
 
 	def Opt_function(self,node):
 		print "Abstract method! Should never be called"
@@ -149,10 +158,15 @@ class MPR_Tree(Tree_extend):
 			self.opt_x = x
 			self.opt_root = node
 
+	def prepare_root(self):
+		pass
+
+'''
 	def Reroot(self):
 		self.Bottomup_update()
 		self.Topdown_update()
 		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+'''
 
 class minVAR_Tree(Tree_extend):
 # supportive class to implement VAR-reroot, hence the name
@@ -197,13 +211,13 @@ class minVAR_Tree(Tree_extend):
 	def prepare_root(self):
 		self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
 		self.compute_dRoot_VAR()
-	
+'''
 	def Reroot(self):
 		self.Bottomup_update()
 		self.prepare_root()
 		self.Topdown_update()
 		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
-				
+'''				
 
 class Node_record(object):
 	def __init__(self,old_label=None):
