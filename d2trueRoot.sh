@@ -9,4 +9,4 @@ true_tree=$5
 d_head=`nw_distance $true_tree -sl $head`
 d_tail=`nw_distance $true_tree -sl $tail`
 
-python d2trueRoot.py $d_head $d_tail $l $x
+d2trueRoot.py $d_head $d_tail $l $x
