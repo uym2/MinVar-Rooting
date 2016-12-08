@@ -38,7 +38,7 @@ class Tree_extend(object):
 		tail_id = self.Tree_records[self.opt_root.parent_node.label].old_label
 		edge_length = self.opt_root.edge_length		
 
-		self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+		self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 		return head_id, tail_id, edge_length, self.opt_x
 
 	def Opt_function(self,node):
@@ -76,10 +76,10 @@ class Tree_extend(object):
 				not node.label is None and not self.Tree_records[node.label].old_label is None and outstream.write(str(self.Tree_records[node.label].old_label))
 			else:
 				not node.label is None and outstream.write(str(node.label))
-		if node.edge_length:
+		if not node.edge_length is None:
 			outstream.write(":"+str(node.edge_length))
 
-	def reroot_at_edge(self,edge,length1,length2,new_root=None):
+	def __reroot_at_edge(self,edge,length1,length2,new_root=None):
 	# the method provided by dendropy DOESN'T seem to work ...
 		head = edge.head_node
 		tail = edge.tail_node
