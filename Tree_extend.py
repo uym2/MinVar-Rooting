@@ -12,7 +12,7 @@ class Tree_extend(object):
 		self.Tree_records = Tree_records
 
 	def New_record(self,old_label=None):
-		print "Abstract method! Should never be called!"
+		print("Abstract method! Should never be called!")
 
 	def Bottomup_update(self):
 		i = 0
@@ -42,7 +42,7 @@ class Tree_extend(object):
 		return head_id, tail_id, edge_length, self.opt_x
 
 	def Opt_function(self,node):
-		print "Abstract method! Should never be called"
+		print("Abstract method! Should never be called")
 
 
 	def tree_as_newick(self,outfile=None,restore_label=False):
