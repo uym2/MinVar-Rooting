@@ -224,7 +224,7 @@ class Node_record(object):
 		self.old_label = old_label
 	
 	def Bottomup_update(self,node,Tree_records):
-		print "Just an abstract method! You should never see this message. Otherwise please check your code!"
+		print ("Just an abstract method! You should never see this message. Otherwise please check your code!")
 
 class MPR_Node_record(Node_record):
 # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
