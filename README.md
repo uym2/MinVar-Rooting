@@ -3,9 +3,9 @@ This is a fast implementation of the midpoint rerooting. The code was designed t
 
 Complexity: both rerooting methods are linear (with the number of tips) in time and memory.
 
-
-Installation:
-Work out of the box. All you need is python 2.7
+Dependencies:
+- python (version 2.7 recommended)
+- dendropy 4
 
 Usage:
 
