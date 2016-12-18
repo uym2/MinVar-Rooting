@@ -36,6 +36,11 @@ try:
 except:
 	pass
 
+try:
+	os.remove(args["infofile"])
+except:
+	pass
+
 trees = TreeList.get(path=tree_file,schema=schema)
 for tree in trees:
 	if args["method"] == "MP":
@@ -46,7 +51,7 @@ for tree in trees:
 	head_id, tail_id, edge_length, x = a_tree.Reroot()
 
 	if args["infofile"]:
-		with open(args["infofile"],'w') as f:
+		with open(args["infofile"],'a') as f:
 			f.write("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x) + "\n")
 
 	a_tree.tree_as_newick(outfile=outfile,append=True,restore_label=True)
