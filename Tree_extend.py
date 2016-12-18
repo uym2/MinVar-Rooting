@@ -35,26 +35,26 @@ class Tree_extend(object):
 		self.Topdown_update()
 
 		head_id = self.Tree_records[self.opt_root.label].old_label
-		tail_id = self.Tree_records[self.opt_root.parent_node.label].old_label
+		tail_id = self.Tree_records[self.opt_root.parent_node.label].old_label if self.opt_root.parent_node else None
 		edge_length = self.opt_root.edge_length		
 
-		self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+		if self.opt_root != self.ddpTree.seed_node:
+			self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 		return head_id, tail_id, edge_length, self.opt_x
 
 	def Opt_function(self,node):
 		print("Abstract method! Should never be called")
 
 
-	def tree_as_newick(self,outfile=None,restore_label=False):
+	def tree_as_newick(self,outfile=None,append=False,restore_label=False):
 	# dendropy's method to write newick seems to have problem ...
 		if outfile:
-			outstream = open(outfile,'w')
+			outstream = open(outfile,'a') if append else open(outfile,'w')
 		else:
 			outstream = VARout
 	
 		self.__write_newick(self.ddpTree.seed_node,outstream,restore_label)
-		outstream.write(";")
-
+		outstream.write(";\n")
 		if outfile:
 			outstream.close()	
 
@@ -144,7 +144,7 @@ class MPR_Tree(Tree_extend):
 		self.Tree_records = Tree_records
 		self.max_distance = -1
 		self.opt_root = self.ddpTree.seed_node
-		self.opt_x = -1
+		self.opt_x = 0
 
 	def New_record(self,old_label=None):
 		return MPR_Node_record(old_label=old_label)
@@ -178,7 +178,7 @@ class minVAR_Tree(Tree_extend):
 		self.Tree_records = Tree_records
 		self.minVAR = None
 		self.opt_root = self.ddpTree.seed_node
-		self.opt_x = -1
+		self.opt_x = 0
 
 	def New_record(self,old_label=None):
 		return minVAR_Node_record(old_label=old_label)
