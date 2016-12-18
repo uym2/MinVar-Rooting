@@ -1,4 +1,4 @@
-#! /usr/bin/env pythoni
+#! /usr/bin/env python
 
 # usage: python MP_reroot.py <tree_file>
 
@@ -20,6 +20,7 @@ parser.add_argument('-i','--input',required=True,help="input file")
 parser.add_argument('-m','--method',required=True,help="method: MP for midpoint and MV for minVAR")
 parser.add_argument('-o','--outfile',required=False,help="specify output file")
 parser.add_argument('-s','--schema',required=False,help="schema of your input treefile. Default is newick")
+parser.add_argument('-f','--infofile',required=False,help="write info of the new root to file. This is important only for research and debugging purposes. Default is to write NOTHING.")
 
 args = vars(parser.parse_args())
 
@@ -41,6 +42,11 @@ for tree in trees:
 		a_tree = MPR_Tree(ddpTree=tree)
 	else:
 		a_tree = minVAR_Tree(ddpTree=tree)
+
 	head_id, tail_id, edge_length, x = a_tree.Reroot()
-	print("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x))
+
+	if args["infofile"]:
+		with open(args["infofile"],'w') as f:
+			f.write("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x) + "\n")
+
 	a_tree.tree_as_newick(outfile=outfile,append=True,restore_label=True)
