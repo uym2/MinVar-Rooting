@@ -41,17 +41,22 @@ try:
 except:
 	pass
 
-trees = TreeList.get(path=tree_file,schema=schema)
-for tree in trees:
-	if args["method"] == "MP":
-		a_tree = MPR_Tree(ddpTree=tree)
-	else:
-		a_tree = minVAR_Tree(ddpTree=tree)
+i = 1
 
-	head_id, tail_id, edge_length, x = a_tree.Reroot()
+#trees = TreeList.get(path=tree_file,schema=schema)
+#trees.write(path=outfile,schema="newick")
+#for tree in trees:
+tree = Tree.get_from_path(tree_file,schema)
 
-	if args["infofile"]:
-		with open(args["infofile"],'a') as f:
-			f.write("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x) + "\n")
+if args["method"] == "MP":
+	a_tree = MPR_Tree(ddpTree=tree)
+else:
+	a_tree = minVAR_Tree(ddpTree=tree)
 
-	a_tree.tree_as_newick(outfile=outfile,append=True,restore_label=True)
+head_id, tail_id, edge_length, x = a_tree.Reroot()
+
+if args["infofile"]:
+	with open(args["infofile"],'a') as f:
+		f.write("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x) + "\n")
+
+a_tree.tree_as_newick(outfile=outfile,restore_label=True)

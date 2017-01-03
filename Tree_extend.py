@@ -1,4 +1,5 @@
 from dendropy import Tree,Node
+import copy
 
 class Tree_extend(object):
 	def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
@@ -46,6 +47,11 @@ class Tree_extend(object):
 	def Topdown_update(self):
 		for node in self.ddpTree.preorder_node_iter():
 			self.Tree_records[node.label].Topdown_update(node,self.Tree_records,self.Opt_function)
+
+	def Restore_label(self):
+		for node in self.ddpTree.postorder_node_iter():
+			if node.label:
+				node.label = self.Tree_records[node.label].old_label
 
 	def Reroot(self):
 		self.Bottomup_update()
@@ -160,7 +166,7 @@ class MPR_Tree(Tree_extend):
 		if tree_file:
 			self.ddpTree = Tree.get_from_path(tree_file,schema)
 		else:
-			self.ddpTree = ddpTree
+			self.ddpTree = copy.deepcopy(ddpTree)
 		self.Tree_records = Tree_records
 		self.max_distance = -1
 		self.opt_root = self.ddpTree.seed_node
@@ -194,7 +200,7 @@ class minVAR_Tree(Tree_extend):
 		if tree_file:
 			self.ddpTree = Tree.get_from_path(tree_file,schema)
 		else:
-			self.ddpTree = ddpTree
+			self.ddpTree = copy.deepcopy(ddpTree)
 		self.Tree_records = Tree_records
 		self.minVAR = None
 		self.opt_root = self.ddpTree.seed_node
