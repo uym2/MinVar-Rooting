@@ -47,4 +47,4 @@ trees = TreeList.get_from_path(tree_file,schema)
 for tree in trees:
 	a_tree = Tree_extend(ddpTree=tree)
 	a_tree.Topdown_label()
-	a_tree.tree_as_newick(outfile=outfile,append=True,restore_label=False)
+	a_tree.tree_as_newick(outfile=outfile,append=True)
