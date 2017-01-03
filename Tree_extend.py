@@ -1,7 +1,4 @@
-try:
-	from dendropy4 import Tree,Node
-except:
-	from dendropy import Tree,Node
+from dendropy import Tree,Node
 
 class Tree_extend(object):
 	def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
@@ -14,6 +11,27 @@ class Tree_extend(object):
 	def New_record(self,old_label=None):
 		print("Abstract method! Should never be called!")
 
+	def Bottomup_label(self):
+		# assign each node a label so that we can later relate to it
+		i = 0	
+		for node in self.ddpTree.postorder_node_iter():
+			if not node.is_leaf():
+				node.label = 'I'+str(i)
+			else:
+				node.label = 'L'+str(i)
+			i = i+1
+
+	
+	def Topdown_label(self):
+		# assign each node a label so that we can later relate to it
+		i = 0	
+		for node in self.ddpTree.preorder_node_iter():
+			if not node.is_leaf():
+				node.label = 'I'+str(i)
+			else:
+				node.label = 'L'+str(i)
+			i = i+1
+
 	def Bottomup_update(self):
 		i = 0
 		for node in self.ddpTree.postorder_node_iter():
@@ -24,7 +42,7 @@ class Tree_extend(object):
 			node_record.Bottomup_update(node,self.Tree_records)
 			self.Tree_records.append(node_record)
 			i = i+1
-	
+
 	def Topdown_update(self):
 		for node in self.ddpTree.preorder_node_iter():
 			self.Tree_records[node.label].Topdown_update(node,self.Tree_records,self.Opt_function)
@@ -41,7 +59,7 @@ class Tree_extend(object):
 		if self.opt_root != self.ddpTree.seed_node:
 			self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 		return head_id, tail_id, edge_length, self.opt_x
-
+		
 	def Opt_function(self,node):
 		print("Abstract method! Should never be called")
 
@@ -73,9 +91,11 @@ class Tree_extend(object):
 			outstream.write(')')
 		if not node.is_leaf():
 			if restore_label: 
-				not node.label is None and not self.Tree_records[node.label].old_label is None and outstream.write(str(self.Tree_records[node.label].old_label))
-			else:
-				not node.label is None and outstream.write(str(node.label))
+				if not node.label is None and not self.Tree_records[node.label].old_label is None:
+					outstream.write(str(self.Tree_records[node.label].old_label))
+			elif not node.label is None:
+				outstream.write(str(node.label))
+		
 		if not node.edge_length is None:
 			outstream.write(":"+str(node.edge_length))
 
