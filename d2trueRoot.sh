@@ -11,16 +11,19 @@ true_tree=$6
 if [ "$l" == "None" ]; then
 	d_head=0
 	d_tail=0
+	l=0
+	x=0
 else
 	d_head=`nw_distance $true_tree -sl $head`
 	if [ "$tail" == "None" ]; then
-		if [ "$head" == "$rand_root"]; then
-			d_tail=$(($d_head-$l))
-		else
-			d_tail=$(($d_head+$l))
+		if [ "$head" == "$rand_root" ]; then
+			d_tail=sub
+		else	
+			d_tail=sum
 		fi
+	else
+		d_tail=`nw_distance $true_tree -sl $tail`
 	fi
-	d_tail=`nw_distance $true_tree -sl $tail`
 fi
 
 d2trueRoot.py $d_head $d_tail $l $x
