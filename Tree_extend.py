@@ -260,11 +260,11 @@ class MDR_Tree(Tree_extend):
         def prepare_root(self):
 		ridx = self.get_root_idx()
                 self.Tree_records[ridx].sum_out = 0
-		child_idx = 0
-		means = []
-		for child in self.get_root().child_node_iter():
-			means.append(self.Tree_records[ridx].sum_in[child_idx]/self.Tree_records[child.idx].nleaf)
-		self.min_MD = abs(means[0]-means[1]) # temporary solution ...
+		#child_idx = 0
+		#means = []
+		#for child in self.get_root().child_node_iter():
+		#	means.append(self.Tree_records[ridx].sum_in[child_idx]/self.Tree_records[child.idx].nleaf)
+		#self.min_MD = abs(means[0]-means[1]) # temporary solution: assume 
 
 
 class Node_record(object):
