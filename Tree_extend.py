@@ -41,7 +41,7 @@ class Tree_extend(object):
 				node_record.Bottomup_update(node,self.Tree_records)
 				self.Tree_records.append(node_record)
 				i = i+1
-
+			
 		def Topdown_update(self):
 			for node in self.ddpTree.preorder_node_iter():
 				self.Tree_records[node.idx].Topdown_update(node,self.Tree_records,self.Opt_function)
@@ -60,6 +60,7 @@ class Tree_extend(object):
 
 			if self.opt_root != self.ddpTree.seed_node:
 				self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+			
 			return head_id, tail_id, edge_length, self.opt_x
 			
 		def Opt_function(self,node):
@@ -250,6 +251,7 @@ class MDR_Tree(Tree_extend):
 		elif x > node.edge_length:
 			x = node.edge_length
                 curr_MD = abs(mean_out-mean_in-2*x)
+		
 		if self.min_MD is None or curr_MD < self.min_MD: 
 			self.min_MD = curr_MD
                         self.opt_x = x
@@ -339,8 +341,11 @@ class MDR_Node_record(Node_record):
 		self.sum_out = sum_out
 
 	def Bottomup_update(self,node,Tree_records):
-		if not node.is_leaf():
+		if node.is_leaf():
 			self.nleaf = 1
+			self.sum_in = [0,0]
+		else:
+			self.nleaf = 0
 			self.sum_in=[]
 			for child in node.child_node_iter():
 				self.nleaf += Tree_records[child.idx].nleaf
