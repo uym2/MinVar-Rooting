@@ -105,20 +105,19 @@ class Tree_extend(object):
 			tail = edge.tail_node
 		
 			if not new_root:
-				new_root = Node()		
+				#new_root = Node()		
+				new_root = self.ddpTree.node_factory()
 
 			tail.remove_child(head)
 			
 			new_root.add_child(head)
 			head.edge_length=length2
-			head.edge.length = length2
 
 			p = tail.parent_node
 			l = tail.edge_length
 
 			new_root.add_child(tail)
 			tail.edge_length=length1
-			tail.edge.length=length1
 
 			if tail == self.ddpTree.seed_node:
 				head = new_root
@@ -132,7 +131,6 @@ class Tree_extend(object):
 				tail.remove_child(head)
 
 				head.add_child(tail)
-				tail.edge.length=l
 				tail.edge_length=l
 				l = l1
 				
