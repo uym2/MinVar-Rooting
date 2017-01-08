@@ -105,20 +105,19 @@ class Tree_extend(object):
 			tail = edge.tail_node
 		
 			if not new_root:
-				new_root = Node()		
+				#new_root = Node()		
+				new_root = self.ddpTree.node_factory()
 
 			tail.remove_child(head)
 			
 			new_root.add_child(head)
 			head.edge_length=length2
-			head.edge.length = length2
 
 			p = tail.parent_node
 			l = tail.edge_length
 
 			new_root.add_child(tail)
 			tail.edge_length=length1
-			tail.edge.length=length1
 
 			if tail == self.ddpTree.seed_node:
 				head = new_root
@@ -132,7 +131,6 @@ class Tree_extend(object):
 				tail.remove_child(head)
 
 				head.add_child(tail)
-				tail.edge.length=l
 				tail.edge_length=l
 				l = l1
 				
@@ -267,6 +265,38 @@ class MDR_Tree(Tree_extend):
 		#self.min_MD = abs(means[0]-means[1]) # temporary solution: assume 
 
 
+class MPR2_Tree(Tree_extend):
+	# supportive class to implement MP2 rooting (extension of midpoint)
+		def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+			if tree_file:
+				self.ddpTree = Tree.get_from_path(tree_file,schema)
+			else:
+				self.ddpTree = copy.deepcopy(ddpTree)
+			self.Tree_records = Tree_records
+			self.max_distance = -1
+			self.opt_root = self.ddpTree.seed_node
+			self.opt_x = 0
+
+		def New_record(self):
+			return MPR2_Node_record()
+
+		#def score_reroot(self,node):
+			# compute the new score if the tree was rerooted at the node specified
+		#	new_score = self.Tree_records[node.idx].cumm_score
+
+		def Opt_function(self,node):
+			#m = max(self.Tree_records[node.idx].max_in) 
+			#curr_max_distance = m + self.Tree_records[node.idx].max_out
+			#x = (self.Tree_records[node.idx].max_out - m)/2
+			#if curr_max_distance > self.max_distance and x >= 0 and x <= node.edge_length:
+			#	self.max_distance = curr_max_distance
+			#	self.opt_x = x
+			#	self.opt_root = node
+			pass
+		def prepare_root(self):
+			pass
+
+
 class Node_record(object):
 	def __init__(self):
 		pass
@@ -356,5 +386,54 @@ class MDR_Node_record(Node_record):
 		child_idx = 0
 		for child in node.child_node_iter():	
 			Tree_records[child.idx].sum_out = self.sum_out + sum([self.sum_in[k] for k in range(len(self.sum_in)) if k != child_idx]) + (MDR_Node_record.total_leaves - Tree_records[child.idx].nleaf)*child.edge_length
+			opt_function(child)
+			child_idx = child_idx+1
+
+class MPR2_Node_record(Node_record):
+# supportive class to implement MPR2
+	def __init__(self,max_in=[[0]],max_out=[0,0]):
+		self.max_in = max_in
+		self.max_out = max_out
+		self.score = 0
+		self.cumm_score = 0
+
+	def MDM_score(lists):
+		# MDM = Min of Difference of Max
+		n = len(lists)
+		score = None		
+		for i in range(n-1):
+			for j in range(i+1,n):
+				delta = min([abs(x-y) for x in lists[i] for y in lists[j]])
+				if score is None or delta < score:
+					score = delta
+		return score
+
+	def score_clade():
+		self.score = MDM_score(self.max_in)
+
+	def Bottomup_update(self,node,Tree_records):
+		if not node.is_leaf():
+			self.max_in=[]
+			self.score_clade()
+			self.cumm_score = self.score
+
+			for child in node.child_node_iter():
+				child_max_in = [ max(L)+child.edge_length for L in Tree_records[child.idx].max_in ]
+				self.max_in.append(child_max_in)	
+				self.cumm_score += Tree_records[child.idx].cumm_score
+	
+
+	def Topdown_update(self,node,Tree_records,opt_function):
+		child_idx = 0
+		for child in node.child_node_iter():	
+			if self.max_out:
+				Tree_records[child.idx].max_out = [ max(self.max_in[k])+child.edge_length for k in range(len(self.max_in)) if k != child_idx ] + [ max(self.max_out)+child.edge_length ]
+			else:
+				if len(self.max_in) > 2:
+					Tree_records[child.idx].max_out = [ max(self.max_in[k])+child.edge_length for k in range(len(self.max_in)) if k != child_idx ]  
+				else:
+					k = 0 if child_idx else 1
+					Tree_records[child.idx].max_out = [ x + child.edge_length for x in self.max_in[k] ]
+
 			opt_function(child)
 			child_idx = child_idx+1
