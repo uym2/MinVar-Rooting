@@ -285,7 +285,7 @@ class MPR2_Tree(Tree_extend):
 			else:
 				self.ddpTree = copy.deepcopy(ddpTree)
 			self.Tree_records = Tree_records
-			self.max_distance = -1
+			self.opt_score = None
 			self.opt_root = self.ddpTree.seed_node
 			self.opt_x = 0
 
@@ -297,6 +297,29 @@ class MPR2_Tree(Tree_extend):
 		#	new_score = self.Tree_records[node.idx].cumm_score
 
 		def Opt_function(self,node):
+			# optimize for rt_score
+			max_in = [max(L) for L in self.Tree_records[node.idx].max_in] 
+			max_out = self.Tree_records[node.idx].max_out
+			opt_rt_score = self.Tree_records[node.idx].rt_score
+
+			for m_i in max_in:
+				for m_o in max_out:
+					x = (m_o-m_i)/2
+					if x < 0:
+						x = 0
+					elif x > node.edge_length:
+						x = node.edge_length
+					score = abs(m_o-m_i-2*x)
+					if score < opt_rt_score:
+						opt_rt_score = score
+
+			curr_opt_score = self.Tree_records[node.idx].cumm_score - self.Tree_records[node.idx].rt_score + opt_rt_score
+
+			if curr_opt_score < self.opt_score:
+				self.opt_score = curr_opt_score
+				self.opt_root = node
+				self.opt_x = x
+
 			#m = max(self.Tree_records[node.idx].max_in) 
 			#curr_max_distance = m + self.Tree_records[node.idx].max_out
 			#x = (self.Tree_records[node.idx].max_out - m)/2
@@ -304,9 +327,12 @@ class MPR2_Tree(Tree_extend):
 			#	self.max_distance = curr_max_distance
 			#	self.opt_x = x
 			#	self.opt_root = node
-			pass
+
 		def prepare_root(self):
-			pass
+			ridx = self.get_root_idx()
+			self.Tree_records[ridx].max_out = None
+			self.Tree_records[ridx].rt_score = 0
+			self.opt_score = self.Tree_records[ridx].cumm_score
 
 
 class Node_record(object):
@@ -403,14 +429,15 @@ class MDR_Node_record(Node_record):
 
 class MPR2_Node_record(Node_record):
 # supportive class to implement MPR2
-	def __init__(self,max_in=[[0]],max_out=[0,0]):
+	def __init__(self,max_in=[[0]],max_out=None):
 		self.max_in = max_in
 		self.max_out = max_out
-		self.score = 0
-		self.cumm_score = 0
+		self.cl_score = 0 # the score off this node as a clade
+		self.rt_score = 0 # the score of this node if the tree was to be rooted at this node
+		self.cumm_score = 0 # cummulative score of the tree up to this node
 
-	def MDM_score(lists):
-		# MDM = Min of Difference of Max
+	def __MoP_score(self,lists):
+		# MoP = Min of Pairs
 		n = len(lists)
 		score = None		
 		for i in range(n-1):
@@ -418,26 +445,42 @@ class MPR2_Node_record(Node_record):
 				delta = min([abs(x-y) for x in lists[i] for y in lists[j]])
 				if score is None or delta < score:
 					score = delta
-		return score
+		if score is None:
+			return 0
+		else:
+			return score
 
-	def score_clade():
-		self.score = MDM_score(self.max_in)
+	def score_as_clade(self):
+		self.cl_score = self.__MoP_score(self.max_in)
+
+	def score_as_root(self):
+		self.rt_score = self.__MoP_score( [[max(L) for L in self.max_in]] + [self.max_out])
+
+	def score_as_child_clade(self,reroot_at_k_child):
+		# moving root from current node to child --> this node becomes its child's child
+		if self.max_out:
+			i_list = [ self.max_in[k] for k in range(len(self.max_in)) if k != reroot_at_k_child ]
+			o_list = [ self.max_out ]
+			return self.__MoP_score(i_list + o_list)
+		else:
+			return 0
 
 	def Bottomup_update(self,node,Tree_records):
 		if not node.is_leaf():
 			self.max_in=[]
-			self.score_clade()
-			self.cumm_score = self.score
-
+			self.cumm_score = 0
 			for child in node.child_node_iter():
 				child_max_in = [ max(L)+child.edge_length for L in Tree_records[child.idx].max_in ]
 				self.max_in.append(child_max_in)	
 				self.cumm_score += Tree_records[child.idx].cumm_score
-	
+
+			self.score_as_clade()
+			self.cumm_score += self.cl_score
 
 	def Topdown_update(self,node,Tree_records,opt_function):
 		child_idx = 0
 		for child in node.child_node_iter():	
+			# compute child's max_out
 			if self.max_out:
 				Tree_records[child.idx].max_out = [ max(self.max_in[k])+child.edge_length for k in range(len(self.max_in)) if k != child_idx ] + [ max(self.max_out)+child.edge_length ]
 			else:
@@ -446,6 +489,12 @@ class MPR2_Node_record(Node_record):
 				else:
 					k = 0 if child_idx else 1
 					Tree_records[child.idx].max_out = [ x + child.edge_length for x in self.max_in[k] ]
-
+			# compute child's rt_score
+			Tree_records[child.idx].score_as_root()
+			# update cumm_score		
+			new_cl_score = self.score_as_child_clade(child_idx)
+			Tree_records[child.idx].cumm_score = self.cumm_score - self.rt_score - self.cl_score + new_cl_score + Tree_records[child.idx].rt_score
+			# solve optimization function
 			opt_function(child)
+			# move on to next child
 			child_idx = child_idx+1

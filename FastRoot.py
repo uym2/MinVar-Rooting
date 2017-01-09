@@ -3,7 +3,7 @@
 # usage: python MP_reroot.py <tree_file>
 
 import os
-from Tree_extend import MPR_Tree,minVAR_Tree,MDR_Tree
+from Tree_extend import MPR_Tree,minVAR_Tree,MDR_Tree,MPR2_Tree
 try:
 	from dendropy4 import Tree,TreeList
 except:
@@ -17,7 +17,7 @@ import optparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-i','--input',required=True,help="input file")
-parser.add_argument('-m','--method',required=True,help="method: MP for midpoint, MV for minVAR, MD for mean-diff")
+parser.add_argument('-m','--method',required=True,help="method: MP for midpoint, MV for minVAR, MD for mean-diff, MP2 for midpoint2")
 parser.add_argument('-o','--outfile',required=False,help="specify output file")
 parser.add_argument('-s','--schema',required=False,help="schema of your input treefile. Default is newick")
 parser.add_argument('-f','--infofile',required=False,help="write info of the new root to file. This is important only for research and debugging purposes. Default is to write NOTHING.")
@@ -53,6 +53,8 @@ elif args["method"] == "MD":
 	a_tree = MDR_Tree(ddpTree=tree)
 elif args["method"] == "MV":
 	a_tree = minVAR_Tree(ddpTree=tree)
+elif args["method"] == "MP2":
+	a_tree = MPR2_Tree(ddpTree=tree)
 else:
 	a_tree = None
 
