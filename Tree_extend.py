@@ -59,7 +59,7 @@ class Tree_extend(object):
 			edge_length = self.opt_root.edge_length		
 
 			if self.opt_root != self.ddpTree.seed_node:
-				self.__reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+				self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 			
 			return head_id, tail_id, edge_length, self.opt_x
 			
@@ -99,7 +99,7 @@ class Tree_extend(object):
 			if not node.edge_length is None:
 				outstream.write(":"+str(node.edge_length))
 
-		def __reroot_at_edge(self,edge,length1,length2,new_root=None):
+		def reroot_at_edge(self,edge,length1,length2,new_root=None):
 		# the method provided by dendropy DOESN'T seem to work ...
 			head = edge.head_node
 			tail = edge.tail_node
@@ -295,7 +295,14 @@ class MPR2_Tree(Tree_extend):
 		#def score_reroot(self,node):
 			# compute the new score if the tree was rerooted at the node specified
 		#	new_score = self.Tree_records[node.idx].cumm_score
-
+		
+		def solve_x(self,m_i,m_o,l):		
+			x = (m_o-m_i)/2
+			if x < 0:
+				x = 0
+			elif x > l:
+				x = l
+			return x
 		def Opt_function(self,node):
 			# optimize for rt_score
 			max_in = [max(L) for L in self.Tree_records[node.idx].max_in] 
@@ -335,8 +342,57 @@ class MPR2_Tree(Tree_extend):
 			self.opt_score = self.Tree_records[ridx].cumm_score
 
 
+class MPR2B_Tree(MPR2_Tree):
+		def New_record(self):
+			return MPR2B_Node_record()
+
+		def Opt_function(self,node):
+			# optimize for rt_score
+			max_in = [max(L) for L in self.Tree_records[node.idx].max_in] 
+			max_out = self.Tree_records[node.idx].max_out
+			opt_rt_score = self.Tree_records[node.idx].rt_score
+			
+			max_max_in = max(max_in)
+			max_max_out = max(max_out)
+
+			m_o = max_max_out
+			# get 1 out from max_in
+			if len(max_in) < 2:
+				m_i = max_max_in
+				x = self.solve_x(m_i,m_o,node.edge_length)
+				score = abs(m_o-m_i-2*x)
+				if score < opt_rt_score:
+					opt_rt_score = score
+			else:
+				for k in range(len(max_in)):
+					m_i = max([max_in[x] for x in range(len(max_in)) if x != k ])
+					score = abs(m_o-m_i-2*x)
+					if score < opt_rt_score:
+						opt_rt_score = score
+			m_i = max_max_in
+			# get 1 out from max_out
+			if len(max_out) < 2:
+				m_o = max_max_out
+				x = self.solve_x(m_i,m_o,node.edge_length)
+				score = abs(m_o-m_i-2*x)
+				if score < opt_rt_score:
+					opt_rt_score = score
+			else:
+				for k in range(len(max_out)):
+					m_o = max([max_out[x] for x in range(len(max_out)) if x != k ])
+					score = abs(m_o-m_i-2*x)
+					if score < opt_rt_score:
+						opt_rt_score = score
+
+			curr_opt_score = self.Tree_records[node.idx].cumm_score - self.Tree_records[node.idx].rt_score + opt_rt_score
+
+			if curr_opt_score < self.opt_score:
+				self.opt_score = curr_opt_score
+				self.opt_root = node
+				self.opt_x = x
+
 class Node_record(object):
-	def __init__(self):
+	def __init__(self):	
 		pass
 	
 	def Bottomup_update(self,node,Tree_records):
@@ -436,6 +492,41 @@ class MPR2_Node_record(Node_record):
 		self.rt_score = 0 # the score of this node if the tree was to be rooted at this node
 		self.cumm_score = 0 # cummulative score of the tree up to this node
 
+	def __Score(self,lists):
+		return self.__MoP_score(lists)
+
+	def __MoRm1_score(self,lists):
+		n = len(lists)
+		score = None		
+		for i in range(n-1):
+			max_i = max(lists[i])
+			for j in range(i+1,n):
+				max_j = max(lists[j])
+				if len(lists[i]) < 2:
+					delta = abs(max_i-max_j)
+					if score is None or delta < score:
+						score = delta
+				else:
+					for k in range(len(lists[i])):
+						list_i_rm_k = [lists[i][x] for x in range(len(lists[i])) if x != k ]
+						delta = abs(max(list_i_rm_k)-max_j)
+						if score is None or delta < score:
+							score = delta
+				
+				if len(lists[j]) < 2:
+					delta = abs(max_i-max_j)
+					if score is None or delta < score:
+						score = delta
+				else:
+					for k in range(len(lists[j])):
+						list_j_rm_k = [lists[j][x] for x in range(len(lists[j])) if x != k ]
+						delta = abs(max(list_j_rm_k)-max_i)
+						if score is None or delta < score:
+							score = delta
+		if score is None:
+			return 0
+		else:
+			return score
 	def __MoP_score(self,lists):
 		# MoP = Min of Pairs
 		n = len(lists)
@@ -451,17 +542,17 @@ class MPR2_Node_record(Node_record):
 			return score
 
 	def score_as_clade(self):
-		self.cl_score = self.__MoP_score(self.max_in)
+		self.cl_score = self.__Score(self.max_in)
 
 	def score_as_root(self):
-		self.rt_score = self.__MoP_score( [[max(L) for L in self.max_in]] + [self.max_out])
+		self.rt_score = self.__Score( [[max(L) for L in self.max_in]] + [self.max_out])
 
 	def score_as_child_clade(self,reroot_at_k_child):
 		# moving root from current node to child --> this node becomes its child's child
 		if self.max_out:
 			i_list = [ self.max_in[k] for k in range(len(self.max_in)) if k != reroot_at_k_child ]
 			o_list = [ self.max_out ]
-			return self.__MoP_score(i_list + o_list)
+			return self.__Score(i_list + o_list)
 		else:
 			return 0
 
@@ -473,8 +564,6 @@ class MPR2_Node_record(Node_record):
 				child_max_in = [ max(L)+child.edge_length for L in Tree_records[child.idx].max_in ]
 				self.max_in.append(child_max_in)	
 				self.cumm_score += Tree_records[child.idx].cumm_score
-
-			self.score_as_clade()
 			self.cumm_score += self.cl_score
 
 	def Topdown_update(self,node,Tree_records,opt_function):
@@ -498,3 +587,8 @@ class MPR2_Node_record(Node_record):
 			opt_function(child)
 			# move on to next child
 			child_idx = child_idx+1
+
+
+class MPR2B_Node_record(MPR2_Node_record):
+	def __Score(self,lists):
+		return self.__MoRm1_score(lists)
