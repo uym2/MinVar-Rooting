@@ -17,7 +17,7 @@ for edge in a_tree.ddpTree.preorder_edge_iter():
 	#print edge.head_node.label
 	if edge.head_node.label == head or (edge.head_node.is_leaf() and edge.head_node.taxon.label == head):
 		a_tree.reroot_at_edge(edge,edge.length-x,x)
-		print("found!")
+		#print("found!")
 		break
 #head_id, tail_id, edge_length, x = a_tree.Reroot()
 #print("Head: " + str(head_id) + "\nTail: " + str(tail_id) + "\nEdge_length: " + str(edge_length) + "\nx: " + str(x))
