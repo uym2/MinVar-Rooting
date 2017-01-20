@@ -9,10 +9,8 @@ try:
 except:
 	from dendropy import Tree,TreeList
 
-from sys import argv
 from os.path import splitext
 import argparse
-import optparse
 
 parser = argparse.ArgumentParser()
 

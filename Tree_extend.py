@@ -1,6 +1,6 @@
 from dendropy import Tree,Node
 import copy
-
+import sys
 class Tree_extend(object):
 		def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
 			if tree_file:
@@ -72,7 +72,7 @@ class Tree_extend(object):
 			if outfile:
 				outstream = open(outfile,'a') if append else open(outfile,'w')
 			else:
-				outstream = VARout
+				outstream = sys.stdout
 		
 			self.__write_newick(self.ddpTree.seed_node,outstream)
 			outstream.write(";\n")
