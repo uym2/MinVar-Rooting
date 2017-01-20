@@ -103,6 +103,8 @@ class Tree_extend(object):
 		# the method provided by dendropy DOESN'T seem to work ...
 			head = edge.head_node
 			tail = edge.tail_node
+			if not tail:
+				return
 		
 			if not new_root:
 				#new_root = Node()		
