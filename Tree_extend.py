@@ -101,6 +101,8 @@ class Tree_extend(object):
 
 		def reroot_at_edge(self,edge,length1,length2,new_root=None):
 		# the method provided by dendropy DOESN'T seem to work ...
+			if not edge:
+				return
 			head = edge.head_node
 			tail = edge.tail_node
 			if not tail:
