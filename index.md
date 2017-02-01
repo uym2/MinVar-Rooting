@@ -5,5 +5,5 @@
 ### Datasets
 
 ### Contact
-Uyen Mai    umai@eng.ucsd.edu
-[Link](url) and ![Image](src)
+Uyen Mai    
+umai@eng.ucsd.edu
