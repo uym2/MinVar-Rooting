@@ -10,18 +10,22 @@ Complexity: the rooting methods are linear (with the number of species) in time 
 ## Usage:
 
 *
-FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
+python FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
 
-optional arguments:\\
-  -h, --help            show this help message and exit
+  -h, --help            show help message and exit
+  
   -i INPUT, --input INPUT
                         input file
+                        
   -m METHOD, --method METHOD
                         method: MP for midpoint and MV for minVAR
+                        
   -o OUTFILE, --outfile OUTFILE
                         specify output file
+                        
   -s SCHEMA, --schema SCHEMA
-                        schema of your input treefile. Default is newick
+                        schema of your input treefile. Default is Newick
+
 
 NOTE: FastRoot.py works with tree list. It will reroot all trees in the treefile by the method of your choice. 
 
