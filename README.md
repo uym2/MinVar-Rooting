@@ -30,13 +30,13 @@ python FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
 
 NOTE: FastRoot.py works with tree list. It will reroot all trees in the treefile by the method of your choice. 
 
-Besides, the following scripts might seem easier to use, but only work with single-tree input, and don't accept optional options.
+Besides, the following scripts might sometimes be more convenient, but only work with single-tree input, and don't accept optional options.
 
 **
 python MP_reroot.py \<tree_file_in_newick\>
 
 **
-python minVAR_reroot.py \<tree_file_in_newick\>
+python MV_reroot.py \<tree_file_in_newick\>
 
 ## Output:
 If you called FastRoot.py with -o, you know what you named the output. Otherwise, in the same directory as the input tree you will find the (re)rooted tree with the same name as the input with suffix MP_rooted or MV_rooted.
