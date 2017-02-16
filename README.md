@@ -27,6 +27,7 @@ python FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
                         schema of your input treefile. Default is Newick
 
 
+
 NOTE: FastRoot.py works with tree list. It will reroot all trees in the treefile by the method of your choice. 
 
 Besides, the following scripts might seem easier to use, but only work with single-tree input, and don't accept optional options.
