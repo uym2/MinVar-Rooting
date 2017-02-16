@@ -12,7 +12,7 @@ Complexity: the rooting methods are linear (with the number of species) in time 
 *
 FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
 
-optional arguments:
+optional arguments:\\
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         input file
