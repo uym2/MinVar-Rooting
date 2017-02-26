@@ -1,7 +1,7 @@
 ## Implementation
 This is a dendropy-based implementation for a new idea of rooting a phylogenetic tree, called the minVar (MV) root. Our rooting method roots the tree at the point that minimizes the variance of the root to tip distances. The code was designed to be easily generalized for a class of 'optimization-based' rooting methods (some of which are under developing), which includes a fast version of midpoint (MP) rooting as well.
 
-Complexity: the rooting methods are linear (with the number of species) in time and space.
+Complexity: the rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies:
 - python (version 2.7 recommended)
