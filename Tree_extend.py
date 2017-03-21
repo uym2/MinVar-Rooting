@@ -58,10 +58,13 @@ class Tree_extend(object):
 			tail_id = self.opt_root.parent_node.label if self.opt_root.parent_node else None
 			edge_length = self.opt_root.edge_length		
 
+			d2currRoot = 0
+			br2currRoot = 0
 			if self.opt_root != self.ddpTree.seed_node:
-				self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
+				d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
 			
-			return head_id, tail_id, edge_length, self.opt_x
+			#return head_id, tail_id, edge_length, self.opt_x
+			return d2currRoot,br2currRoot
 			
 		def Opt_function(self,node):
 			print("Abstract method! Should never be called")
@@ -122,6 +125,9 @@ class Tree_extend(object):
 
 			new_root.add_child(tail)
 			tail.edge_length=length1
+			
+			br2currRoot = 0
+			d2currRoot = length1
 
 			if tail == self.ddpTree.seed_node:
 				head = new_root
@@ -130,6 +136,9 @@ class Tree_extend(object):
 				head = tail
 				tail = p
 				p = tail.parent_node
+
+				br2currRoot += 1
+				d2currRoot += l
 
 				l1 = tail.edge_length
 				tail.remove_child(head)
@@ -150,6 +159,7 @@ class Tree_extend(object):
 			
 			new_root.label = self.ddpTree.seed_node.label
 			self.ddpTree.seed_node = new_root
+			return d2currRoot,br2currRoot
 
 		def get_root_idx(self):
 			return self.ddpTree.seed_node.idx
@@ -184,7 +194,7 @@ class MPR_Tree(Tree_extend):
 		def prepare_root(self):
 			pass
 
-class minVAR_Tree(Tree_extend):
+class MVR_Tree(Tree_extend):
 	# supportive class to implement VAR-reroot, hence the name
 		def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
 			if tree_file:
