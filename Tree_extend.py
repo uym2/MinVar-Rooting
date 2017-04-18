@@ -6,6 +6,7 @@ class Tree_extend(object):
 			if tree_file:
 				self.ddpTree = Tree.get_from_path(tree_file,schema)
 			else:
+				#self.ddpTree = copy.deepcopy(ddpTree)
 				self.ddpTree = ddpTree
 			self.Tree_records = Tree_records
 
@@ -173,7 +174,8 @@ class MPR_Tree(Tree_extend):
 			if tree_file:
 				self.ddpTree = Tree.get_from_path(tree_file,schema)
 			else:
-				self.ddpTree = copy.deepcopy(ddpTree)
+				#self.ddpTree = copy.deepcopy(ddpTree)
+				self.ddpTree = ddpTree
 			self.Tree_records = Tree_records
 			self.max_distance = -1
 			self.opt_root = self.ddpTree.seed_node
@@ -200,7 +202,8 @@ class MVR_Tree(Tree_extend):
 			if tree_file:
 				self.ddpTree = Tree.get_from_path(tree_file,schema)
 			else:
-				self.ddpTree = copy.deepcopy(ddpTree)
+				#self.ddpTree = copy.deepcopy(ddpTree)
+				self.ddpTree = ddpTree
 			self.Tree_records = Tree_records
 			self.minVAR = None
 			self.opt_root = self.ddpTree.seed_node
@@ -244,7 +247,8 @@ class MDR_Tree(Tree_extend):
                 if tree_file:
                         self.ddpTree = Tree.get_from_path(tree_file,schema)
                 else:
-                        self.ddpTree = copy.deepcopy(ddpTree)
+                        #self.ddpTree = copy.deepcopy(ddpTree)
+			self.ddpTree = ddpTree
                 self.Tree_records = Tree_records
                 self.min_MD = None
                 self.opt_root = self.ddpTree.seed_node
@@ -297,7 +301,8 @@ class MPR2_Tree(Tree_extend):
 			if tree_file:
 				self.ddpTree = Tree.get_from_path(tree_file,schema)
 			else:
-				self.ddpTree = copy.deepcopy(ddpTree)
+				#self.ddpTree = copy.deepcopy(ddpTree)
+				self.ddpTree = ddpTree
 			self.Tree_records = Tree_records
 			self.opt_score = None
 			self.opt_root = self.ddpTree.seed_node
