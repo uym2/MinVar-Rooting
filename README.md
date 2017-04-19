@@ -3,6 +3,10 @@ This is a dendropy-based implementation for a new idea of rooting a phylogenetic
 
 Complexity: the rooting methods are linear (with the number of species) in time and memory.
 
+## Pseudocode
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)
+
 ## Dependencies:
 - python (version 2.7 recommended)
 - dendropy (version 4.2.0 recommended)
@@ -25,7 +29,6 @@ Complexity: the rooting methods are linear (with the number of species) in time 
                         
   -s SCHEMA, --schema SCHEMA
                         schema of your input treefile. Default is Newick
-
 
 
 NOTE: FastRoot.py works with single tree only. 
