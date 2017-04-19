@@ -48,7 +48,7 @@ elif args["method"] == "MP2":
 else:
 	a_tree = None
 if a_tree is None:
-	print "Invalid method!"
+	print("Invalid method!")
 else:
 	#head_id, tail_id, edge_length, x = a_tree.Reroot()
 	d2currRoot, br2currRoot = a_tree.Reroot()
