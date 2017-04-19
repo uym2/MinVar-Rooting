@@ -3,10 +3,6 @@ This is a dendropy-based implementation for a new idea of rooting a phylogenetic
 
 Complexity: the rooting methods are linear (with the number of species) in time and memory.
 
-## Pseudocode
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)
-
 ## Dependencies:
 - python (version 2.7 recommended)
 - dendropy (version 4.2.0 recommended)
@@ -44,3 +40,10 @@ The following scripts might be more handy but only work with single-tree input, 
 ## Output:
 The FastRoot.py with -o will output to the specified destination. Without -o, it prints the tree to stdout. 
 The MP\_reroot.py and MV\_reroot.py will place the output in the same directory as the input tree with suffix MP\_rooted or MV\_rooted accordingly.
+
+## Pseudocode
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq4.png)
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq6.png)
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq7.png)
+![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)
