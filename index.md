@@ -1,5 +1,3 @@
-# Minimum variance rooting of phylogenetic trees and implications for species tree reconstruction
-
 ## Code repositories
 Github page for [the python code](https://github.com/uym2/MinVar-Rooting) for MV and MP. 
 
