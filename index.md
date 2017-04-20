@@ -12,7 +12,7 @@ Unrooted [true trees](https://drive.google.com/file/d/0B6VQuQbxaAq-bmx6NGdIb2JTZ
 and
 [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-X1BoWlZPLUZRbDg)
 
-rooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-QkhMbE40VFdjOVE) and [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-aW5QalAtZjJrN00)
+Rooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-QkhMbE40VFdjOVE) and [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-aW5QalAtZjJrN00)
 
 ### D2 dataset (2K & 5K taxon) 
 
