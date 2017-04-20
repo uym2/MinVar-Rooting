@@ -20,9 +20,9 @@ and
 
 Rooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-TVR3c2NsRkNDQWc) and [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-amU3RXRCZ3hVUEU)
 
-### D3 dataset 
+### D3 dataset (ASTRAL-II dataset)
 
-[ASTRAL-II data](http://www.cs.utexas.edu/~phylo/datasets/astral2/)
+[Unrooted trees](http://www.cs.utexas.edu/~phylo/datasets/astral2/)
 
 [Rooted trees](https://drive.google.com/open?id=0B6VQuQbxaAq-X25xUWlFYVJKN3M)
 
