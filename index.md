@@ -20,7 +20,7 @@ Unrooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-cDhYdGlJOWcw
 and
 [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-amU3RXRCZ3hVUEU)
 
-rooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-TVR3c2NsRkNDQWc) and [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-amU3RXRCZ3hVUEU)
+Rooted [true trees](https://drive.google.com/open?id=0B6VQuQbxaAq-TVR3c2NsRkNDQWc) and [estimated trees](https://drive.google.com/open?id=0B6VQuQbxaAq-amU3RXRCZ3hVUEU)
 
 ### D3 dataset 
 
