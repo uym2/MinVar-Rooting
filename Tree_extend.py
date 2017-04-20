@@ -239,6 +239,7 @@ class MVR_Tree(Tree_extend):
 			self.compute_dRoot_VAR()
 
 class MDR_Tree(Tree_extend):
+# OBSOLETE. Soon to be replaced with MBR_Tree
 # supportive class to implement mean difference root (mdr = mean difference reroot, hence the name)
         def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
                 if tree_file:
@@ -258,6 +259,7 @@ class MDR_Tree(Tree_extend):
 		mean_in = sum(self.Tree_records[node.idx].sum_in)/nleaf
         	mean_out = self.Tree_records[node.idx].sum_out/(MDR_Node_record.total_leaves-nleaf)         
 		x = (mean_out - mean_in)/2 
+		print(x)
                 if x < 0:
 			x = 0
 		elif x > node.edge_length:
@@ -284,11 +286,69 @@ class MDR_Tree(Tree_extend):
         def prepare_root(self):
 		ridx = self.get_root_idx()
                 self.Tree_records[ridx].sum_out = 0
-		#child_idx = 0
-		#means = []
-		#for child in self.get_root().child_node_iter():
-		#	means.append(self.Tree_records[ridx].sum_in[child_idx]/self.Tree_records[child.idx].nleaf)
-		#self.min_MD = abs(means[0]-means[1]) # temporary solution: assume 
+
+
+class MBR_Tree(Tree_extend):
+# supportive class to implement midpoint balance root 
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+                if tree_file:
+                        self.ddpTree = Tree.get_from_path(tree_file,schema)
+                else:
+                        #self.ddpTree = copy.deepcopy(ddpTree)
+			self.ddpTree = ddpTree
+
+                self.Tree_records = Tree_records
+                #self.min_MD = None
+		self.BPs = [] # BPs = balance points
+                self.opt_root = self.ddpTree.seed_node
+                self.opt_x = 0
+
+        def New_record(self):
+                return MBR_Node_record()
+
+        def Opt_function(self,node):
+		nleaf = self.Tree_records[node.idx].nleaf
+		mean_in = sum(self.Tree_records[node.idx].sum_in)/nleaf
+        	mean_out = self.Tree_records[node.idx].sum_out/(MBR_Node_record.total_leaves-nleaf)         
+		x = (mean_out - mean_in)/2
+		#print(x) 
+                #if x < 0:
+		#	x = 0
+		#elif x > node.edge_length:
+		#	x = node.edge_length
+                #curr_MD = abs(mean_out-mean_in-2*x)
+		
+		#if self.min_MD is None or curr_MD < self.min_MD: 
+			#self.min_MD = curr_MD
+                        #self.opt_x = x
+                        #self.opt_root = node
+		if x >= 0 and x <= node.edge_length:
+			self.BPs.append((node,x))
+
+	def diff_of_means(self):
+		self.Bottomup_update()
+		ridx = self.get_root_idx()
+                
+		child_idx = 0
+                means = []
+                for child in self.get_root().child_node_iter():
+                	means.append(self.Tree_records[ridx].sum_in[child_idx]/self.Tree_records[child.idx].nleaf)
+			child_idx += 1
+		return abs(means[0]-means[1])
+
+
+        def prepare_root(self):
+		ridx = self.get_root_idx()
+                self.Tree_records[ridx].sum_out = 0
+
+	
+	def list_balance_points(self):
+		self.Bottomup_update()
+		self.prepare_root()
+		self.Topdown_update()
+
+		for item in self.BPs:
+			print(str(item[0].label) + "\t" + str(item[1]) + "\n")
 
 
 class MPR2_Tree(Tree_extend):
@@ -471,6 +531,7 @@ class minVAR_Node_record(Node_record):
 
 
 class MDR_Node_record(Node_record):
+# OBSOLETE! This will be replaced by the MBR (midpoint balance root) soon.
 # supportive class to implement mean-difference reroot (mdr = mean difference reroot, hence the name)
 	total_leaves = 0
 	def __init__(self,nleaf=1,sum_in=[0,0],sum_out=-1):
@@ -496,6 +557,35 @@ class MDR_Node_record(Node_record):
 			Tree_records[child.idx].sum_out = self.sum_out + sum([self.sum_in[k] for k in range(len(self.sum_in)) if k != child_idx]) + (MDR_Node_record.total_leaves - Tree_records[child.idx].nleaf)*child.edge_length
 			opt_function(child)
 			child_idx = child_idx+1
+
+
+class MBR_Node_record(Node_record):
+# supportive class to implement midpoint balance 
+	total_leaves = 0
+	def __init__(self,nleaf=1,sum_in=[0,0],sum_out=-1):
+		self.nleaf = nleaf
+		self.sum_in = sum_in
+		self.sum_out = sum_out
+
+	def Bottomup_update(self,node,Tree_records):
+		if node.is_leaf():
+			self.nleaf = 1
+			self.sum_in = [0,0]
+		else:
+			self.nleaf = 0
+			self.sum_in=[]
+			for child in node.child_node_iter():
+				self.nleaf += Tree_records[child.idx].nleaf
+				s = sum(Tree_records[child.idx].sum_in) + Tree_records[child.idx].nleaf*child.edge_length
+				self.sum_in.append(s)	
+			MBR_Node_record.total_leaves = max(MBR_Node_record.total_leaves,self.nleaf)	
+	def Topdown_update(self,node,Tree_records,opt_function):
+		child_idx = 0
+		for child in node.child_node_iter():	
+			Tree_records[child.idx].sum_out = self.sum_out + sum([self.sum_in[k] for k in range(len(self.sum_in)) if k != child_idx]) + (MBR_Node_record.total_leaves - Tree_records[child.idx].nleaf)*child.edge_length
+			opt_function(child)
+			child_idx = child_idx+1
+
 
 class MPR2_Node_record(Node_record):
 # supportive class to implement MPR2
