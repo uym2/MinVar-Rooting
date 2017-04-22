@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# usage: python MP_reroot.py <tree_file>
+# usage: python LabelTree.py <tree_file>
 
 import os
 from Tree_extend import Tree_extend
