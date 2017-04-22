@@ -84,8 +84,10 @@ class Tree_extend(object):
 
         def __write_newick(self,node,outstream):
             if node.is_leaf():
+                try:
                     outstream.write(node.taxon.label)
-                    #outstream.write(str(node.label))
+                except:
+                    outstream.write(str(node.label))
             else:
                 outstream.write('(')
                 is_first_child = True
@@ -313,7 +315,7 @@ class MBR_Tree(Tree_extend):
             mean_out = self.Tree_records[node.idx].sum_out/(self.total_leaves-nleaf)         
             x = (mean_out - mean_in)/2
             if x >= 0 and x <= node.edge_length:
-                self.BPs.append((node,x))
+                self.BPs.append((node,x,mean_in+x))
                 node.x = x
                 node.mean = mean_in + x
             else:
@@ -346,11 +348,11 @@ class MBR_Tree(Tree_extend):
             self.prepare_root()
             self.Topdown_update()
  
-            for (node,x) in self.BPs:
+            for (node,x,mean) in self.BPs:
                 if node.is_leaf():
-                    print(node.taxon.label + "\t" + str(x) + "\n")
+                    print(node.taxon.label + "\t" + str(x) + "\t" + str(mean))
                 else:
-                    print(node.label + "\t" + str(x) + "\n")
+                    print(node.label + "\t" + str(x) + "\t" + str(mean))
 
         def build_balance_tree(self):
             #self.Topdown_label()
@@ -397,6 +399,9 @@ class MBR_Tree(Tree_extend):
                             p = self.ddpTree.node_factory()
                             ch1 = self.ddpTree.node_factory()
 
+                            p.label = "bp" # bp: balance-point
+                            ch1.label = "dm" # dm: dummy
+
                             #node.remove_child(ch)
                             node.add_child(p)
                             p.add_child(ch1)
@@ -415,6 +420,9 @@ class MBR_Tree(Tree_extend):
                         p = self.ddpTree.node_factory()
                         ch1 = self.ddpTree.node_factory()
 
+                        p.label = "bp"
+                        ch1.label = "dm"
+
                         node.remove_child(ch)
                         node.add_child(p)
                         p.add_child(ch)
@@ -423,11 +431,6 @@ class MBR_Tree(Tree_extend):
                         ch.edge_length = ch.extraction_source.x
                         p.edge_length = edgelen - ch.extraction_source.x
                         ch1.edge_length = ch.extraction_source.mean 
-
-                #if node.is_leaf():
-                #    print(str(node.BPbelow) + "\t" + node.taxon.label)
-                #else:
-                #    print(str(node.BPbelow) + "\t" + node.label)
 
             # topdown pruning
             node = balance_tree.seed_node
@@ -440,6 +443,11 @@ class MBR_Tree(Tree_extend):
                 nchild = len(node.child_nodes())
 
             balance_tree.seed_node = node
+            balance_tree.seed_node.edge_length = None
+            #balance_tree.seed_node.edge = None
+           
+            mptre = MPR_Tree(ddpTree=balance_tree)
+            mptre.tree_as_newick()
             
             return balance_tree    
 
