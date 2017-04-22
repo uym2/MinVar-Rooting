@@ -29,8 +29,8 @@ schema=args["schema"] if args["schema"] else "newick"
 if args["outfile"]:
 	outfile = args["outfile"]
 else:
-	outfile = base_name + "_labeled" + ext
-
+	#outfile = base_name + "_labeled" + ext
+        outfile = None
 try:
 	os.remove(outfile)
 except:
