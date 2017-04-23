@@ -3,7 +3,7 @@
 # usage: python MP_reroot.py <tree_file>
 
 import os
-from Tree_extend import MPR_Tree,MVR_Tree,MDR_Tree,MPR2_Tree
+from Tree_extend import MPR_Tree,MVR_Tree,MDR_Tree,MPR2_Tree,MBR_Tree
 try:
 	from dendropy4 import Tree,TreeList
 except:
@@ -43,6 +43,8 @@ elif args["method"] == "MD":
 	a_tree = MDR_Tree(ddpTree=tree)
 elif args["method"] == "MV":
 	a_tree = MVR_Tree(ddpTree=tree)
+elif args["method"] == "MB":
+	a_tree = MBR_Tree(ddpTree=tree)
 elif args["method"] == "MP2":
 	a_tree = MPR2_Tree(ddpTree=tree)
 else:
