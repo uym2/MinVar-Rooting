@@ -46,17 +46,27 @@ class Tree_extend(object):
             for node in self.ddpTree.preorder_node_iter():
                 self.Tree_records[node.idx].Topdown_update(node,self.Tree_records,self.Opt_function,self)
 
-        def Reroot(self):
+        def find_root(self):
+            self.Topdown_label() # temporarily included for debugging
             self.Bottomup_update()
             self.prepare_root()
             self.Topdown_update()
 
-            if self.opt_root.is_leaf():
-                head_id = self.opt_root.taxon.label
-            else:
-                head_id = self.opt_root.label
-            tail_id = self.opt_root.parent_node.label if self.opt_root.parent_node else None
-            edge_length = self.opt_root.edge_length        
+        def Reroot(self):
+            #self.Bottomup_update()
+            #self.prepare_root()
+            #self.Topdown_update()
+            
+            self.find_root()
+            
+
+            #if self.opt_root.is_leaf():
+            #    head_id = self.opt_root.taxon.label
+            #else:
+            #    head_id = self.opt_root.label
+
+            #tail_id = self.opt_root.parent_node.label if self.opt_root.parent_node else None
+            #edge_length = self.opt_root.edge_length        
 
             d2currRoot = 0
             br2currRoot = 0
@@ -131,10 +141,11 @@ class Tree_extend(object):
             br2currRoot = 0
             d2currRoot = length1
 
-            if tail == self.ddpTree.seed_node:
+            if tail.label == self.ddpTree.seed_node.label:
                 head = new_root
 
-            while tail != self.ddpTree.seed_node:
+
+            while tail.label != self.ddpTree.seed_node.label:
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -152,13 +163,15 @@ class Tree_extend(object):
             # out of while loop: tail IS now tree.seed_node
             if tail.num_child_nodes() < 2:
                 # merge the 2 branches of the old root and adjust the branch length
-                sis = [child for child in tail.child_node_iter()][0]
+                #sis = [child for child in tail.child_node_iter()][0]
+                sis = tail.child_nodes()[0]
                 l = sis.edge_length
                 tail.remove_child(sis)    
                 head.add_child(sis)
                 sis.edge_length=l+tail.edge_length
                 head.remove_child(tail)
-            
+                #tail.remove_child(head)
+
             new_root.label = self.ddpTree.seed_node.label
             self.ddpTree.seed_node = new_root
             return d2currRoot,br2currRoot
@@ -355,17 +368,18 @@ class MBR_Tree(Tree_extend):
                     print(node.label + "\t" + str(x) + "\t" + str(mean))
 
         def build_balance_tree(self):
-            #self.Topdown_label()
-            #self.Bottomup_update()
-            #self.prepare_root()
-            #self.Topdown_update()
+            self.Topdown_label() # keep this step for now for debugging purpose
+            self.Bottomup_update()
+            self.prepare_root()
+            self.Topdown_update()
             
-            self.list_balance_points()
+            #self.list_balance_points()
             
-            balance_tree = self.ddpTree.extract_tree()
+            self.balance_tree = self.ddpTree.extract_tree()
             
             # bottom up pruning
-            for node in balance_tree.postorder_node_iter():    
+            for node in self.balance_tree.postorder_node_iter():    
+                node.type = "real"
                 node.BPbelow = False
                 
                 '''if node.is_leaf():
@@ -399,8 +413,9 @@ class MBR_Tree(Tree_extend):
                             p = self.ddpTree.node_factory()
                             ch1 = self.ddpTree.node_factory()
 
-                            p.label = "bp" # bp: balance-point
-                            ch1.label = "dm" # dm: dummy
+                            p.type = "bp" # bp: balance-point
+                            p.ref_child = ch.extraction_source # link p to the original tree (for later use after finding midpoint)
+                            ch1.type = "dm" # dm: dummy
 
                             #node.remove_child(ch)
                             node.add_child(p)
@@ -420,8 +435,9 @@ class MBR_Tree(Tree_extend):
                         p = self.ddpTree.node_factory()
                         ch1 = self.ddpTree.node_factory()
 
-                        p.label = "bp"
-                        ch1.label = "dm"
+                        p.type = "bp"
+                        p.ref_child = ch.extraction_source # link p to the original tree (for later use after finding midpoint)
+                        ch1.type = "dm"
 
                         node.remove_child(ch)
                         node.add_child(p)
@@ -433,23 +449,46 @@ class MBR_Tree(Tree_extend):
                         ch1.edge_length = ch.extraction_source.mean 
 
             # topdown pruning
-            node = balance_tree.seed_node
+            node = self.balance_tree.seed_node
             nchild = len(node.child_nodes())
             while nchild > 0 and nchild < 2:
                 # node has less than 2 children
                 temp = node
                 node = node.child_nodes()[0]
                 temp.remove_child(node)
+                if node.type == "dm":
+                    node = temp
+                    break
                 nchild = len(node.child_nodes())
 
-            balance_tree.seed_node = node
-            balance_tree.seed_node.edge_length = None
+            self.balance_tree.seed_node = node
+            self.balance_tree.seed_node.edge_length = None
             #balance_tree.seed_node.edge = None
            
-            mptre = MPR_Tree(ddpTree=balance_tree)
-            mptre.tree_as_newick()
+            #mptre = MPR_Tree(ddpTree=balance_tree)
+            #mptre.tree_as_newick()
             
-            return balance_tree    
+            #return balance_tree    
+
+        def find_root(self):
+            self.build_balance_tree()
+            mptre = MPR_Tree(ddpTree=self.balance_tree)
+            mptre.tree_as_newick()
+            mptre.find_root()
+
+            print(mptre.opt_root.type)
+
+            if mptre.opt_root.type == "bp":
+                self.opt_root = mptre.opt_root.ref_child
+                self.opt_x = mptre.opt_root.ref_child.x + mptre.opt_x
+            elif mptre.opt_root.type == "dm":
+                print("Hmm... Is it possible that a dummy was found as the opt_root?")
+            else:
+                self.opt_root = mptre.opt_root.extraction_source
+                self.opt_x = mptre.opt_x
+
+            print(self.opt_root.label)
+            print(self.opt_x)
 
 class MPR2_Tree(Tree_extend):
     # supportive class to implement MP2 rooting (extension of midpoint)
