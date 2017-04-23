@@ -22,10 +22,10 @@ case $key in
     outtree="$2"
     shift # past argument
     ;;
-#    -f|--info)
-#    outinfo="$2"
-#    shift # past argument
-#    ;;
+    -f|--info)
+    outinfo="$2"
+    shift # past argument
+    ;;
     --default)
     DEFAULT=YES
     ;;
@@ -42,12 +42,13 @@ done
 
 temp_in=`mktemp tmp-XXXXX`
 temp_out=`mktemp tmp-XXXXX`
-#temp_info=`mktemp tmp-XXXXX`
+temp_info=`mktemp tmp-XXXXX`
 
 
 while read l; do 
 	echo $l > $temp_in
-	FastRoot.py -i $temp_in -m $method -o $temp_out
+	FastRoot.py -i $temp_in -m $method -o $temp_out -f $temp_info
 	cat $temp_out >> $outtree
-	rm $temp_in $temp_out
+	cat $temp_info >> $outinfo
+	rm $temp_in $temp_out $temp_info
 done < $intree
