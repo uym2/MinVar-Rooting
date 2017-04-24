@@ -3,12 +3,12 @@ import copy
 import sys
 
 class Tree_extend(object):
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
                 if tree_file:
                     self.ddpTree = Tree.get_from_path(tree_file,schema)
                 else:
                     self.ddpTree = ddpTree
-                self.Tree_records = Tree_records
+                self.Tree_records = Tree_records if Tree_records else []
 
         def New_record(self):
                 print("Abstract method! Should never be called!")
@@ -184,12 +184,12 @@ class Tree_extend(object):
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 self.ddpTree = copy.deepcopy(ddpTree)
-            self.Tree_records = Tree_records
+            self.Tree_records = Tree_records if Tree_records else []
             self.max_distance = -1
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
@@ -216,7 +216,7 @@ class MVR_Tree(Tree_extend):
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 self.ddpTree = copy.deepcopy(ddpTree)
-            self.Tree_records = Tree_records
+            self.Tree_records = Tree_records if Tree_records else []
             self.minVAR = None
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
@@ -307,14 +307,14 @@ class MDR_Tree(Tree_extend):
 
 class MBR_Tree(Tree_extend):
 # supportive class to implement midpoint balance root 
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
             if tree_file:
                     self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                     #self.ddpTree = copy.deepcopy(ddpTree)
                     self.ddpTree = ddpTree
 
-            self.Tree_records = Tree_records
+            self.Tree_records = Tree_records if Tree_records else []
             self.BPs = [] # BPs : balance points
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
