@@ -1,6 +1,7 @@
 from dendropy import Tree,Node
 import copy
 import sys
+import math
 
 class Tree_extend(object):
         def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
@@ -55,23 +56,26 @@ class Tree_extend(object):
         def filter_branch(self,threshold=None):
             # filter out abnormally long branches
             self.Reroot()
-            while self.__filter_by_threshold(threshold=threshold):
+            while self.filter_by_threshold(threshold=threshold):
                     self.Reroot()
-           
-        def __filter_by_threshold(threshold=None):
+        def filter_by_threshold(self,threshold=None):
             if threshold is None:
-                threshold = self.__compute_threshold()
+                threshold = self.compute_threshold()
+            
             def __filter(node,cumm_l):
                 node.child_removed = False
+                removed = False
                 for child in node.child_nodes():
                     __filter(child,cumm_l+child.edge_length)
                 
-                p = node.parent_node()
+                p = node.parent_node
                 if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
                     # remove node
                     p.remove_child(node)
                     # update parent node
                     p.child_removed = True
+                    removed = True
+                    print(node.name + " removed")
                    
                 elif len(node.child_nodes()) == 1:
                     # remove node and attach its only child to its parent
@@ -83,9 +87,9 @@ class Tree_extend(object):
                     p.add_child(child)
                     child.edge_length = e1 + e2 
 
-            __filter(self.get_root(),0)           
+            return __filter(self.get_root(),0)           
 
-        def __compute_threhold(self,k=4):
+        def compute_threhold(self,k=4):
             print("Abstract class! Should never be called")
             return 0
 
@@ -237,7 +241,7 @@ class MPR_Tree(Tree_extend):
         def prepare_root(self):
             pass
         
-        def __compute_threhold(self,k=4):
+        def compute_threhold(self,k=4):
             print("We don't do thresholding for MPR_Tree. How come it got here?")
             return 0
 
@@ -286,9 +290,9 @@ class MVR_Tree(Tree_extend):
             self.compute_dRoot_VAR()
             self.total_leaves = self.Tree_records[self.get_root_idx()].nleaf
         
-        def __compute_threhold(self,k=4):
+        def compute_threshold(self,k=4):
             # should be called only AFTER the MV root was found
-            mean = self.Tree_records[self.get_root_idx()].sum_total/self.total_leaves
+            mean = self.Tree_records[self.opt_root.idx].sum_total/self.total_leaves + self.opt_x
             std = math.sqrt(self.minVAR)
             return mean + k*std
 
@@ -374,7 +378,7 @@ class MBR_Tree(Tree_extend):
                 node.x = None
                 node.mean = None
 
-        def __compute_threhold(self,k=4):
+        def compute_threhold(self,k=4):
             print("MBR_Tree filtering is not yet implemented. Please try again later!")
             return 0
 
