@@ -18,9 +18,9 @@ class Tree_extend(object):
                 i = 0    
                 for node in self.ddpTree.postorder_node_iter():
                     if not node.is_leaf():
-                        node.label = 'I'+str(i)
+                        node.name = 'I'+str(i)
                     else:
-                        node.label = 'L'+str(i)
+                        node.name = 'L'+str(i)
                     i = i+1
         
         def Topdown_label(self):
@@ -28,9 +28,9 @@ class Tree_extend(object):
             i = 0    
             for node in self.ddpTree.preorder_node_iter():
                 if not node.is_leaf():
-                    node.label = 'I'+str(i)
+                    node.name = 'I'+str(i)
                 else:
-                    node.label = 'L'+str(i)
+                    node.name = 'L'+str(i)
                 i = i+1
 
         def Bottomup_update(self):
@@ -52,6 +52,43 @@ class Tree_extend(object):
             self.prepare_root()
             self.Topdown_update()
 
+        def filter_branch(self,threshold=None):
+            # filter out abnormally long branches
+            self.Reroot()
+            while self.__filter_by_threshold(threshold=threshold):
+                    self.Reroot()
+           
+        def __filter_by_threshold(threshold=None):
+            if threshold is None:
+                threshold = self.__compute_threshold()
+            def __filter(node,cumm_l):
+                node.child_removed = False
+                for child in node.child_nodes():
+                    __filter(child,cumm_l+child.edge_length)
+                
+                p = node.parent_node()
+                if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
+                    # remove node
+                    p.remove_child(node)
+                    # update parent node
+                    p.child_removed = True
+                   
+                elif len(node.child_nodes()) == 1:
+                    # remove node and attach its only child to its parent
+                    e1 = node.edge_length
+                    child = node.child_nodes()[0]
+                    e2 = child.edge_length
+                    node.remove_child(child)
+                    p.remove_child(node)
+                    p.add_child(child)
+                    child.edge_length = e1 + e2 
+
+            __filter(self.get_root(),0)           
+
+        def __compute_threhold(self,k=4):
+            print("Abstract class! Should never be called")
+            return 0
+
         def Reroot(self):
             #self.Bottomup_update()
             #self.prepare_root()
@@ -59,15 +96,6 @@ class Tree_extend(object):
             
             self.find_root()
             
-
-            #if self.opt_root.is_leaf():
-            #    head_id = self.opt_root.taxon.label
-            #else:
-            #    head_id = self.opt_root.label
-
-            #tail_id = self.opt_root.parent_node.label if self.opt_root.parent_node else None
-            #edge_length = self.opt_root.edge_length        
-
             d2currRoot = 0
             br2currRoot = 0
             if self.opt_root != self.ddpTree.seed_node:
@@ -141,11 +169,11 @@ class Tree_extend(object):
             br2currRoot = 0
             d2currRoot = length1
 
-            if tail.label == self.ddpTree.seed_node.label:
+            if tail.name == self.ddpTree.seed_node.name:
                 head = new_root
 
 
-            while tail.label != self.ddpTree.seed_node.label:
+            while tail.name != self.ddpTree.seed_node.name:
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -172,7 +200,7 @@ class Tree_extend(object):
                 head.remove_child(tail)
                 #tail.remove_child(head)
 
-            new_root.label = self.ddpTree.seed_node.label
+            new_root.name = self.ddpTree.seed_node.name
             self.ddpTree.seed_node = new_root
             return d2currRoot,br2currRoot
 
@@ -208,6 +236,10 @@ class MPR_Tree(Tree_extend):
 
         def prepare_root(self):
             pass
+        
+        def __compute_threhold(self,k=4):
+            print("We don't do thresholding for MPR_Tree. How come it got here?")
+            return 0
 
 class MVR_Tree(Tree_extend):
     # supportive class to implement VAR-reroot, hence the name
@@ -253,6 +285,12 @@ class MVR_Tree(Tree_extend):
             self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
             self.compute_dRoot_VAR()
             self.total_leaves = self.Tree_records[self.get_root_idx()].nleaf
+        
+        def __compute_threhold(self,k=4):
+            # should be called only AFTER the MV root was found
+            mean = self.Tree_records[self.get_root_idx()].sum_total/self.total_leaves
+            std = math.sqrt(self.minVAR)
+            return mean + k*std
 
 class MDR_Tree(Tree_extend):
 # OBSOLETE. Soon to be replaced with MBR_Tree
@@ -324,7 +362,8 @@ class MBR_Tree(Tree_extend):
 
         def Opt_function(self,node):
             nleaf = self.Tree_records[node.idx].nleaf
-            mean_in = sum(self.Tree_records[node.idx].sum_in)/nleaf
+            #mean_in = sum(self.Tree_records[node.idx].sum_in)/nleaf
+            mean_in = self.Tree_records[node.idx].sum_in/nleaf
             mean_out = self.Tree_records[node.idx].sum_out/(self.total_leaves-nleaf)         
             x = (mean_out - mean_in)/2
             if x >= 0 and x <= node.edge_length:
@@ -334,6 +373,10 @@ class MBR_Tree(Tree_extend):
             else:
                 node.x = None
                 node.mean = None
+
+        def __compute_threhold(self,k=4):
+            print("MBR_Tree filtering is not yet implemented. Please try again later!")
+            return 0
 
         def diff_of_means(self):
             self.Bottomup_update()
@@ -356,6 +399,7 @@ class MBR_Tree(Tree_extend):
 
     
         def list_balance_points(self):
+            # mostly for debugging purposes
             self.Topdown_label()
             self.Bottomup_update()
             self.prepare_root()
@@ -363,9 +407,9 @@ class MBR_Tree(Tree_extend):
  
             for (node,x,mean) in self.BPs:
                 if node.is_leaf():
-                    print(node.taxon.label + "\t" + str(x) + "\t" + str(mean))
+                    print(node.taxon.name + "\t" + str(x) + "\t" + str(mean))
                 else:
-                    print(node.label + "\t" + str(x) + "\t" + str(mean))
+                    print(node.name + "\t" + str(x) + "\t" + str(mean))
 
         def build_balance_tree(self):
             self.Topdown_label() # keep this step for now for debugging purpose
@@ -383,15 +427,15 @@ class MBR_Tree(Tree_extend):
                 node.BPbelow = False
                 
                 '''if node.is_leaf():
-                    print("parent: " + node.taxon.label)# + "\t" + str(node.extraction_source.x))
+                    print("parent: " + node.taxon.name)# + "\t" + str(node.extraction_source.x))
                 else:
-                    print("parent: " + node.label)#+ "\t" + str(node.extraction_source.x))'''
+                    print("parent: " + node.name)#+ "\t" + str(node.extraction_source.x))'''
 
                 for ch in node.child_nodes():
                     '''try:
-                        print("child: " + ch.taxon.label)# + "\t" + str(ch.extraction_source.x))
+                        print("child: " + ch.taxon.name)# + "\t" + str(ch.extraction_source.x))
                     except:
-                        print("child: " + ch.label) #+ "\t" + str(ch.extraction_source.x))'''
+                        print("child: " + ch.name) #+ "\t" + str(ch.extraction_source.x))'''
                     
                     if ch.BPbelow or (ch.extraction_source.x is not None):
                         node.BPbelow = True
@@ -487,7 +531,7 @@ class MBR_Tree(Tree_extend):
                 self.opt_root = mptre.opt_root.extraction_source
                 self.opt_x = mptre.opt_x
 
-            print(self.opt_root.label)
+            print(self.opt_root.name)
             print(self.opt_x)
 
 class MPR2_Tree(Tree_extend):
@@ -699,7 +743,8 @@ class MDR_Node_record(Node_record):
 class MBR_Node_record(Node_record):
 # supportive class to implement midpoint balance 
     #total_leaves = 0
-    def __init__(self,nleaf=1,sum_in=[0,0],sum_out=-1):
+    #def __init__(self,nleaf=1,sum_in=[0,0],sum_out=-1):
+    def __init__(self,nleaf=1,sum_in=0,sum_out=-1):
         #total_leaves = 0
         self.nleaf = nleaf
         self.sum_in = sum_in
@@ -708,19 +753,23 @@ class MBR_Node_record(Node_record):
     def Bottomup_update(self,node,Tree_records):
         if node.is_leaf():
             self.nleaf = 1
-            self.sum_in = [0,0]
+            #self.sum_in = [0,0]
+            self.sum_in = 0
         else:
             self.nleaf = 0
-            self.sum_in=[]
+            #self.sum_in=[]
+            self.sum_in = 0
             for child in node.child_node_iter():
                 self.nleaf += Tree_records[child.idx].nleaf
-                s = sum(Tree_records[child.idx].sum_in) + Tree_records[child.idx].nleaf*child.edge_length
-                self.sum_in.append(s)    
+                #s = sum(Tree_records[child.idx].sum_in) + Tree_records[child.idx].nleaf*child.edge_length
+                #self.sum_in.append(s)    
+                self.sum_in += Tree_records[child.idx].sum_in + Tree_records[child.idx].nleaf*child.edge_length
             #Tree.total_leaves = max(Tree.total_leaves,self.nleaf)    
     def Topdown_update(self,node,Tree_records,opt_function,Tree):
         child_idx = 0
         for child in node.child_node_iter():    
-            Tree_records[child.idx].sum_out = self.sum_out + sum([self.sum_in[k] for k in range(len(self.sum_in)) if k != child_idx]) + (Tree.total_leaves - Tree_records[child.idx].nleaf)*child.edge_length
+            #Tree_records[child.idx].sum_out = self.sum_out + sum([self.sum_in[k] for k in range(len(self.sum_in)) if k != child_idx]) + (Tree.total_leaves - Tree_records[child.idx].nleaf)*child.edge_length
+            Tree_records[child.idx].sum_out = self.sum_out + self.sum_in + child.edge_length*(Tree.total_leaves - 2*Tree_records[child.idx].nleaf) - Tree_records[child.idx].sum_in
             opt_function(child)
             child_idx = child_idx+1
 
