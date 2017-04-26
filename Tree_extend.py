@@ -47,26 +47,33 @@ class Tree_extend(object):
             for node in self.ddpTree.preorder_node_iter():
                 self.Tree_records[node.idx].Topdown_update(node,self.Tree_records,self.Opt_function,self)
 
-        def find_root(self):
-            self.Topdown_label() # temporarily included for debugging
-            self.Bottomup_update()
-            self.prepare_root()
-            self.Topdown_update()
 
         def filter_branch(self,threshold=None):
             # filter out abnormally long branches
+            i=1
+            print("Iteration: " + str(i))
             self.Reroot()
-            while self.filter_by_threshold(threshold=threshold):
+            while 1:
+                    check = self.filter_by_threshold(threshold=threshold)
+                    if (not check):
+                        print("I could not remove anything more! I stop here!")
+                        break
+                    i += 1
+                    print("Itertation: " + str(i))
+                    self.reset()
                     self.Reroot()
+                    print(len(self.Tree_records))
+
         def filter_by_threshold(self,threshold=None):
             if threshold is None:
-                threshold = self.compute_threshold()
+                threshold = self.compute_threshold(k=4)
             
             def __filter(node,cumm_l):
-                node.child_removed = False
                 removed = False
+                node.child_removed = False
                 for child in node.child_nodes():
-                    __filter(child,cumm_l+child.edge_length)
+                    check = __filter(child,cumm_l+child.edge_length)
+                    removed = removed or check
                 
                 p = node.parent_node
                 if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
@@ -75,7 +82,10 @@ class Tree_extend(object):
                     # update parent node
                     p.child_removed = True
                     removed = True
-                    print(node.name + " removed")
+                    try:
+                        print(node.taxon.label + " removed")
+                    except:
+                        print(node.name + " removed")
                    
                 elif len(node.child_nodes()) == 1:
                     # remove node and attach its only child to its parent
@@ -85,19 +95,31 @@ class Tree_extend(object):
                     node.remove_child(child)
                     p.remove_child(node)
                     p.add_child(child)
-                    child.edge_length = e1 + e2 
-
-            return __filter(self.get_root(),0)           
+                    child.edge_length = e1 + e2
+                return removed  
+            
+            return __filter(self.get_root(),0)         
 
         def compute_threhold(self,k=4):
             print("Abstract class! Should never be called")
             return 0
 
+        def find_root(self):
+            self.Topdown_label() # temporarily included for debugging
+            self.Bottomup_update()
+            self.prepare_root()
+            self.Topdown_update()
+       
+        def reset(self):
+            self.minVAR = None
+            self.opt_root = self.get_root()
+            self.opt_x = None
+            self.Tree_records = []
+
         def Reroot(self):
             #self.Bottomup_update()
             #self.prepare_root()
             #self.Topdown_update()
-            
             self.find_root()
             
             d2currRoot = 0
@@ -247,7 +269,7 @@ class MPR_Tree(Tree_extend):
 
 class MVR_Tree(Tree_extend):
     # supportive class to implement VAR-reroot, hence the name
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
@@ -287,24 +309,26 @@ class MVR_Tree(Tree_extend):
 
         def prepare_root(self):
             self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
-            self.compute_dRoot_VAR()
             self.total_leaves = self.Tree_records[self.get_root_idx()].nleaf
+            self.compute_dRoot_VAR()
         
         def compute_threshold(self,k=4):
             # should be called only AFTER the MV root was found
-            mean = self.Tree_records[self.opt_root.idx].sum_total/self.total_leaves + self.opt_x
+            mean = (self.Tree_records[self.opt_root.idx].sum_total - self.opt_x*(self.total_leaves-2*self.Tree_records[self.opt_root.idx].nleaf))/self.total_leaves
+            print(mean)
+            print(self.minVAR)
             std = math.sqrt(self.minVAR)
             return mean + k*std
 
 class MDR_Tree(Tree_extend):
 # OBSOLETE. Soon to be replaced with MBR_Tree
 # supportive class to implement mean difference root (mdr = mean difference reroot, hence the name)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
                 if tree_file:
                         self.ddpTree = Tree.get_from_path(tree_file,schema)
                 else:
                         self.ddpTree = copy.deepcopy(ddpTree)
-                self.Tree_records = Tree_records
+                self.Tree_records = Tree_records if Tree_records else []
                 self.min_MD = None
                 self.opt_root = self.ddpTree.seed_node
                 self.opt_x = 0
@@ -382,7 +406,7 @@ class MBR_Tree(Tree_extend):
             print("MBR_Tree filtering is not yet implemented. Please try again later!")
             return 0
 
-        def diff_of_means(self):
+        '''def diff_of_means(self):
             self.Bottomup_update()
             ridx = self.get_root_idx()
                     
@@ -392,7 +416,7 @@ class MBR_Tree(Tree_extend):
                 means.append(self.Tree_records[ridx].sum_in[child_idx]/self.Tree_records[child.idx].nleaf)
                 child_idx += 1
             return abs(means[0]-means[1])
-
+        '''
 
         def prepare_root(self):
             ridx = self.get_root_idx()
@@ -540,12 +564,12 @@ class MBR_Tree(Tree_extend):
 
 class MPR2_Tree(Tree_extend):
     # supportive class to implement MP2 rooting (extension of midpoint)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 self.ddpTree = copy.deepcopy(ddpTree)
-            self.Tree_records = Tree_records
+            self.Tree_records = Tree_records if Tree_records else []
             self.opt_score = None
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
