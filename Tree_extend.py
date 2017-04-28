@@ -48,6 +48,18 @@ class Tree_extend(object):
                 self.Tree_records[node.idx].Topdown_update(node,self.Tree_records,self.Opt_function,self)
 
 
+        def compute_distances(self):
+            D = {}
+            def __compute_dRoot(node,cumm_l):
+                if node.is_leaf():
+                    D[node.name] = cumm_l
+                else:
+                    for child in node.child_node_iter():
+                        __compute_dRoot(child,cumm_l+child.edge_length)      
+
+            __compute_dRoot(self.ddpTree.seed_node,0)
+            return D
+
         def filter_branch(self,threshold=None):
             # filter out abnormally long branches
             i=1
@@ -66,7 +78,7 @@ class Tree_extend(object):
 
         def filter_by_threshold(self,threshold=None):
             if threshold is None:
-                threshold = self.compute_threshold(k=4)
+                threshold = self.compute_threshold(k=3)
             
             def __filter(node,cumm_l):
                 removed = False
@@ -76,7 +88,8 @@ class Tree_extend(object):
                     removed = removed or check
                 
                 p = node.parent_node
-                if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
+                #if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
+                if ( cumm_l > threshold ) or ( node.child_removed and node.num_child_nodes() == 0 ):
                     # remove node
                     p.remove_child(node)
                     # update parent node
@@ -86,16 +99,17 @@ class Tree_extend(object):
                         print(node.taxon.label + " removed")
                     except:
                         print(node.name + " removed")
-                   
-                elif len(node.child_nodes()) == 1:
+                #elif len(node.child_nodes()) == 1:
+                '''elif node.num_child_nodes() == 1:
+                    print(node.name)
                     # remove node and attach its only child to its parent
                     e1 = node.edge_length
                     child = node.child_nodes()[0]
                     e2 = child.edge_length
-                    node.remove_child(child)
                     p.remove_child(node)
+                    node.remove_child(child)
                     p.add_child(child)
-                    child.edge_length = e1 + e2
+                    child.edge_length = e1 + e2 '''
                 return removed  
             
             return __filter(self.get_root(),0)         
@@ -134,24 +148,26 @@ class Tree_extend(object):
             print("Abstract method! Should never be called")
 
 
-        def tree_as_newick(self,outfile=None,append=False):
+        def tree_as_newick(self,outfile=None,append=False,label_by_name=False):
         # dendropy's method to write newick seems to have problem ...
             if outfile:
                 outstream = open(outfile,'a') if append else open(outfile,'w')
             else:
                 outstream = sys.stdout
-        
-            self.__write_newick(self.ddpTree.seed_node,outstream)
+            self.__write_newick(self.ddpTree.seed_node,outstream,label_by_name=label_by_name)
             outstream.write(";\n")
             if outfile:
                 outstream.close()    
 
-        def __write_newick(self,node,outstream):
+        def __write_newick(self,node,outstream,label_by_name=False):
             if node.is_leaf():
-                try:
-                    outstream.write(node.taxon.label)
-                except:
-                    outstream.write(str(node.label))
+                if label_by_name:
+                    outstream.write(str(node.name))
+                else:
+                    try:
+                        outstream.write(node.taxon.label)
+                    except:
+                        outstream.write(str(node.label))
             else:
                 outstream.write('(')
                 is_first_child = True
@@ -160,9 +176,12 @@ class Tree_extend(object):
                         is_first_child = False
                     else:
                         outstream.write(',')
-                    self.__write_newick(child,outstream)
+                    self.__write_newick(child,outstream,label_by_name=label_by_name)
                 outstream.write(')')
-            if not node.is_leaf() and node.label is not None:
+            if not node.is_leaf():
+                if label_by_name:
+                    outstream.write(str(node.name))
+                elif node.label is not None:
                     outstream.write(str(node.label))
             
             if not node.edge_length is None:
