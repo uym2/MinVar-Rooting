@@ -286,6 +286,61 @@ class MPR_Tree(Tree_extend):
             print("We don't do thresholding for MPR_Tree. How come it got here?")
             return 0
 
+class MVR2_Tree(Tree_extend):
+    # supportive class to implement VAR-reroot, hence the name
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
+            if tree_file:
+                self.ddpTree = Tree.get_from_path(tree_file,schema)
+            else:
+                self.ddpTree = copy.deepcopy(ddpTree)
+            self.Tree_records = Tree_records if Tree_records else []
+            self.minVAR = None
+            self.opt_root = self.ddpTree.seed_node
+            self.opt_x = 0
+
+        def New_record(self):
+            return minVAR2_Node_record()
+
+        def Opt_function(self,node,a,b,c):
+            x = -b/(2*a)
+            if x >= 0 and x <= node.edge_length:
+                factor = float(self.Tree_records[node.idx].nleaf)/self.total_leaves
+                factor = factor * (1 - factor)
+                curr_minVAR = (a*x*x + b*x + c)/factor
+                if self.minVAR is None or curr_minVAR < self.minVAR:
+                    self.minVAR = curr_minVAR
+                    self.opt_root = node
+                    self.opt_x = node.edge_length-x
+
+        def compute_dRoot_VAR(self):
+            cumm = {'ssq':0,'sum':0}
+            def compute_dRoot(node,cumm_l):
+                if node.is_leaf():
+                    cumm['ssq'] += cumm_l**2
+                    cumm['sum'] += cumm_l
+                else:
+                    for child in node.child_node_iter():
+                        compute_dRoot(child,cumm_l+child.edge_length)
+
+            compute_dRoot(self.get_root(),0)
+            N = self.Tree_records[self.get_root_idx()].nleaf
+            root_var = cumm['ssq']/N-(cumm['sum']/N)**2    
+            self.Tree_records[self.get_root_idx()].var = root_var
+            self.minVAR = root_var
+
+        def prepare_root(self):
+            self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
+            self.total_leaves = self.Tree_records[self.get_root_idx()].nleaf
+            self.compute_dRoot_VAR()
+        
+        def compute_threshold(self,k=4):
+            # should be called only AFTER the MV root was found
+            mean = (self.Tree_records[self.opt_root.idx].sum_total - self.opt_x*(self.total_leaves-2*self.Tree_records[self.opt_root.idx].nleaf))/self.total_leaves
+            print(mean)
+            print(self.minVAR)
+            std = math.sqrt(self.minVAR)
+            return mean + k*std
+
 class MVR_Tree(Tree_extend):
     # supportive class to implement VAR-reroot, hence the name
         def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=None):
@@ -758,6 +813,40 @@ class minVAR_Node_record(Node_record):
             a,b,c = Tree_records[child.idx].Update_var(self,child.edge_length,Tree)
             opt_function(child,a,b,c)
 
+class minVAR2_Node_record(Node_record):
+# supportive class to implement VAR-reroot, hence the name
+    def __init__(self,nleaf=1,sum_in=0,sum_total=0,var=-1):
+        self.sum_in = sum_in
+        self.sum_total = sum_total
+        self.nleaf = nleaf
+        self.var = var
+
+    def Bottomup_update(self,node,Tree_records):
+        if node.is_leaf():
+            self.nleaf = 1
+            self.sum_in = 0
+        else:
+            self.nleaf = 0
+            self.sum_in = 0
+            for child in node.child_node_iter():
+                self.nleaf += Tree_records[child.idx].nleaf
+                self.sum_in += Tree_records[child.idx].sum_in + Tree_records[child.idx].nleaf*child.edge_length
+            #Tree.total_leaves = max(Tree.total_leaves,self.nleaf)    
+    
+    def Update_var(self,p_record,edge_length,Tree):
+        alpha = 2*( p_record.sum_total-2*(self.sum_in+self.nleaf*edge_length) )/Tree.total_leaves
+        beta = 1-2*float(self.nleaf)/Tree.total_leaves
+        a = 1-beta*beta
+        b = alpha-2*p_record.sum_total*beta/Tree.total_leaves
+        c = p_record.var
+        self.var = a*edge_length*edge_length + b*edge_length + c
+        return a,b,c
+
+    def Topdown_update(self,node,Tree_records,opt_function,Tree):
+        for child in node.child_node_iter():    
+            Tree_records[child.idx].sum_total = Tree_records[node.idx].sum_total + (Tree.total_leaves-2*Tree_records[child.idx].nleaf)*child.edge_length
+            a,b,c = Tree_records[child.idx].Update_var(self,child.edge_length,Tree)
+            opt_function(child,a,b,c)
 
 class MDR_Node_record(Node_record):
 # OBSOLETE! This will be replaced by the MBR (midpoint balance root) soon.
