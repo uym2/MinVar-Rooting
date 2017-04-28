@@ -140,7 +140,6 @@ class Tree_extend(object):
             br2currRoot = 0
             if self.opt_root != self.ddpTree.seed_node:
                 d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge,self.opt_root.edge_length-self.opt_x,self.opt_x)
-            
             #return head_id, tail_id, edge_length, self.opt_x
             return d2currRoot,br2currRoot
             
@@ -326,7 +325,7 @@ class MVR2_Tree(Tree_extend):
             N = self.Tree_records[self.get_root_idx()].nleaf
             root_var = cumm['ssq']/N-(cumm['sum']/N)**2    
             self.Tree_records[self.get_root_idx()].var = root_var
-            self.minVAR = root_var
+            #self.minVAR = root_var
 
         def prepare_root(self):
             self.Tree_records[self.get_root_idx()].sum_total = self.Tree_records[self.get_root_idx()].sum_in
