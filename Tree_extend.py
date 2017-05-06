@@ -2,13 +2,13 @@ from dendropy import Tree,Node
 import copy
 import sys
 class Tree_extend(object):
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick"):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 #self.ddpTree = copy.deepcopy(ddpTree)
                 self.ddpTree = ddpTree
-            self.Tree_records = Tree_records
+            self.Tree_records = []
 
         def New_record(self):
             print("Abstract method! Should never be called!")
@@ -103,7 +103,6 @@ class Tree_extend(object):
             if not node.edge_length is None:
                 outstream.write(":"+str(node.edge_length))
 
-        
         def reroot_at_edge(self,edge,length1,length2,new_root=None):
         # the method provided by dendropy DOESN'T seem to work ...
             if not edge:
@@ -131,12 +130,10 @@ class Tree_extend(object):
             br2currRoot = 0
             d2currRoot = length1
 
-            if tail.label == self.ddpTree.seed_node.label:
+            if tail == self.ddpTree.seed_node:
                 head = new_root
 
-
-            while tail.label != self.ddpTree.seed_node.label:
-                q = tail.parent_node
+            while tail != self.ddpTree.seed_node:
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -147,8 +144,6 @@ class Tree_extend(object):
                 l1 = tail.edge_length
                 tail.remove_child(head)
 
-                head.parent_node = q
-
                 head.add_child(tail)
                 tail.edge_length=l
                 l = l1
@@ -156,20 +151,17 @@ class Tree_extend(object):
             # out of while loop: tail IS now tree.seed_node
             if tail.num_child_nodes() < 2:
                 # merge the 2 branches of the old root and adjust the branch length
-                #sis = [child for child in tail.child_node_iter()][0]
-                sis = tail.child_nodes()[0]
+                sis = [child for child in tail.child_node_iter()][0]
                 l = sis.edge_length
                 tail.remove_child(sis)    
                 head.add_child(sis)
                 sis.edge_length=l+tail.edge_length
                 head.remove_child(tail)
-                #tail.remove_child(head)
-
+            
             new_root.label = self.ddpTree.seed_node.label
             self.ddpTree.seed_node = new_root
-
-
             return d2currRoot,br2currRoot
+
         def get_root_idx(self):
             return self.ddpTree.seed_node.idx
 
@@ -306,13 +298,13 @@ class MDR_Tree(Tree_extend):
 
 class MPR2_Tree(Tree_extend):
     # supportive class to implement MP2 rooting (extension of midpoint)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick"):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 #self.ddpTree = copy.deepcopy(ddpTree)
                 self.ddpTree = ddpTree
-            self.Tree_records = Tree_records
+            self.Tree_records = []
             self.opt_score = None
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
