@@ -1,7 +1,7 @@
 ## Implementation
-This is a dendropy-based implementation for a new idea of rooting a phylogenetic tree, called the minVar (MV) root. Our rooting method roots the tree at the point that minimizes the variance of the root to tip distances. The code was designed to be easily generalized for a class of 'optimization-based' rooting methods (some of which are under developing), which includes a fast version of the traditional midpoint (MP) rooting as well.
+This is a dendropy-based implementation for a new idea of rooting a phylogenetic tree, called the minVar (MV) root. Our rooting method roots the tree at the point that minimizes the variance of the root to tip distances. The code was designed to be easily generalized for a class of 'optimization-based' rooting methods (some of which are under development), which includes the traditional midpoint (MP) rooting as well.
 
-Complexity: the rooting methods are linear (with the number of species) in time and memory.
+Complexity: all rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies
 - python (version 2.7 recommended)
@@ -27,9 +27,9 @@ Complexity: the rooting methods are linear (with the number of species) in time 
                         schema of your input treefile. Default is Newick
 
 
-NOTE: FastRoot.py works for a list of trees. 
+NOTE: FastRoot.py works for a list of trees
 
-The following scripts might be more handy but only work with single-tree input.
+The following scripts might be more handy but only work with single-tree input
 
 
 - python MP\_reroot.py \<tree_file_in_newick\>
