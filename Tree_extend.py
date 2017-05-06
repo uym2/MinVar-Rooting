@@ -103,7 +103,8 @@ class Tree_extend(object):
             if not node.edge_length is None:
                 outstream.write(":"+str(node.edge_length))
 
-        def reroot_at_edge(self,edge,length1,length2,new_root=None):
+        
+	def reroot_at_edge(self,edge,length1,length2,new_root=None):
         # the method provided by dendropy DOESN'T seem to work ...
             if not edge:
                 return
@@ -134,6 +135,8 @@ class Tree_extend(object):
                 head = new_root
 
             while tail != self.ddpTree.seed_node:
+		q = tail.parent_node		
+
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -143,6 +146,7 @@ class Tree_extend(object):
 
                 l1 = tail.edge_length
                 tail.remove_child(head)
+		head.parent_node = q
 
                 head.add_child(tail)
                 tail.edge_length=l
