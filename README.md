@@ -18,7 +18,7 @@ Complexity: the rooting methods are linear (with the number of species) in time 
                         input file
                         
   -m METHOD, --method METHOD
-                        method: MP for midpoint and MV for minVAR
+                        method: MP for midpoint and MV for minVAR. Default is MV
                         
   -o OUTFILE, --outfile OUTFILE
                         specify output file
@@ -27,10 +27,9 @@ Complexity: the rooting methods are linear (with the number of species) in time 
                         schema of your input treefile. Default is Newick
 
 
-NOTE: FastRoot.py works with single tree only. 
-To simultaneously root a list of trees (i.e. a list of gene trees), use FastRoot\_multi.sh. The options are the same as for FastRoot.py, but all options are required (sorry).   
+NOTE: FastRoot.py works for a list of trees. 
 
-The following scripts might be more handy but only work with single-tree input, and don't accept optional options.
+The following scripts might be more handy but only work with single-tree input.
 
 
 - python MP\_reroot.py \<tree_file_in_newick\>
