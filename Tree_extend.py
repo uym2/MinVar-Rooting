@@ -103,6 +103,7 @@ class Tree_extend(object):
             if not node.edge_length is None:
                 outstream.write(":"+str(node.edge_length))
 
+        
         def reroot_at_edge(self,edge,length1,length2,new_root=None):
         # the method provided by dendropy DOESN'T seem to work ...
             if not edge:
@@ -130,10 +131,12 @@ class Tree_extend(object):
             br2currRoot = 0
             d2currRoot = length1
 
-            if tail == self.ddpTree.seed_node:
+            if tail.label == self.ddpTree.seed_node.label:
                 head = new_root
 
-            while tail != self.ddpTree.seed_node:
+
+            while tail.label != self.ddpTree.seed_node.label:
+                q = tail.parent_node
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -144,6 +147,8 @@ class Tree_extend(object):
                 l1 = tail.edge_length
                 tail.remove_child(head)
 
+                head.parent_node = q
+
                 head.add_child(tail)
                 tail.edge_length=l
                 l = l1
@@ -151,17 +156,20 @@ class Tree_extend(object):
             # out of while loop: tail IS now tree.seed_node
             if tail.num_child_nodes() < 2:
                 # merge the 2 branches of the old root and adjust the branch length
-                sis = [child for child in tail.child_node_iter()][0]
+                #sis = [child for child in tail.child_node_iter()][0]
+                sis = tail.child_nodes()[0]
                 l = sis.edge_length
                 tail.remove_child(sis)    
                 head.add_child(sis)
                 sis.edge_length=l+tail.edge_length
                 head.remove_child(tail)
-            
+                #tail.remove_child(head)
+
             new_root.label = self.ddpTree.seed_node.label
             self.ddpTree.seed_node = new_root
-            return d2currRoot,br2currRoot
 
+
+            return d2currRoot,br2currRoot
         def get_root_idx(self):
             return self.ddpTree.seed_node.idx
 
@@ -170,13 +178,13 @@ class Tree_extend(object):
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick"):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 #self.ddpTree = copy.deepcopy(ddpTree)
                 self.ddpTree = ddpTree
-            self.Tree_records = Tree_records
+            self.Tree_records = []
             self.max_distance = -1
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
@@ -198,13 +206,13 @@ class MPR_Tree(Tree_extend):
 
 class MVR_Tree(Tree_extend):
     # supportive class to implement VAR-reroot, hence the name
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick"):
             if tree_file:
                 self.ddpTree = Tree.get_from_path(tree_file,schema)
             else:
                 #self.ddpTree = copy.deepcopy(ddpTree)
                 self.ddpTree = ddpTree
-            self.Tree_records = Tree_records
+            self.Tree_records = []
             self.minVAR = None
             self.opt_root = self.ddpTree.seed_node
             self.opt_x = 0
@@ -243,13 +251,13 @@ class MVR_Tree(Tree_extend):
 
 class MDR_Tree(Tree_extend):
 # supportive class to implement mean difference root (mdr = mean difference reroot, hence the name)
-        def __init__(self,ddpTree=None,tree_file=None,schema="newick",Tree_records=[]):
+        def __init__(self,ddpTree=None,tree_file=None,schema="newick"):
                 if tree_file:
                         self.ddpTree = Tree.get_from_path(tree_file,schema)
                 else:
                         #self.ddpTree = copy.deepcopy(ddpTree)
             	        self.ddpTree = ddpTree
-                self.Tree_records = Tree_records
+                self.Tree_records = []
                 self.min_MD = None
                 self.opt_root = self.ddpTree.seed_node
                 self.opt_x = 0
