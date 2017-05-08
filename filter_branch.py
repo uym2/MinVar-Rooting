@@ -14,6 +14,7 @@ a_tree.filter_branch()
 #head_id, tail_id, edge_length, x = a_tree.Reroot()
 #d2currRoot,br2currRoot = a_tree.Reroot()
 #print("d2currRoot: " + str(d2currRoot) + "\nbr2currRoot: " + str(br2currRoot) + "\n")
-a_tree.tree_as_newick(outfile=base_name+"_MV_filtered"+ext,label_by_name=True)
+a_tree.tree_as_newick(outfile=base_name+"_MV_filtered"+ext)
+#a_tree.tree_as_newick(outfile=tree_file+"_MV_filtered")
 
 

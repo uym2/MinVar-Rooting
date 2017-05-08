@@ -100,7 +100,7 @@ class Tree_extend(object):
                     except:
                         print(node.name + " removed")
                 #elif len(node.child_nodes()) == 1:
-                '''elif node.num_child_nodes() == 1:
+                elif node.num_child_nodes() == 1:
                     print(node.name)
                     # remove node and attach its only child to its parent
                     e1 = node.edge_length
@@ -109,7 +109,7 @@ class Tree_extend(object):
                     p.remove_child(node)
                     node.remove_child(child)
                     p.add_child(child)
-                    child.edge_length = e1 + e2 '''
+                    child.edge_length = e1 + e2
                 return removed  
             
             return __filter(self.get_root(),0)         
@@ -218,6 +218,7 @@ class Tree_extend(object):
 
 
             while tail.name != self.ddpTree.seed_node.name:
+                q = tail.parent_node
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -227,6 +228,7 @@ class Tree_extend(object):
 
                 l1 = tail.edge_length
                 tail.remove_child(head)
+                head.parent_node = q
 
                 head.add_child(tail)
                 tail.edge_length=l
