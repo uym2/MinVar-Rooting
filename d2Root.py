@@ -3,7 +3,7 @@
 # usage: python LabelTree.py <tree_file>
 
 import os
-from Tree_extend import Tree_extend,MVR_Tree,MPR_Tree,MBR_Tree
+from Tree_extend import Tree_extend,minVAR_Base_Tree,MPR_Tree,MBR_Tree
 from dendropy import Tree,TreeList
 
 from sys import argv
@@ -28,7 +28,7 @@ trees = TreeList.get_from_path(tree_file,schema)
 
 for tree in trees:
         if args["method"] == "MV":
-        	a_tree = MVR_Tree(ddpTree=tree)
+        	a_tree = minVAR_Base_Tree(ddpTree=tree)
         elif args["method"] == "MP":
         	a_tree = MPR_Tree(ddpTree=tree)
         elif args["method"] == "MB":

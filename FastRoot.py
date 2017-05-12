@@ -3,11 +3,8 @@
 # usage: python MP_reroot.py <tree_file>
 
 import os
-from Tree_extend import MPR_Tree,MVR_Tree,MDR_Tree,MPR2_Tree,MBR_Tree,MVR2_Tree
-try:
-	from dendropy4 import Tree,TreeList
-except:
-	from dendropy import Tree,TreeList
+from Tree_extend import MPR_Tree,MV00_Tree,MBR_Tree,MV0F_Tree,MVD0_Tree,MVDF_Tree
+from dendropy import Tree,TreeList
 
 from os.path import splitext
 import argparse
@@ -15,7 +12,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-i','--input',required=True,help="input file")
-parser.add_argument('-m','--method',required=True,help="method: MP for midpoint, MV for minVAR, MD for mean-diff, MP2 for midpoint2")
+parser.add_argument('-m','--method',required=True,help="method: MP for midpoint, MV for minVAR")
 parser.add_argument('-o','--outfile',required=True,help="specify output file")
 parser.add_argument('-s','--schema',required=False,help="schema of your input treefile. Default is newick")
 parser.add_argument('-f','--infofile',required=False,help="write info of the new root to file. This is important only for research and debugging purposes. Default is to write NOTHING.")
@@ -45,21 +42,19 @@ if args["infofile"]:
 else: 
 	f_info = None
 
+method = "MV"
+if args["method"]:
+    method = args["method"]
+
 with open(tree_file,'r') as f:
 	for line in f:
 		tree = Tree.get(data=line,schema=schema)	
-		if args["method"] == "MP":
+		if method == "MP":
 			a_tree = MPR_Tree(ddpTree=tree)
-		elif args["method"] == "MD":
-			a_tree = MDR_Tree(ddpTree=tree)
-		elif args["method"] == "MV":
-			a_tree = MVR_Tree(ddpTree=tree)
-		elif args["method"] == "MP2":
-			a_tree = MPR2_Tree(ddpTree=tree)
-		elif args["method"] == "MB":
-			a_tree = MBR_Tree(ddpTree=tree)
-		elif args["method"] == "MV2":
-			a_tree = MVR2_Tree(ddpTree=tree)
+		elif method == "MV":
+			a_tree = MV00_Tree(ddpTree=tree)
+		elif method == "MV2":
+			a_tree = MVDF_Tree(ddpTree=tree)
 		else:
 			a_tree = None
 		if a_tree is None:

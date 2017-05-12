@@ -4,10 +4,7 @@
 
 import os
 from Tree_extend import Tree_extend
-try:
-	from dendropy4 import Tree,TreeList
-except:
-	from dendropy import Tree,TreeList
+from dendropy import Tree,TreeList
 
 from sys import argv
 from os.path import splitext
