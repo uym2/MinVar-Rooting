@@ -50,6 +50,28 @@ class Tree_extend(object):
             __compute_dRoot(self.ddpTree.seed_node,0)
             return D
 
+        def compute_ingroup_distances(self):
+            D = []
+            def __compute_dLeaf(node,cumm_l):
+                if node.is_leaf():
+                    D.append(cumm_l)
+                else:
+                    for child in node.child_node_iter():
+                        __compute_dLeaf(child,cumm_l+child.edge_length)      
+
+            children = self.ddpTree.seed_node.child_nodes()
+            crowded_child = None
+            maxleaf = -1
+
+            for node in children:
+                if node.nleaf > maxleaf:
+                    maxleaf = node.nleaf
+                    crowded_child = node
+
+            __compute_dLeaf(children[1],0)
+
+            return D
+        
         def filter_branch(self, threshold = None):
             # filter out abnormally long branches
             i=1
@@ -367,6 +389,10 @@ class MVDF_Tree(minVAR_Base_Tree):
             super().__init__(ddpTree, tree_file, schema)
             self.deep_node = None
 
+        def reset(self):
+            super().reset()
+            self.deep_node = None
+        
         def Opt_function(self, node, a, b, c):
             x = -b/(2*a)
             if x >= 0 and x <= node.edge_length:
@@ -416,6 +442,10 @@ class MVD0_Tree(minVAR_Base_Tree):
             super().__init__(ddpTree, tree_file, schema)
             self.deep_node = None
 
+        def reset(self):
+            super().reset()
+            self.deep_node = None
+        
         def Opt_function(self, node, a, b, c):
             x = -b/(2*a)
             if x >= 0 and x <= node.edge_length:
