@@ -83,7 +83,7 @@ class Tree_extend(object):
                         print("I could not remove anything more! I stop here!")
                         break
                     i += 1
-                    print("Itertation: " + str(i))
+                    print("Iteration: " + str(i))
                     self.reset()
                     self.Reroot()
 
@@ -273,7 +273,7 @@ class Tree_extend(object):
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-            super().__init__(ddpTree, tree_file, schema)
+            super(MPR_Tree,self).__init__(ddpTree, tree_file, schema)
             self.reset()
 
         def reset(self):
@@ -319,7 +319,7 @@ class MPR_Tree(Tree_extend):
 class minVAR_Base_Tree(Tree_extend):
      # supportive base class to implement VAR-reroot, hence the name
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-            super().__init__(ddpTree, tree_file, schema)
+            super(minVAR_Base_Tree,self).__init__(ddpTree, tree_file, schema)
             self.reset()
 
         def reset(self):
@@ -386,11 +386,11 @@ class minVAR_Base_Tree(Tree_extend):
 class MVDF_Tree(minVAR_Base_Tree):
     # supportive class to implement VAR-reroot + deepest node + factorization
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-            super().__init__(ddpTree, tree_file, schema)
+            super(MVDF_Tree,self).__init__(ddpTree, tree_file, schema)
             self.deep_node = None
 
         def reset(self):
-            super().reset()
+            super(MVDF_Tree,self).reset()
             self.deep_node = None
         
         def Opt_function(self, node, a, b, c):
@@ -439,11 +439,11 @@ class MVDF_Tree(minVAR_Base_Tree):
 class MVD0_Tree(minVAR_Base_Tree):
     # supportive class to implement VAR-reroot + deepest node + no factorization
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-            super().__init__(ddpTree, tree_file, schema)
+            super(MVD0_Tree,self).__init__(ddpTree, tree_file, schema)
             self.deep_node = None
 
         def reset(self):
-            super().reset()
+            super(MVD0_Tree,self).reset()
             self.deep_node = None
         
         def Opt_function(self, node, a, b, c):
@@ -543,7 +543,7 @@ class MV00_Tree(minVAR_Base_Tree):
 class MBR_Tree(Tree_extend):
 # supportive class to implement midpoint balance root 
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-            super().__init__(ddpTree, tree_file, schema)
+            super(MBR_Tree,self).__init__(ddpTree, tree_file, schema)
 
             self.BPs = [] # BPs : balance points
             self.opt_root = self.ddpTree.seed_node

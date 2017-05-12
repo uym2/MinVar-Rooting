@@ -9,7 +9,7 @@ def filter_branch(a_tree,root_method=None,unit_length=None,low_percentile=0,high
     branch_list = list_branch(a_tree)
     d = estimate_diameter(a_tree,branch_list,root_method=root_method,unit_length=unit_length,low_percentile=low_percentile,high_percentile=high_percentile)
     thres = d*factor
-    print(thres)
+    print("Branch length threshod: ",thres)
     count_leaves(a_tree)
     for br in branch_list:
         #print(br.length)
