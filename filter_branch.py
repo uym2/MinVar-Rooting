@@ -12,5 +12,3 @@ base_name,ext = splitext(tree_file)
 a_tree = MV00_Tree(tree_file=tree_file)
 a_tree.filter_branch()
 a_tree.tree_as_newick(outfile=base_name+"_MV_filtered"+ext,label_by_name=True)
-
-

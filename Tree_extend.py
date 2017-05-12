@@ -135,7 +135,6 @@ class Tree_extend(object):
         def tree_as_newick(self, outfile=None, append = False, label_by_name = False):
         # dendropy's method to write newick seems to have problem ...
             if outfile:
-#                outstream = open(outfile,'a') if append else open(outfile,'w')
                 outstream = open(outfile,'a' if append else 'w')
             else:
                 outstream = sys.stdout
@@ -210,6 +209,7 @@ class Tree_extend(object):
 
 
             while tail is not self.ddpTree.seed_node:
+#            while tail.name != self.ddpTree.seed_node.name:
                 q = tail.parent_node
                 head = tail
                 tail = p
