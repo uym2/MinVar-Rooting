@@ -202,37 +202,31 @@ class Tree_extend(object):
             if not tail:
                 return
         
-            if length1 == 0:
-                new_root = tail
-            elif length2 == 0:
-                new_root = head
-            else:
-                new_root = self.ddpTree.node_factory()
-
+            new_root = self.ddpTree.node_factory()
+            
             tail.remove_child(head)
 
-            if length2 != 0:
-                new_root.add_child(head)
-                head.edge_length=length2
+            new_root.add_child(head)
+            head.edge_length=length2
 
             p = tail.parent_node
             l = tail.edge_length
-    
-            if length1 != 0:
-                new_root.add_child(tail)
-                tail.edge_length=length1
+
+            new_root.add_child(tail)
+            tail.edge_length = length1
 
             br2currRoot = 0
             d2currRoot = length1
 
 #            if tail.label == self.ddpTree.seed_node.label:
-            if (tail is self.ddpTree.seed_node) and (length1 != 0):
+            if (tail is self.ddpTree.seed_node):
                 head = new_root
 
 
             while tail is not self.ddpTree.seed_node:
-#            while tail.name != self.ddpTree.seed_node.name:
+# MAD@ add
                 q = tail.parent_node
+# End MAD@ add
                 head = tail
                 tail = p
                 p = tail.parent_node
@@ -242,7 +236,9 @@ class Tree_extend(object):
 
                 l1 = tail.edge_length
                 tail.remove_child(head)
+# MAD@ add
                 head.parent_node = q
+# End MAD@ add
 
                 head.add_child(tail)
                 tail.edge_length=l
@@ -264,6 +260,13 @@ class Tree_extend(object):
             self.ddpTree.seed_node.name = "OLD"
             self.ddpTree.seed_node = new_root
 
+### MAD@ add
+#            for node in self.ddpTree.postorder_node_iter():
+#                for child in node.child_nodes():
+#                    if child.parent_node is not node:
+#                        print("Error found!")
+#                        child.parent_node = node
+### MAD@ add
 
             return d2currRoot,br2currRoot
 
