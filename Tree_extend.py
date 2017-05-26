@@ -157,41 +157,52 @@ class Tree_extend(object):
         def tree_as_newick(self, outfile=None, append = False, label_by_name = False):
         # dendropy's method to write newick seems to have problem ...
             if outfile:
-                outstream = open(outfile,'a' if append else 'w')
+#                outstream = open(outfile,'a' if append else 'w')
+                outstream = open(outfile,'ab' if append else 'wb')
             else:
                 outstream = sys.stdout
             self.__write_newick(self.ddpTree.seed_node, outstream, label_by_name = label_by_name)
-            outstream.write(";\n")
+#            outstream.write(";\n")
+            outstream.write(bytes(";\n", "ascii"))
             if outfile:
                 outstream.close()
 
         def __write_newick(self, node, outstream, label_by_name = False):
             if node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.name))
+#                    outstream.write(str(node.name))
+                    outstream.write(bytes(str(node.name), "ascii"))
                 else:
                     try:
-                        outstream.write(node.taxon.label)
+#                        outstream.write(node.taxon.label)
+                        outstream.write(bytes(node.taxon.label, "ascii"))
                     except:
-                        outstream.write(str(node.label))
+#                        outstream.write(str(node.label))
+                        outstream.write(bytes(str(node.label), "ascii"))
             else:
-                outstream.write('(')
+#                outstream.write('(')
+                outstream.write(bytes('(', "ascii"))
                 is_first_child = True
                 for child in node.child_node_iter():
                     if is_first_child:
                         is_first_child = False
                     else:
-                        outstream.write(',')
+#                        outstream.write(',')
+                        outstream.write(bytes(',', "ascii"))
                     self.__write_newick(child,outstream, label_by_name = label_by_name)
-                outstream.write(')')
+#                outstream.write(')')
+                outstream.write(bytes(')', "ascii"))
             if not node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.name))
+#                    outstream.write(str(node.name))
+                    outstream.write(bytes(str(node.name), "ascii"))
                 elif node.label is not None:
-                    outstream.write(str(node.label))
+#                    outstream.write(str(node.label))
+                    outstream.write(bytes(str(node.label), "ascii"))
             
             if not node.edge_length is None:
-                outstream.write(":" + str(node.edge_length))
+#                outstream.write(":" + str(node.edge_length))
+                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
 
         def reroot_at_edge(self, edge, length1, length2):
         # the method provided by dendropy DOESN'T seem to work ...
@@ -202,6 +213,9 @@ class Tree_extend(object):
             if not tail:
                 return
         
+            if (length2 == 0) and head.is_leaf():
+                return 0, 0
+
             new_root = self.ddpTree.node_factory()
             
             tail.remove_child(head)
