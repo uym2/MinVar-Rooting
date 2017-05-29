@@ -40,24 +40,24 @@ class Tree_extend(object):
 
         def compute_distances(self):
             D = {}
-            def __compute_dRoot(node,cumm_l):
+            def __compute_dRoot__(node,cumm_l):
                 if node.is_leaf():
                     D[node.name] = cumm_l
                 else:
                     for child in node.child_node_iter():
-                        __compute_dRoot(child,cumm_l+child.edge_length)      
+                        __compute_dRoot__(child,cumm_l+child.edge_length)      
 
-            __compute_dRoot(self.ddpTree.seed_node,0)
+            __compute_dRoot__(self.ddpTree.seed_node,0)
             return D
 
         def compute_ingroup_distances(self):
             D = []
-            def __compute_dLeaf(node,cumm_l):
+            def __compute_dLeaf__(node,cumm_l):
                 if node.is_leaf():
                     D.append(cumm_l)
                 else:
                     for child in node.child_node_iter():
-                        __compute_dLeaf(child,cumm_l+child.edge_length)      
+                        __compute_dLeaf__(child,cumm_l+child.edge_length)      
 
             children = self.ddpTree.seed_node.child_nodes()
             crowded_child = None
@@ -68,7 +68,7 @@ class Tree_extend(object):
                     maxleaf = node.nleaf
                     crowded_child = node
 
-            __compute_dLeaf(children[1],0)
+            __compute_dLeaf__(children[1],0)
 
             return D
         
