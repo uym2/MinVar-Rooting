@@ -91,11 +91,11 @@ class Tree_extend(object):
             if threshold is None:
                 threshold = self.compute_threshold(k = k)
             
-            def __filter(node,cumm_l):
+            def __filter__(node,cumm_l):
                 removed = False
                 node.child_removed = False
                 for child in node.child_nodes():
-                    check = __filter(child,cumm_l + child.edge_length)
+                    check = __filter__(child,cumm_l + child.edge_length)
                     removed = removed or check
                 
                 p = node.parent_node
@@ -123,7 +123,7 @@ class Tree_extend(object):
                     child.edge_length = e1 + e2
                 return removed  
             
-            return __filter(self.get_root(),0)         
+            return __filter__(self.get_root(),0)         
 
         def compute_threhold(self, k=3.5):
             print("Abstract class! Should never be called")
