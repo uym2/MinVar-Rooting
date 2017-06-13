@@ -48,7 +48,7 @@ if args["method"]:
 
 with open(tree_file,'r') as f:
 	for line in f:
-		tree = Tree.get(data=line,schema=schema)	
+		tree = Tree.get(data=line,schema=schema,preserve_underscores=True)	
 		if method == "MP":
 			a_tree = MPR_Tree(ddpTree=tree)
 		elif method == "MV":
