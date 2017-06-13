@@ -40,24 +40,24 @@ class Tree_extend(object):
 
         def compute_distances(self):
             D = {}
-            def __compute_dRoot(node,cumm_l):
+            def __compute_dRoot__(node,cumm_l):
                 if node.is_leaf():
                     D[node.name] = cumm_l
                 else:
                     for child in node.child_node_iter():
-                        __compute_dRoot(child,cumm_l+child.edge_length)      
+                        __compute_dRoot__(child,cumm_l+child.edge_length)      
 
-            __compute_dRoot(self.ddpTree.seed_node,0)
+            __compute_dRoot__(self.ddpTree.seed_node,0)
             return D
 
         def compute_ingroup_distances(self):
             D = []
-            def __compute_dLeaf(node,cumm_l):
+            def __compute_dLeaf__(node,cumm_l):
                 if node.is_leaf():
                     D.append(cumm_l)
                 else:
                     for child in node.child_node_iter():
-                        __compute_dLeaf(child,cumm_l+child.edge_length)      
+                        __compute_dLeaf__(child,cumm_l+child.edge_length)      
 
             children = self.ddpTree.seed_node.child_nodes()
             crowded_child = None
@@ -68,7 +68,7 @@ class Tree_extend(object):
                     maxleaf = node.nleaf
                     crowded_child = node
 
-            __compute_dLeaf(children[1],0)
+            __compute_dLeaf__(children[1],0)
 
             return D
         
@@ -91,11 +91,11 @@ class Tree_extend(object):
             if threshold is None:
                 threshold = self.compute_threshold(k = k)
             
-            def __filter(node,cumm_l):
+            def __filter__(node,cumm_l):
                 removed = False
                 node.child_removed = False
                 for child in node.child_nodes():
-                    check = __filter(child,cumm_l + child.edge_length)
+                    check = __filter__(child,cumm_l + child.edge_length)
                     removed = removed or check
                 
                 p = node.parent_node
@@ -123,7 +123,7 @@ class Tree_extend(object):
                     child.edge_length = e1 + e2
                 return removed  
             
-            return __filter(self.get_root(),0)         
+            return __filter__(self.get_root(),0)         
 
         def compute_threhold(self, k=3.5):
             print("Abstract class! Should never be called")
