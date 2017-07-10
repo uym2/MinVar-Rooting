@@ -33,8 +33,8 @@ NOTE: FastRoot.py works for a list of trees
 The following scripts might be more handy but only work with single-tree input
 
 ```python 
-python MP\_reroot.py \<tree_file_in_newick\>
-python MV\_reroot.py \<tree_file_in_newick\>
+python MP_reroot.py <tree_file_in_newick>
+python MV_reroot.py <tree_file_in_newick>
 ```
 
 ## Output
