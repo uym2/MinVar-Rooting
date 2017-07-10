@@ -9,9 +9,10 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 ## Usage
 
+```python
+python FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA] ```
 
-- python FastRoot.py [-h] -i INPUT -m METHOD [-o OUTFILE] [-s SCHEMA]
-
+```
   -h, --help            show help message and exit
   
   -i INPUT, --input INPUT:
@@ -25,16 +26,16 @@ Complexity: all rooting methods are linear (with the number of species) in time 
                         
   -s SCHEMA, --schema SCHEMA
                         schema of your input treefile. Default is Newick
-
+```
 
 NOTE: FastRoot.py works for a list of trees
 
 The following scripts might be more handy but only work with single-tree input
 
-
-- python MP\_reroot.py \<tree_file_in_newick\>
-
-- python MV\_reroot.py \<tree_file_in_newick\>
+```python 
+python MP\_reroot.py \<tree_file_in_newick\>
+python MV\_reroot.py \<tree_file_in_newick\>
+```
 
 ## Output
 The FastRoot.py with -o will output to the specified destination. Without -o, it prints the tree to stdout. 
