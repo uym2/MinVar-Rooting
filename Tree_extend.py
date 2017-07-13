@@ -85,8 +85,10 @@ class Tree_extend(object):
 
         def __write_newick(self,node,outstream):
             if node.is_leaf():
+                try:
                     outstream.write(node.taxon.label)
-                    #outstream.write(str(node.label))
+                except:
+                    outstream.write(node.label)
             else:
                 outstream.write('(')
                 is_first_child = True
@@ -135,7 +137,7 @@ class Tree_extend(object):
                 head = new_root
 
             while tail != self.ddpTree.seed_node:
-		q = tail.parent_node		
+                q = tail.parent_node		
 
                 head = tail
                 tail = p
@@ -146,14 +148,14 @@ class Tree_extend(object):
 
                 l1 = tail.edge_length
                 tail.remove_child(head)
-		head.parent_node = q
+                head.parent_node = q
 
                 head.add_child(tail)
                 tail.edge_length=l
                 l = l1
                 
             # out of while loop: tail IS now tree.seed_node
-            if tail.num_child_nodes() < 2:
+            if tail.num_child_nodes() == 1:
                 # merge the 2 branches of the old root and adjust the branch length
                 sis = [child for child in tail.child_node_iter()][0]
                 l = sis.edge_length
