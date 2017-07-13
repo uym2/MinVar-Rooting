@@ -5,7 +5,7 @@ import math
 class Tree_extend(object):
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
                 if tree_file:
-                    self.ddpTree = Tree.get_from_path(tree_file,schema,preserve_underscores)
+                    self.ddpTree = Tree.get_from_path(tree_file,schema,preserve_underscores=True)
                 else:
                     self.ddpTree = ddpTree
 
@@ -177,7 +177,7 @@ class Tree_extend(object):
                         outstream.write(node.taxon.label)
 #                        outstream.write(bytes(node.taxon.label, "ascii"))
                     except:
-                        outstream.write(str(node.label))
+                        outstream.write(node.label)
 #                        outstream.write(bytes(str(node.label), "ascii"))
             else:
                 outstream.write('(')
@@ -259,7 +259,7 @@ class Tree_extend(object):
                 l = l1
                 
             # out of while loop: tail IS now tree.seed_node
-            if tail.num_child_nodes() < 2:
+            if tail.num_child_nodes() == 1:
                 # merge the 2 branches of the old root and adjust the branch length
                 #sis = [child for child in tail.child_node_iter()][0]
                 sis = tail.child_nodes()[0]
