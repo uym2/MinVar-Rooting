@@ -1,7 +1,7 @@
-## Mathematical properties of the MinVar-Rooting method and justifications of the linear algorithm can be found in the following paper
+## When you use MinVar-Rooting, please cite the following paper:
 - Mai, Uyen, Erfan Sayyari, and Siavash Mirarab. “Minimum Variance Rooting of Phylogenetic Trees and Implications for Species Tree Reconstruction.” Edited by Gabriel Moreno-Hagelsieb. PLOS ONE 12, no. 8 (2017): e0182238. doi:10.1371/journal.pone.0182238.
           - Best paper award at GLBIO 2017.
-- Besides, MinVar-Rootig is named MCCV in an independent and simultaneous work published in Nature Ecology and Evolution.
+- Besides, MinVar-Rootig is named MCCV in an independent and simultaneous work. You should consider citing MCCV and the following paper 
 Domingues Kümmel Tria, Fernando & Landan, Giddy & Dagan, Tal. (2017). Phylogenetic rooting using minimal ancestor deviation. Nature Ecology & Evolution. 1. 0193. 10.1038/s41559-017-0193. 
   
 
