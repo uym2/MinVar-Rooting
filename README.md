@@ -1,4 +1,4 @@
-## When you use MinVar-Rooting, please cite the following paper
+## When you use MinVar-Rooting, please consider citing the following paper
 - Mai, Uyen, Erfan Sayyari, and Siavash Mirarab. “Minimum Variance Rooting of Phylogenetic Trees and Implications for Species Tree Reconstruction.” Edited by Gabriel Moreno-Hagelsieb. PLOS ONE 12, no. 8 (2017): e0182238. doi:10.1371/journal.pone.0182238.
 
 
