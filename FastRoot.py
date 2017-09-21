@@ -28,7 +28,7 @@ for line in args.input:
 	if args.infofile:
 		args.infofile.write("d2currRoot: " + str(d2currRoot) + "\nbr2currRoot: " + str(br2currRoot) + "\n")
 
-	a_tree.tree_as_newick(outfile=outfile,append=True)
+	a_tree.tree_as_newick(outfile=args.outfile,append=True)
 
 if args.infofile:
 	args.infofile.close()

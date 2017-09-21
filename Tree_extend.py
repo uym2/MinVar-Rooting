@@ -72,16 +72,9 @@ class Tree_extend(object):
 
 
     def tree_as_newick(self,outfile=None,append=False):
-    # dendropy's method to write newick seems to have problem ...
-        if outfile:
-            outstream = open(outfile,'a') if append else open(outfile,'w')
-        else:
-            outstream = sys.stdout
-
-        self.__write_newick(self.ddpTree.seed_node,outstream)
-        outstream.write(";\n")
-        if outfile:
-            outstream.close()
+        # dendropy's method to write newick seems to have problem ...
+        self.__write_newick(self.ddpTree.seed_node,outfile)
+        outfile.write(";\n")
 
     def __write_newick(self,node,outstream):
         if node.is_leaf():
