@@ -6,58 +6,29 @@ import os
 from Tree_extend import MPR_Tree,MVR_Tree
 from dendropy import Tree,TreeList
 
-from os.path import splitext
+from sys import stdin,stdout
 import argparse
 
+METHOD2FUNC = {'MP':MPR_Tree,'MV':MVR_Tree}
+
 parser = argparse.ArgumentParser()
+parser.add_argument('-i','--input',required=False,type=argparse.FileType('r'),default=stdin,help="Input File (default is STDIN)")
+parser.add_argument('-m','--method',required=False,type=str,default="MV",help="Method (MP for midpoint, MV for minVAR) (default is MV)")
+parser.add_argument('-o','--outfile',required=False,type=argparse.FileType('w'),default=stdout,help="Output File (default is STDOUT)")
+parser.add_argument('-s','--schema',required=False,type=str,default="newick",help="Schema of your input treefile (default is newick)")
+parser.add_argument('-f','--infofile',required=False,type=argparse.FileType('w'),default=None,help="Write info of the new root to file (mostly for research and debugging purposes) (default is None)")
+args = parser.parse_args()
+assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR"
 
-parser.add_argument('-i','--input',required=True,help="input file")
-parser.add_argument('-m','--method',required=False,help="method: MP for midpoint, MV for minVAR. Default is MV")
-parser.add_argument('-o','--outfile',required=False,help="specify output file")
-parser.add_argument('-s','--schema',required=False,help="schema of your input treefile. Default is newick")
-parser.add_argument('-f','--infofile',required=False,help="write info of the new root to file; mostly for research and debugging purposes")
+for line in args.input:
+	tree = Tree.get(data=line,schema=args.schema.lower(),preserve_underscores=True)
+	a_tree = METHOD2FUNC[args.method](ddpTree=tree)
+	d2currRoot,br2currRoot = a_tree.Reroot()
 
-args = vars(parser.parse_args())
+	if args.infofile:
+		args.infofile.write("d2currRoot: " + str(d2currRoot) + "\nbr2currRoot: " + str(br2currRoot) + "\n")
 
-tree_file = args["input"]
-base_name,ext = splitext(tree_file)
+	a_tree.tree_as_newick(outfile=args.outfile,append=True)
 
-schema=args["schema"] if args["schema"] else "newick"
-
-outfile = args["outfile"] if args["outfile"] else None
-
-f_info = open(args["infofile"],'w') if args["infofile"] else None
-
-method = args["method"] if args["method"] else "MV"
-
-try:
-	os.remove(outfile)
-except:
-	pass
-
-try:
-	os.remove(args["infofile"])
-except:
-	pass
-
-	
-
-with open(tree_file,'r') as f:
-	for line in f:
-		tree = Tree.get(data=line,schema=schema,preserve_underscores=True)	
-		if method == "MP":
-			a_tree = MPR_Tree(ddpTree=tree)
-		elif method == "MV":
-			a_tree = MVR_Tree(ddpTree=tree)
-		else:
-			print("Invalid method!")
-			break
-		d2currRoot,br2currRoot = a_tree.Reroot()
-
-		if f_info:
-			f_info.write("d2currRoot: " + str(d2currRoot) + "\nbr2currRoot: " + str(br2currRoot) + "\n")
-			
-		a_tree.tree_as_newick(outfile=outfile,append=True)
-
-if f_info:
-	f_info.close()
+if args.infofile:
+	args.infofile.close()
