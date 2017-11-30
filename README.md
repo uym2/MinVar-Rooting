@@ -12,8 +12,8 @@ This is a dendropy-based implementation of the MinVar-Rooting, which seeks to ro
 Complexity: all rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies
-- python (either 2.x or 3.x)
-- dendropy (version 4.2.0 recommended)
+- Python (either 2.x or 3.x)
+- Dendropy (version 4.2.0 recommended)
 
 ## Usage
 
