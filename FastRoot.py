@@ -54,7 +54,7 @@ with open(tree_file,'r') as f:
 		elif method == "MV":
 			a_tree = MV00_Tree(ddpTree=tree)
 		elif method == "MV2":
-			a_tree = MVDF_Tree(ddpTree=tree)
+			a_tree = MV0F_Tree(ddpTree=tree)
 		else:
 			a_tree = None
 		if a_tree is None:

@@ -19,14 +19,21 @@ class Tree_extend(object):
                     node.name = 'I' + str(i)
                 i += 1
         
-        def Topdown_label(self):
+        def Topdown_label(self,label_type="all"):
             # assign each node a label so that we can later relate to it
             i = 0
+
             for node in self.ddpTree.preorder_node_iter():
                 if node.is_leaf():
-                    node.name = 'L' + str(i)
+                    if label_type == "all" or label_type == "leaves":
+                        node.name = 'L' + str(i)
+                    else:
+                        node.name = node.taxon.label
                 else:
-                    node.name = 'I' + str(i)
+                    if label_type == "all" or label_type == "internal":
+                        node.name = 'I' + str(i)
+                    else:
+                        node.name = node.label    
                 i += 1
 
         def Bottomup_update(self):
