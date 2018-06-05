@@ -145,17 +145,25 @@ class Tree_extend(object):
             self.prepare_root()
             self.Topdown_update()
 
+        def opt_score(self):
+            print("Abstract class! Should never be called")
+
+
+        def report_score(self):
+            print("Abstract class! Should never be called")
+
         def Reroot(self):
             
             self.find_root()
-            
-            d2currRoot = 0
-            br2currRoot = 0
+         
+            #d2currRoot = 0
+            #br2currRoot = 0
             if self.opt_root != self.ddpTree.seed_node:
-                d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                #d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
             
             #return head_id, tail_id, edge_length, self.opt_x
-            return d2currRoot,br2currRoot
+            #return d2currRoot,br2currRoot
             
         def Opt_function(self,node):
             print("Abstract method! Should never be called")
@@ -303,12 +311,13 @@ class OGR_Tree(Tree_extend):
             super(OGR_Tree,self).__init__(ddpTree, tree_file, schema)
             self.OGs = set(outgroups)
             self.nOGs = len(outgroups)
-            self.nIGs = len(self.ddpTree.leaf_nodes())
+            self.nIGs = len(self.ddpTree.leaf_nodes()) - self.nOGs
+            self.max_nTrpls = self.nIGs*self.nOGs*(self.nOGs-1)/2 + self.nOGs*self.nIGs*(self.nIGs-1)/2
             self.reset()
 
         def reset(self):
             self.opt_root = self.ddpTree.seed_node    
-            self.max_nTrpls = 0
+            self.opt_nTrpls = 0
 
         def Node_init(self, node, nTrpl_in=0, nTrpl_out = 0, nOGs = 0, nIGs = 0): 
             node.nTrpl_in = nTrpl_in
@@ -318,8 +327,8 @@ class OGR_Tree(Tree_extend):
             
         def Opt_function(self,node):
             curr_nTrpls = node.nTrpl_in + node.nTrpl_out
-            if curr_nTrpls > self.max_nTrpls:
-                self.max_nTrpls = curr_nTrpls
+            if curr_nTrpls > self.opt_nTrpls:
+                self.opt_nTrpls = curr_nTrpls
                 self.opt_root = node
                 self.opt_x = node.edge_length/2 # NOTE: this method does not consider branch length, the *middle point* of the edge is just arbitrarily chosen
                 
@@ -363,6 +372,11 @@ class OGR_Tree(Tree_extend):
         def prepare_root(self):
             pass
                     
+        def opt_score(self):
+            return self.opt_nTrpls/float(self.max_nTrpls)
+
+        def report_score(self):
+            return "Triplet score: " + str(self.opt_score())    
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
@@ -409,6 +423,12 @@ class MPR_Tree(Tree_extend):
         def compute_threhold(self, k=3.5):
             print("We don't do thresholding for MPR_Tree. How come it got here?")
             return 0
+ 
+        def opt_score(self):
+            return self.max_distance/2
+
+        def report_score(self):
+            return "Tree height: " + str(self.opt_score())    
 
 class minVAR_Base_Tree(Tree_extend):
      # supportive base class to implement VAR-reroot, hence the name
@@ -476,6 +496,12 @@ class minVAR_Base_Tree(Tree_extend):
             root.sum_total = root.sum_in
             self.compute_dRoot_VAR()
             self.total_leaves = root.nleaf
+
+        def opt_score(self):
+            return self.minVAR
+        
+        def report_score(self):
+            return "MinVar score: " + str(self.opt_score())    
 
 class MVDF_Tree(minVAR_Base_Tree):
     # supportive class to implement VAR-reroot + deepest node + factorization
