@@ -17,10 +17,28 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 ## Usage
 
+
 ```bash
-python FastRoot.py [-h] [-i INPUT] [-m METHOD] [-o OUTFILE] [-s SCHEMA]
+FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE]
 ```
+
+optional arguments:
 ```
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Input File (default is STDIN)
+  -m METHOD, --method METHOD
+                        Method (MP for midpoint, MV for minVAR, OG for
+                        outgroup) (default is MV)
+  -g OUTGROUPS, --outgroups OUTGROUPS
+                        Listing of the outgroups; to be used with -m OG
+  -o OUTFILE, --outfile OUTFILE
+                        Output File (default is STDOUT)
+  -s SCHEMA, --schema SCHEMA
+                        Schema of your input treefile (default is newick)
+  -f INFOFILE, --infofile INFOFILE
+                        Report the optimization score to file
+
 -h, --help            show this help message and exit
 
 -i INPUT, --input INPUT
@@ -43,16 +61,8 @@ python FastRoot.py [-h] [-i INPUT] [-m METHOD] [-o OUTFILE] [-s SCHEMA]
 
 NOTE: `FastRoot.py` works for a list of trees
 
-The following scripts might be more handy but only work with single-tree input
-
-```bash
-python MP_reroot.py <tree_file_in_newick>
-python MV_reroot.py <tree_file_in_newick>
-```
-
 ## Output
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output.
-`MP_reroot.py` and `MV_reroot.py` will place the output in the same directory as the input tree with suffix `MP_rooted` or `MV_rooted` accordingly.
 
 ## Pseudocode
 ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)

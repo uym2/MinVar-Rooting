@@ -17,7 +17,7 @@ parser.add_argument('-m','--method',required=False,type=str,default="MV",help="M
 parser.add_argument('-g','--outgroups',required=False,type=str,help="Listing of the outgroups; to be used with -m OG")
 parser.add_argument('-o','--outfile',required=False,type=argparse.FileType('w'),default=stdout,help="Output File (default is STDOUT)")
 parser.add_argument('-s','--schema',required=False,type=str,default="newick",help="Schema of your input treefile (default is newick)")
-parser.add_argument('-f','--infofile',required=False,type=argparse.FileType('w'),default=None,help="Write info of the new root to file (mostly for research and debugging purposes) (default is None)")
+parser.add_argument('-f','--infofile',required=False,type=argparse.FileType('w'),default=None,help="Report the optimization score to file")
 
 args = parser.parse_args()
 
