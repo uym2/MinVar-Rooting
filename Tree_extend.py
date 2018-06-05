@@ -366,18 +366,19 @@ class OGR_Tree(Tree_extend):
                     for c2 in C1[i+1:]:
                         IG_trpls = c1.nIGs*c2.nIGs*child.nOGs
                         OG_trpls = c1.nOGs*c2.nOGs*child.nIGs
-                        node.nTrpl_out += IG_trpls + OG_trpls
-
+                        
+                        child.nTrpl_out += IG_trpls + OG_trpls
+                        
                 opt_function(child)
                     
         def prepare_root(self):
             pass
                     
         def opt_score(self):
-            return self.opt_nTrpls/float(self.max_nTrpls)
+            return self.opt_nTrpls/float(self.max_nTrpls) if self.max_nTrpls != 0 else None
 
         def report_score(self):
-            return "Triplet score: " + str(self.opt_score())    
+            return "Triplet score: " + str(self.opt_score()) if self.opt_score() is not None else "Warning: OG rooting failed because the tree has no outgroup"   
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
