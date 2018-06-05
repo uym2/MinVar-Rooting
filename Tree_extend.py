@@ -294,6 +294,76 @@ class Tree_extend(object):
         def get_root(self):
             return self.ddpTree.seed_node
 
+class OGR_Tree(Tree_extend):
+    # supportive class to implement outgroup-reroot (OGR = outgroup reroot, hence the name)
+    # this rooting method solve the difficulty in finding the root when there are mulitple outgroups
+    # and they are not monophyletic. It seeks for the rooting place that maximizes the triplet score
+    # of the specified outgroups.
+        def __init__(self, outgroups ,ddpTree = None, tree_file = None, schema = "newick"):
+            super(OGR_Tree,self).__init__(ddpTree, tree_file, schema)
+            self.OGs = set(outgroups)
+            self.nOGs = len(outgroups)
+            self.nIGs = len(self.ddpTree.leaf_nodes())
+            self.reset()
+
+        def reset(self):
+            self.opt_root = self.ddpTree.seed_node    
+            self.max_nTrpls = 0
+
+        def Node_init(self, node, nTrpl_in=0, nTrpl_out = 0, nOGs = 0, nIGs = 0): 
+            node.nTrpl_in = nTrpl_in
+            node.nTrpl_out = nTrpl_out
+            node.nOGs = nOGs
+            node.nIGs = nIGs
+            
+        def Opt_function(self,node):
+            curr_nTrpls = node.nTrpl_in + node.nTrpl_out
+            if curr_nTrpls > self.max_nTrpls:
+                self.max_nTrpls = curr_nTrpls
+                self.opt_root = node
+                self.opt_x = node.edge_length/2 # NOTE: this method does not consider branch length, the *middle point* of the edge is just arbitrarily chosen
+                
+        def bUp_update(self,node):
+            if node.is_leaf():
+                node.nOGs = 1 if node.taxon.label in self.OGs else 0               
+                node.nIGs = 1 if node.nOGs == 0 else 0
+            else:
+                C = node.child_nodes()
+
+                node.nOGs = sum([ c.nOGs for c in C ] )
+                node.nIGs = sum([ c.nIGs for c in C ] )
+                
+                node.nTrpl_in = sum([ c.nTrpl_in for c in C ])
+            
+                for i,c1 in enumerate(C):
+                    for c2 in C[i+1:]:
+                        IG_trpls = c1.nIGs*c2.nIGs*(self.nOGs - node.nOGs) 
+                        OG_trpls = c1.nOGs*c2.nOGs*(self.nIGs - node.nIGs) 
+                        node.nTrpl_in += IG_trpls + OG_trpls
+
+        def tDown_update(self,node, opt_function):
+            C = node.child_nodes()
+
+            for child in C:
+                C1 = [ c for c in C if c is not child ]
+                child.nTrpl_out = node.nTrpl_out
+ 
+                for i,c1 in enumerate(C1):
+                    child.nTrpl_out += c1.nTrpl_in
+                    child.nTrpl_out += (self.nIGs - node.nIGs)*c1.nIGs*child.nOGs
+                    child.nTrpl_out += (self.nOGs - node.nOGs)*c1.nOGs*child.nIGs
+
+                    for c2 in C1[i+1:]:
+                        IG_trpls = c1.nIGs*c2.nIGs*child.nOGs
+                        OG_trpls = c1.nOGs*c2.nOGs*child.nIGs
+                        node.nTrpl_out += IG_trpls + OG_trpls
+
+                opt_function(child)
+                    
+        def prepare_root(self):
+            pass
+                    
+
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
