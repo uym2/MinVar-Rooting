@@ -38,25 +38,6 @@ optional arguments:
                         Schema of your input treefile (default is newick)
   -f INFOFILE, --infofile INFOFILE
                         Report the optimization score to file
-
--h, --help            show this help message and exit
-
--i INPUT, --input INPUT
-                      Input File (default is STDIN)
-
--m METHOD, --method METHOD
-                      Method (MP for midpoint, MV for minVAR) (default is
-                      MV)
-
--o OUTFILE, --outfile OUTFILE
-                      Output File (default is STDOUT)
-
--s SCHEMA, --schema SCHEMA
-                      Schema of your input treefile (default is newick)
-
--f INFOFILE, --infofile INFOFILE
-                      Write info of the new root to file (mostly for
-                      research and debugging purposes) (default is None)
 ```
 
 NOTE: `FastRoot.py` works for a list of trees
