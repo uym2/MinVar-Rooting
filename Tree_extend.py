@@ -169,18 +169,11 @@ class Tree_extend(object):
             print("Abstract method! Should never be called")
 
 
-        def tree_as_newick(self, outfile=None, append = False, label_by_name = False):
+        def tree_as_newick(self, outstream=sys.stdout, label_by_name = False):
         # dendropy's method to write newick seems to have problem ...
-            if outfile:
-                outstream = open(outfile,'a' if append else 'w')
-#                outstream = open(outfile,'ab' if append else 'wb')
-            else:
-                outstream = sys.stdout
             self.__write_newick(self.ddpTree.seed_node, outstream, label_by_name = label_by_name)
             outstream.write(";\n")
 #            outstream.write(bytes(";\n", "ascii"))
-            if outfile:
-                outstream.close()
 
         def __write_newick(self, node, outstream, label_by_name = False):
             if node.is_leaf():

@@ -37,9 +37,9 @@ for line in args.input:
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")
 
-    args.outfile.write(a_tree.ddpTree.as_string("newick"))     
+    #args.outfile.write(a_tree.ddpTree.as_string("newick"))     
 
-    #a_tree.tree_as_newick(outfile=args.outfile,append=True)
+    a_tree.tree_as_newick(outstream=args.outfile)
 
 #if args.infofile:
     #args.infofile.close()
