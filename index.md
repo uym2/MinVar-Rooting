@@ -9,10 +9,6 @@ Github page for [the python code](https://github.com/uym2/MinVar-Rooting) for MV
 Github page for [scripts and pipelines](https://github.com/esayyari/simphy-uyen).
 
 ## Datasets
-## 
-
-
-
 ### D1 dataset (30 taxon) 
 
 [True trees](https://drive.google.com/file/d/0B6VQuQbxaAq-bmx6NGdIb2JTZmc/view?usp=sharing) 
@@ -38,3 +34,4 @@ and
 ## Contact
 Uyen Mai    
 umai@eng.ucsd.edu
+-
