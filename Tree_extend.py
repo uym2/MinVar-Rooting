@@ -1,4 +1,4 @@
-#from dendropy import Tree
+from dendropy import Tree
 from treeswift import *
 import sys
 import math
@@ -6,8 +6,6 @@ import math
 class Tree_extend(object):
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
                 if tree_file:
-                    #self.ddpTree = Tree.get_from_path(tree_file,schema,preserve_underscores=True)
-                        #not sure how to maintain preserve_underscores
                     self.ddpTree = read_tree(tree_file, schema)
                 else:
                     self.ddpTree = ddpTree
@@ -30,8 +28,7 @@ class Tree_extend(object):
                 if node.is_leaf():
                     if label_type == "all" or label_type == "leaves":
                         node.label = 'L' + str(i)
-                        #node.set_label('L' + str(i))
-                        ######### ^ is either better/more efficient?
+                        #node.set_label('L' + str(i)) --alternative but same as line above
                     '''
                     else:
                         node.label = node.label  ### redundant bc already has label
@@ -47,12 +44,12 @@ class Tree_extend(object):
 
         def Bottomup_update(self):
             for node in self.ddpTree.traverse_postorder():
-                self.Node_init(node) ######## ?
-                self.bUp_update(node) ####### ?
+                self.Node_init(node) ##
+                self.bUp_update(node) ##
             
         def Topdown_update(self):
             for node in self.ddpTree.traverse_preorder():
-                self.tDown_update(node,self.Opt_function) #######
+                self.tDown_update(node,self.Opt_function) ##
 
         def compute_distances(self):
             D = {}
