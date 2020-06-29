@@ -1,11 +1,14 @@
-from dendropy import Tree
+#from dendropy import Tree
+from treeswift import *
 import sys
 import math
 
 class Tree_extend(object):
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
                 if tree_file:
-                    self.ddpTree = Tree.get_from_path(tree_file,schema,preserve_underscores=True)
+                    #self.ddpTree = Tree.get_from_path(tree_file,schema,preserve_underscores=True)
+                        #not sure how to maintain preserve_underscores
+                    self.ddpTree = read_tree(tree_file, schema)
                 else:
                     self.ddpTree = ddpTree
 
