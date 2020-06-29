@@ -62,7 +62,12 @@ class Tree_extend(object):
                 else:
                     for child in node.child_nodes():
                         __compute_dRoot__(child,cumm_l+child.edge_length)
-            __compute_dRoot__(self.ddpTree.seed_node,0)
+
+            root = None
+            for node in self.ddpTree.traverse_preorder():
+                root = node
+                break
+            __compute_dRoot__(root,0)
             return D
 
         def compute_ingroup_distances(self):
@@ -73,16 +78,19 @@ class Tree_extend(object):
                 else:
                     for child in node.child_nodes():
                         __compute_dLeaf__(child,cumm_l+child.edge_length)
-                        ###### what is this method
 
-            children = self.ddpTree.seed_node.child_nodes()
-            ###### what is a seed_node
+            #### replacing seed_node by finding root:
+            root = None
+            for node in self.dppTree.traverse_preorder():
+                root = node
+                break
+            children = root.child_nodes()
             crowded_child = None
             maxleaf = -1
 
             for node in children:
                 if node.nleaf > maxleaf:
-                    maxleaf = node.nleaf
+                    maxleaf = node.nleaf #####
                     crowded_child = node
 
             __compute_dLeaf__(children[1],0)
