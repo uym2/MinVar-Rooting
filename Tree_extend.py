@@ -15,48 +15,53 @@ class Tree_extend(object):
         def Bottomup_label(self):
             # assign each node a label so that we can later relate to it
             i = 0
-            for node in self.ddpTree.postorder_node_iter():
+            for node in self.ddpTree.traverse_postorder():
                 if node.is_leaf():
-                    node.name = 'L' + str(i)
+                    node.label = 'L' + str(i)
                 else:
-                    node.name = 'I' + str(i)
+                    node.label = 'I' + str(i)
                 i += 1
         
         def Topdown_label(self,label_type="all"):
             # assign each node a label so that we can later relate to it
             i = 0
 
-            for node in self.ddpTree.preorder_node_iter():
+            for node in self.ddpTree.traverse_preorder():
                 if node.is_leaf():
                     if label_type == "all" or label_type == "leaves":
-                        node.name = 'L' + str(i)
+                        node.label = 'L' + str(i)
+                        #node.set_label('L' + str(i))
+                        ######### ^ is either better/more efficient?
+                    '''
                     else:
-                        node.name = node.taxon.label
+                        node.label = node.label  ### redundant bc already has label
+                        '''
                 else:
                     if label_type == "all" or label_type == "internal":
-                        node.name = 'I' + str(i)
+                        node.label = 'I' + str(i)
+                    '''
                     else:
-                        node.name = node.label    
+                        node.label = node.label
+                        '''
                 i += 1
 
         def Bottomup_update(self):
-            for node in self.ddpTree.postorder_node_iter():
-                self.Node_init(node)
-                self.bUp_update(node)
+            for node in self.ddpTree.traverse_postorder():
+                self.Node_init(node) ######## ?
+                self.bUp_update(node) ####### ?
             
         def Topdown_update(self):
-            for node in self.ddpTree.preorder_node_iter():
-                self.tDown_update(node,self.Opt_function)
+            for node in self.ddpTree.traverse_preorder():
+                self.tDown_update(node,self.Opt_function) #######
 
         def compute_distances(self):
             D = {}
             def __compute_dRoot__(node,cumm_l):
                 if node.is_leaf():
-                    D[node.name] = cumm_l
+                    D[node.label] = cumm_l
                 else:
-                    for child in node.child_node_iter():
-                        __compute_dRoot__(child,cumm_l+child.edge_length)      
-
+                    for child in node.child_nodes():
+                        __compute_dRoot__(child,cumm_l+child.edge_length)
             __compute_dRoot__(self.ddpTree.seed_node,0)
             return D
 
@@ -66,10 +71,12 @@ class Tree_extend(object):
                 if node.is_leaf():
                     D.append(cumm_l)
                 else:
-                    for child in node.child_node_iter():
-                        __compute_dLeaf__(child,cumm_l+child.edge_length)      
+                    for child in node.child_nodes():
+                        __compute_dLeaf__(child,cumm_l+child.edge_length)
+                        ###### what is this method
 
             children = self.ddpTree.seed_node.child_nodes()
+            ###### what is a seed_node
             crowded_child = None
             maxleaf = -1
 
@@ -194,7 +201,7 @@ class Tree_extend(object):
                 outstream.write('(')
                 #outstream.write(bytes('(', "ascii"))
                 is_first_child = True
-                for child in node.child_node_iter():
+                for child in node.child_nodes():
                     if is_first_child:
                         is_first_child = False
                     else:
