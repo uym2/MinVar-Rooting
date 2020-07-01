@@ -7,7 +7,7 @@ def compute_variance(tree):  # tree is rooted
     for v in tree.traverse_preorder():
         if not v.is_root():
             # v.set_edge_length(4)  -- must have defined edge lengths
-            v.droot = v.get_parent().droot + v.get_edge_length()
+            v.droot = v.get_parent().droot + v.edge_length
             if v.is_leaf():
                 D.append(v.droot)
     SSD, ST = 0, 0

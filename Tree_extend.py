@@ -164,7 +164,7 @@ class Tree_extend(object):
          
             #d2currRoot = 0
             #br2currRoot = 0
-            if self.opt_root != self.ddpTree.seed_node:
+            if self.opt_root != self.ddpTree.root:
                 #d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
                 self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
             
@@ -177,7 +177,7 @@ class Tree_extend(object):
 
         def tree_as_newick(self, outstream=sys.stdout, label_by_name = False):
         # dendropy's method to write newick seems to have problem ...
-            self.__write_newick(self.ddpTree.seed_node, outstream, label_by_name = label_by_name)
+            self.__write_newick(self.ddpTree.root, outstream, label_by_name = label_by_name)
             outstream.write(";\n")
 #            outstream.write(bytes(";\n", "ascii"))
 
@@ -246,12 +246,12 @@ class Tree_extend(object):
             br2currRoot = 0
             d2currRoot = length1
 
-#            if tail.label == self.ddpTree.seed_node.label:
-            if (tail is self.ddpTree.seed_node):
+#            if tail.label == self.ddpTree.root.label:
+            if (tail is self.ddpTree.root):
                 head = new_root
 
 
-            while tail is not self.ddpTree.seed_node:
+            while tail is not self.ddpTree.root:
 # MAD@ add
                 q = tail.parent_node
 # End MAD@ add
@@ -272,7 +272,7 @@ class Tree_extend(object):
                 tail.edge_length=l
                 l = l1
                 
-            # out of while loop: tail IS now tree.seed_node
+            # out of while loop: tail IS now tree.root
             if tail.num_child_nodes() == 1:
                 # merge the 2 branches of the old root and adjust the branch length
                 #sis = [child for child in tail.child_node_iter()][0]
@@ -284,9 +284,9 @@ class Tree_extend(object):
                 head.remove_child(tail)
                 #tail.remove_child(head)
 
-            new_root.name = self.ddpTree.seed_node.name
-            self.ddpTree.seed_node.name = "OLD"
-            self.ddpTree.seed_node = new_root
+            new_root.name = self.ddpTree.root.name
+            self.ddpTree.root.name = "OLD"
+            self.ddpTree.root = new_root
 
 ### MAD@ add
 #            for node in self.ddpTree.postorder_node_iter():
@@ -299,7 +299,7 @@ class Tree_extend(object):
             return d2currRoot,br2currRoot
 
         def get_root(self):
-            return self.ddpTree.seed_node
+            return self.ddpTree.root
 
 class OGR_Tree(Tree_extend):
     # supportive class to implement outgroup-reroot (OGR = outgroup reroot, hence the name)
@@ -316,7 +316,7 @@ class OGR_Tree(Tree_extend):
             self.reset()
 
         def reset(self):
-            self.opt_root = self.ddpTree.seed_node    
+            self.opt_root = self.ddpTree.root
             self.opt_nTrpls = 0
 
         def Node_init(self, node, nTrpl_in=0, nTrpl_out = 0, nOGs = 0, nIGs = 0): 
@@ -387,7 +387,7 @@ class MPR_Tree(Tree_extend):
 
         def reset(self):
             self.max_distance = -1
-            self.opt_root = self.ddpTree.seed_node
+            self.opt_root = self.ddpTree.root
             self.opt_x = 0
 
         def Node_init(self, node, max_in = None, max_out = -1):
@@ -439,7 +439,7 @@ class minVAR_Base_Tree(Tree_extend):
 
         def reset(self):
             self.minVAR = None
-            self.opt_root = self.ddpTree.seed_node
+            self.opt_root = self.ddpTree.root
             self.opt_x = 0
 
         def Node_init(self, node, nleaf = 1, sum_in = 0, sum_total = 0, var=-1):
@@ -667,7 +667,7 @@ class MBR_Tree(Tree_extend):
             super(MBR_Tree,self).__init__(ddpTree, tree_file, schema)
 
             self.BPs = [] # BPs : balance points
-            self.opt_root = self.ddpTree.seed_node
+            self.opt_root = self.ddpTree.root
             self.opt_x = 0
 
         def Node_init(self, node, nleaf = 1, sum_in = 0, sum_out=-1):
@@ -821,9 +821,9 @@ class MBR_Tree(Tree_extend):
                     break
                 nchild = len(node.child_nodes())
 
-            self.balance_tree.seed_node = node
-            self.balance_tree.seed_node.edge_length = None
-            #balance_tree.seed_node.edge = None
+            self.balance_tree.root = node
+            self.balance_tree.root.edge_length = None
+            #balance_tree.root.edge = None
            
             #mptre = MPR_Tree(ddpTree=balance_tree)
             #mptre.tree_as_newick()
