@@ -5,7 +5,7 @@
 import os
 from Tree_extend import MPR_Tree,MV00_Tree,OGR_Tree
 from dendropy import Tree,TreeList
-
+from treeswift import *
 from sys import stdin,stdout
 import argparse
 
@@ -26,7 +26,8 @@ assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoi
 OGs = args.outgroups.split() if args.outgroups else None
 
 for line in args.input:
-    tree = Tree.get(data=line,schema=args.schema.lower(),preserve_underscores=True)
+    tree = read_tree(line, schema=args.schema.lower()) ######
+    #tree = Tree.get(data=line,schema=args.schema.lower(),preserve_underscores=True)
     if args.method == 'OG':
         a_tree = OGR_Tree(OGs,ddpTree=tree)
     else:    
