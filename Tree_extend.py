@@ -809,7 +809,7 @@ class MBR_Tree(Tree_extend):
                         ch1.edge_length = ch.extraction_source.mean 
 
             # topdown pruning
-            node = self.balance_tree.seed_node
+            node = self.balance_tree.root
             nchild = len(node.child_nodes())
             while nchild > 0 and nchild < 2:
                 # node has less than 2 children
