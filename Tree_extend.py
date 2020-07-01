@@ -275,7 +275,7 @@ class Tree_extend(object):
             # out of while loop: tail IS now tree.root
             if tail.num_child_nodes() == 1:
                 # merge the 2 branches of the old root and adjust the branch length
-                #sis = [child for child in tail.child_node_iter()][0]
+                #sis = [child for child in tail.child_nodes()][0]
                 sis = tail.child_nodes()[0]
                 l = sis.edge_length
                 tail.remove_child(sis)    
@@ -289,7 +289,7 @@ class Tree_extend(object):
             self.ddpTree.root = new_root
 
 ### MAD@ add
-#            for node in self.ddpTree.postorder_node_iter():
+#            for node in self.ddpTree.postorder_nodes():
 #                for child in node.child_nodes():
 #                    if child.parent_node is not node:
 #                        print("Error found!")
@@ -407,12 +407,12 @@ class MPR_Tree(Tree_extend):
         def bUp_update(self, node):
             if not node.is_leaf():
                 node.max_in=[]
-                for child in node.child_node_iter():
+                for child in node.child_nodes():
                     node.max_in.append(max(child.max_in) + child.edge_length)    
         
         def tDown_update(self, node, opt_function):
             child_idx = 0
-            for child in node.child_node_iter():
+            for child in node.child_nodes():
                 child.max_out = max([node.max_out] + [node.max_in[k] for k in range(len(node.max_in))
                                 if k != child_idx]) + child.edge_length
                 opt_function(child)
@@ -458,7 +458,7 @@ class minVAR_Base_Tree(Tree_extend):
                     cumm['ssq'] += cumm_l**2
                     cumm['sum'] += cumm_l
                 else:
-                    for child in node.child_node_iter():
+                    for child in node.child_nodes():
                         compute_dRoot(child, cumm_l + child.edge_length)
 
             compute_dRoot(self.get_root(), 0)
@@ -473,7 +473,7 @@ class minVAR_Base_Tree(Tree_extend):
             else:
                 node.nleaf = 0
                 node.sum_in = 0
-                for child in node.child_node_iter():
+                for child in node.child_nodes():
                     node.nleaf += child.nleaf
                     node.sum_in += child.sum_in + child.nleaf * child.edge_length
         
@@ -487,7 +487,7 @@ class minVAR_Base_Tree(Tree_extend):
             return a, b, c
     
         def tDown_update(self, node, opt_function):
-            for child in node.child_node_iter():    
+            for child in node.child_nodes():
                 child.sum_total = node.sum_total + (self.total_leaves - 2 * child.nleaf) * child.edge_length
                 a, b, c = self.Update_var(child, node, child.edge_length)
                 opt_function(child, a, b, c)
@@ -694,13 +694,13 @@ class MBR_Tree(Tree_extend):
                 node.nleaf = 1
             else:
                 node.nleaf = 0
-                for child in node.child_node_iter():
+                for child in node.child_nodes():
                     node.nleaf += child.nleaf
                     node.sum_in += child.sum_in + child.nleaf*child.edge_length
 
         def tDown_update(self, node, opt_function):
             child_idx = 0
-            for child in node.child_node_iter():    
+            for child in node.child_nodes():
                 child.sum_out = (node.sum_out + node.sum_in + child.edge_length * 
                                 (self.total_leaves - 2*child.nleaf) - child.sum_in)
                 opt_function(child)
@@ -738,7 +738,7 @@ class MBR_Tree(Tree_extend):
             self.balance_tree = self.ddpTree.extract_tree()
             
             # bottom up pruning
-            for node in self.balance_tree.postorder_node_iter():    
+            for node in self.balance_tree.postorder_nodes():
                 node.type = "real"
                 node.BPbelow = False
                 
@@ -759,7 +759,7 @@ class MBR_Tree(Tree_extend):
 
                     if not ch.BPbelow:
                         # remove the whole clade under ch
-                        #for ch1 in ch.child_node_iter():
+                        #for ch1 in ch.child_nodes():
                         #    ch.remove_child(ch1)
                         edgelen = ch.edge_length
                         node.remove_child(ch)
