@@ -44,12 +44,12 @@ class Tree_extend(object):
 
         def Bottomup_update(self):
             for node in self.ddpTree.traverse_postorder():
-                self.Node_init(node) ##
-                self.bUp_update(node) ##
+                self.Node_init(node)
+                self.bUp_update(node)
             
         def Topdown_update(self):
             for node in self.ddpTree.traverse_preorder():
-                self.tDown_update(node,self.Opt_function) ##
+                self.tDown_update(node,self.Opt_function)
 
         def compute_distances(self):
             D = {}
@@ -78,7 +78,7 @@ class Tree_extend(object):
 
             for node in children:
                 if node.nleaf > maxleaf:
-                    maxleaf = node.nleaf #####
+                    maxleaf = node.nleaf
                     crowded_child = node
 
             __compute_dLeaf__(children[1],0)
@@ -218,7 +218,7 @@ class Tree_extend(object):
                 outstream.write(":" + str(node.edge_length))
 #                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
 
-        def reroot_at_edge(self, edge, length1, length2):
+        def reroot_at_edge(self, edge, length1, length2):  #########
         # the method provided by dendropy DOESN'T seem to work ...
             if not edge:
                 return
