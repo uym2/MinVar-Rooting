@@ -222,6 +222,7 @@ class Tree_extend(object):
         def reroot_at_edge(self, node, length): # node is node below new root and length is the distance between them
             self.reroot(node,length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+            return
 
 
 '''
@@ -307,7 +308,7 @@ class Tree_extend(object):
             
             '''
 
-    def get_root(self):
+        def get_root(self):
             return self.ddpTree.root
 
 class OGR_Tree(Tree_extend):
