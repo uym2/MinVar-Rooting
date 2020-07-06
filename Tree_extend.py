@@ -214,10 +214,11 @@ class Tree_extend(object):
 
         def reroot_at_edge(self, edge, length1, length2):
         # the method provided by dendropy DOESN'T seem to work ...
+        # change edge to opt_root
             if not edge:
                 return
-            head = edge.head_node
-            tail = edge.tail_node
+            head = edge.head_node #opt_root = v
+            tail = edge.tail_node #u parent of opt_root
             if not tail:
                 return
         
