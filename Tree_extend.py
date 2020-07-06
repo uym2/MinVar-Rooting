@@ -307,7 +307,7 @@ class Tree_extend(object):
             
             '''
 
-        def get_root(self):
+    def get_root(self):
             return self.ddpTree.root
 
 class OGR_Tree(Tree_extend):
