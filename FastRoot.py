@@ -26,7 +26,7 @@ assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoi
 OGs = args.outgroups.split() if args.outgroups else None
 
 for line in args.input:
-    tree = read_tree(line, schema=args.schema.lower()) ######
+    tree = read_tree(line, schema=args.schema.lower()) ####
     #tree = Tree.get(data=line,schema=args.schema.lower(),preserve_underscores=True)
     if args.method == 'OG':
         a_tree = OGR_Tree(OGs,ddpTree=tree)

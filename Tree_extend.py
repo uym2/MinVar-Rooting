@@ -166,8 +166,8 @@ class Tree_extend(object):
             #br2currRoot = 0
             if self.opt_root != self.ddpTree.root:
                 #d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-                ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-                self.reroot(self.opt_root,self.opt_x) ##############
+                #self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                self.reroot_at_edge(self.opt_root,self.opt_root.edge_length-self.opt_x) ##############
             
             #return head_id, tail_id, edge_length, self.opt_x
             #return d2currRoot,br2currRoot
@@ -219,6 +219,12 @@ class Tree_extend(object):
                 outstream.write(":" + str(node.edge_length))
 #                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
 
+        def reroot_at_edge(self, node, length): # node is node below new root and length is the distance between them
+            self.reroot(node,length)
+            ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+
+
+'''
         def reroot_at_edge(self, edge, length1, length2):  #########
         # the method provided by dendropy DOESN'T seem to work ...
             if not edge:
@@ -298,6 +304,8 @@ class Tree_extend(object):
 ### MAD@ add
 
             return d2currRoot,br2currRoot
+            
+            '''
 
         def get_root(self):
             return self.ddpTree.root
@@ -358,7 +366,7 @@ class OGR_Tree(Tree_extend):
                 C1 = [ c for c in C if c is not child ]
                 child.nTrpl_out = node.nTrpl_out
  
-                for i,c1 in enumerate(C1):
+                for i,c1 in enumerate(C1): ####DON'T FULLY UNDERSTAND
                     child.nTrpl_out += c1.nTrpl_in
                     child.nTrpl_out += (self.nIGs - node.nIGs)*c1.nIGs*child.nOGs
                     child.nTrpl_out += (self.nOGs - node.nOGs)*c1.nOGs*child.nIGs
