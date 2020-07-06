@@ -185,7 +185,7 @@ class Tree_extend(object):
         def __write_newick(self, node, outstream, label_by_name = False):
             if node.is_leaf():
                 if label_by_name:
-                    outstream.write(node.label)
+                    outstream.write(str(node.label))
 #                    outstream.write(bytes(str(node.name), "ascii"))
                 else:
                     try:
@@ -209,7 +209,7 @@ class Tree_extend(object):
 #                outstream.write(bytes(')', "ascii"))
             if not node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.name))
+                    outstream.write(str(node.label))
 #                    outstream.write(bytes(str(node.name), "ascii"))
                 elif node.label is not None:
                     outstream.write(str(node.label))
@@ -225,14 +225,12 @@ class Tree_extend(object):
         def reroot_at_edge(self, node, length): # node is node below new root and length is the distance between them
             #self.reroot(node,length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-            return
+
 
             if not isinstance(node, Node):
                 raise TypeError("node must be a Node")
             if length is not None and not isinstance(length, float) and not isinstance(length, int):
                 raise TypeError("length must be a float")
-            if not isinstance(branch_support, bool):
-                raise TypeError("branch_support must be a bool")
             if length is not None and length < 0:
                 raise ValueError("Specified length at which to reroot must be positive")
             if node.edge_length is None:
@@ -251,7 +249,7 @@ class Tree_extend(object):
                 node = newnode
             if node.is_root():
                 return
-            elif self.root.edge_length is not None:
+            elif self.get_root().edge_length is not None:
                 newnode = Node(label='ROOT');
                 newnode.add_child(self.root);
                 self.root = newnode
@@ -260,15 +258,11 @@ class Tree_extend(object):
                 curr = ancestors[i];
                 curr.parent.edge_length = curr.edge_length;
                 curr.edge_length = None
-                if branch_support:
-                    curr.parent.label = curr.label;
-                    curr.label = None
                 curr.parent.children.remove(curr);
                 curr.add_child(curr.parent);
                 curr.parent = None
             self.root = node;
             self.is_rooted = True
-
 
 
 '''
