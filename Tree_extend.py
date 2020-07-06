@@ -166,7 +166,8 @@ class Tree_extend(object):
             #br2currRoot = 0
             if self.opt_root != self.ddpTree.root:
                 #d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-                self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                self.reroot(self.opt_root,self.opt_x) ##############
             
             #return head_id, tail_id, edge_length, self.opt_x
             #return d2currRoot,br2currRoot
