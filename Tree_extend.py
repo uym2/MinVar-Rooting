@@ -271,13 +271,6 @@ class Tree_extend(object):
 
 
 
-
-
-
-
-
-
-
 '''
         def reroot_at_edge(self, edge, length1, length2):  #########
         # the method provided by dendropy DOESN'T seem to work ...
