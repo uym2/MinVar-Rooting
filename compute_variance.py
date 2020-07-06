@@ -1,6 +1,5 @@
 from treeswift import *
 
-
 def compute_variance(tree):  # tree is rooted
     tree.root.droot = 0
     D = []

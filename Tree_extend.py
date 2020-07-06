@@ -120,12 +120,12 @@ class Tree_extend(object):
                     p.child_removed = True
                     removed = True
                     try:
-                        print(node.taxon.label + " removed")
+                        print(node.label + " removed")
                     except:
-                        print(node.name + " removed")
+                        print(node.label + " removed") ### doen't make sense anymore
                 #elif len(node.child_nodes()) == 1:
-                elif node.num_child_nodes() == 1:
-                    print(node.name)
+                elif node.num_children() == 1:
+                    print(node.label)
                     # remove node and attach its only child to its parent
                     e1 = node.edge_length
                     child = node.child_nodes()[0]
@@ -185,11 +185,11 @@ class Tree_extend(object):
         def __write_newick(self, node, outstream, label_by_name = False):
             if node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.name))
+                    outstream.write(node.label)
 #                    outstream.write(bytes(str(node.name), "ascii"))
                 else:
                     try:
-                        outstream.write(node.taxon.label)
+                        outstream.write(node.label)
 #                        outstream.write(bytes(node.taxon.label, "ascii"))
                     except:
                         outstream.write(node.label)
