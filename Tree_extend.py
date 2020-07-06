@@ -355,7 +355,7 @@ class OGR_Tree(Tree_extend):
     # of the specified outgroups.
         def __init__(self, outgroups ,ddpTree = None, tree_file = None, schema = "newick"):
             super(OGR_Tree,self).__init__(ddpTree, tree_file, schema)
-            L = self.ddpTree.leaf_nodes()
+            L = self.ddpTree.traverse_leaves()
             self.OGs = set([ x.taxon.label for x in L if x.taxon.label in set(outgroups) ])
             self.nOGs = len(self.OGs)
             self.nIGs = len(L) - self.nOGs
@@ -785,7 +785,7 @@ class MBR_Tree(Tree_extend):
             self.balance_tree = self.ddpTree.extract_tree()
             
             # bottom up pruning
-            for node in self.balance_tree.postorder_nodes():
+            for node in self.balance_tree.traverse_postorder():
                 node.type = "real"
                 node.BPbelow = False
                 
