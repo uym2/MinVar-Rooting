@@ -1,4 +1,6 @@
 from treeswift import *
+from sys import argv
+
 
 def compute_variance(tree):  # tree is rooted
     tree.root.droot = 0
@@ -17,3 +19,7 @@ def compute_variance(tree):  # tree is rooted
     var = (SSD / n) - ((ST / n) ** 2)
     return var
     # output: non-negative float # which is the variance of the root-to-tip distance of the input
+
+myTreeFile = argv[1]
+myTree = read_tree_newick(myTreeFile)
+print(compute_variance(myTree))
