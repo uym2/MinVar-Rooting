@@ -219,6 +219,7 @@ class Tree_extend(object):
     def reroot_at_edge(self, node, length):
         #self.ddpTree.reroot(node, length)
 
+        '''
         if not isinstance(node, Node):
             raise TypeError("node must be a Node")
         if length is not None and not isinstance(length, float) and not isinstance(length, int):
@@ -231,8 +232,11 @@ class Tree_extend(object):
         elif length is not None and length > node.edge_length:
             raise ValueError("Specified length must be shorter than the edge at which to reroot")
         if length is not None and length > 0:
-            newnode = Node(edge_length=node.edge_length - length);
-            node.edge_length -= length
+            newnode = Node(edge_length=node.edge_length - length); #############
+            print(node.edge_length)
+            print(node.parent.edge_length)
+            print(length)
+            node.edge_length -= length ############
             if not node.is_root():
                 p = node.parent;
                 p.children.remove(node);
@@ -245,25 +249,31 @@ class Tree_extend(object):
             newnode = Node(label='ROOT');
             newnode.add_child(self.ddpTree.root);
             self.ddpTree.root = newnode
+        #self.ddpTree.root.label = 'r'
+        #node.label = 'nn'
         ancestors = [a for a in node.traverse_ancestors(include_self=True) if not a.is_root()]
         for i in range(len(ancestors) - 1, -1, -1):
             curr = ancestors[i];
+            #print(i)
+            print(curr.parent.edge_length)
             curr.parent.edge_length = curr.edge_length;
+            print(curr.parent.edge_length)
             curr.edge_length = None
             curr.parent.children.remove(curr);
             curr.add_child(curr.parent);
             curr.parent = None
         self.ddpTree.root = node;
         self.ddpTree.is_rooted = True
+        '''
 
-
-    '''
     # the method provided by dendropy DOESN'T seem to work ...
     # change edge to opt_root
-        if not edge:
+        length1 = node.edge_length-length
+        length2 = length
+        if not node:
             return
-        head = edge.head_node #opt_root = v
-        tail = edge.tail_node #u parent of opt_root
+        head = node #opt_root = v = node
+        tail = node.parent #u parent of opt_root
         if not tail:
             return
 
@@ -278,10 +288,10 @@ class Tree_extend(object):
         new_root.add_child(head)
         head.edge_length=length2
 
-        p = tail.parent_node
+        p = tail.parent
         l = tail.edge_length
 
-        new_root.add_child(tail)
+        new_root.add_child(tail) #never removed tail from its possible parent
         tail.edge_length = length1
 
         br2currRoot = 0
@@ -294,11 +304,12 @@ class Tree_extend(object):
 
         while tail is not self.ddpTree.root:
 # MAD@ add
-            q = tail.parent_node
+            #q = tail.parent #tail should have 2 parents right now: new_root and its old parent
+            q = head.parent
 # End MAD@ add
             head = tail
             tail = p
-            p = tail.parent_node
+            p = tail.parent
 
             br2currRoot += 1
             d2currRoot += l
@@ -306,7 +317,7 @@ class Tree_extend(object):
             l1 = tail.edge_length
             tail.remove_child(head)
 # MAD@ add
-            head.parent_node = q
+            head.parent = q #####
 # End MAD@ add
 
             head.add_child(tail)
@@ -314,7 +325,7 @@ class Tree_extend(object):
             l = l1
 
         # out of while loop: tail IS now tree.root
-        if tail.num_child_nodes() == 1:
+        if tail.num_children() == 1:
             # merge the 2 branches of the old root and adjust the branch length
             #sis = [child for child in tail.child_nodes()][0]
             sis = tail.child_nodes()[0]
@@ -338,11 +349,6 @@ class Tree_extend(object):
 ### MAD@ add
 
         return d2currRoot,br2currRoot
-
-        '''
-
-
-
 
     def get_root(self):
         return self.ddpTree.root
