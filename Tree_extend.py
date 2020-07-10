@@ -163,7 +163,7 @@ class Tree_extend(object):
         # br2currRoot = 0
         if self.opt_root != self.ddpTree.root:
             # d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-            self.reroot_at_edge(self.opt_root, self.opt_x)
+            self.reroot_at_edge(self.opt_root, self.opt_root.edge_length-self.opt_x)
 
         # return head_id, tail_id, edge_length, self.opt_x
         # return d2currRoot,br2currRoot
@@ -217,9 +217,7 @@ class Tree_extend(object):
     #                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
 
     def reroot_at_edge(self, node, length):
-        #self.ddpTree.reroot(node, node.edge_length - length)
-        '''
-        length = node.edge_length-length
+        #self.ddpTree.reroot(node, length)
 
         if not isinstance(node, Node):
             raise TypeError("node must be a Node")
@@ -245,8 +243,8 @@ class Tree_extend(object):
             return
         elif self.ddpTree.root.edge_length is not None:
             newnode = Node(label='ROOT');
-            newnode.add_child(self.root);
-            self.root = newnode
+            newnode.add_child(self.ddpTree.root);
+            self.ddpTree.root = newnode
         ancestors = [a for a in node.traverse_ancestors(include_self=True) if not a.is_root()]
         for i in range(len(ancestors) - 1, -1, -1):
             curr = ancestors[i];
@@ -255,9 +253,9 @@ class Tree_extend(object):
             curr.parent.children.remove(curr);
             curr.add_child(curr.parent);
             curr.parent = None
-        self.root = node;
-        self.is_rooted = True
-'''
+        self.ddpTree.root = node;
+        self.ddpTree.is_rooted = True
+
 
     '''
     # the method provided by dendropy DOESN'T seem to work ...
