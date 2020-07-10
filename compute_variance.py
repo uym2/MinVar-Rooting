@@ -1,5 +1,6 @@
 from treeswift import *
 from sys import argv
+from Tree_extend import *
 
 
 def compute_variance(tree):  # tree is rooted
@@ -23,3 +24,6 @@ def compute_variance(tree):  # tree is rooted
 myTreeFile = argv[1]
 myTree = read_tree_newick(myTreeFile)
 print(compute_variance(myTree))
+x = Tree_extend(myTree)
+y = minVAR_Base_Tree(x)
+print(y.report_score())
