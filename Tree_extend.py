@@ -13,11 +13,11 @@ class Tree_extend(object):
         def Bottomup_label(self):
             # assign each node a label so that we can later relate to it
             i = 0
-            for node in self.ddpTree.traverse_postorder():
+            for node in self.ddpTree.postorder_node_iter():
                 if node.is_leaf():
-                    node.label = 'L' + str(i)
+                    node.name = 'L' + str(i)
                 else:
-                    node.label = 'I' + str(i)
+                    node.name = 'I' + str(i)
                 i += 1
         
         def Topdown_label(self,label_type="all"):
