@@ -162,7 +162,7 @@ class Tree_extend(object):
             if self.opt_root != self.ddpTree.root:
                 #d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
                 #self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-                self.reroot_at_edge(self.opt_root,self.opt_root.edge_length-self.opt_x) ##############
+                self.reroot_at_edge(self.opt_root,self.opt_x) ##############
             
             #return head_id, tail_id, edge_length, self.opt_x
             #return d2currRoot,br2currRoot
@@ -221,6 +221,8 @@ class Tree_extend(object):
             self.ddpTree.reroot(node, node.edge_length-length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
 
+
+'''
             if not isinstance(node, Node):
                 raise TypeError("node must be a Node")
             if length is not None and not isinstance(length, float) and not isinstance(length, int):
@@ -260,7 +262,7 @@ class Tree_extend(object):
                 curr.parent = None
             self.root = node;
             self.is_rooted = True
-
+'''
 
 
 
