@@ -218,7 +218,7 @@ class Tree_extend(object):
             return self.ddpTree.root
 
         def reroot_at_edge(self, node, length): # node is node below new root and length is the distance between them
-            self.ddpTree.reroot(node,length)
+            self.ddpTree.reroot(node, node.edge_length-length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
 
 
