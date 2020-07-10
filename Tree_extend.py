@@ -218,7 +218,8 @@ class Tree_extend(object):
 
     def reroot_at_edge(self, node, length):
         #self.ddpTree.reroot(node, node.edge_length - length)
-        #length = node.edge_length-length
+        '''
+        length = node.edge_length-length
 
         if not isinstance(node, Node):
             raise TypeError("node must be a Node")
@@ -256,7 +257,7 @@ class Tree_extend(object):
             curr.parent = None
         self.root = node;
         self.is_rooted = True
-
+'''
 
     '''
     # the method provided by dendropy DOESN'T seem to work ...
