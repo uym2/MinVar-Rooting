@@ -221,6 +221,39 @@ class Tree_extend(object):
             self.ddpTree.reroot(node, node.edge_length-length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
 
+            '''
+            if length is not None and length > 0:
+                newnode = Node(edge_length=node.edge_length - length);
+                node.edge_length -= length
+                if not node.is_root():
+                    p = node.parent;
+                    p.children.remove(node);
+                    p.add_child(newnode)
+                newnode.add_child(node);
+                node = newnode
+            if node.is_root():
+                return
+            elif self.ddpTree.root.edge_length is not None: ###########
+                newnode = Node(label='ROOT');
+                newnode.add_child(self.root);
+                self.root = newnode
+            ancestors = [a for a in node.traverse_ancestors(include_self=True) if not a.is_root()]
+            for i in range(len(ancestors) - 1, -1, -1):
+                curr = ancestors[i];
+                curr.parent.edge_length = curr.edge_length;
+                curr.edge_length = None
+                curr.parent.children.remove(curr);
+                curr.add_child(curr.parent);
+                curr.parent = None
+            self.root = node;
+            self.is_rooted = True
+'''
+
+
+
+
+
+
 
 '''
         def reroot_at_edge(self, edge, length1, length2):  #########
