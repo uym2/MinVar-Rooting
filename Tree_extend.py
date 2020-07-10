@@ -28,9 +28,8 @@ class Tree_extend(object):
                 if node.is_leaf():
                     if label_type == "all" or label_type == "leaves":
                         node.name = 'L' + str(i)
-                        #node.set_label('L' + str(i)) --alternative but same as line above
                     else:
-                        node.name = node.label  ### redundant bc already has label
+                        node.name = node.label
                 else:
                     if label_type == "all" or label_type == "internal":
                         node.name = 'I' + str(i)
