@@ -5,15 +5,15 @@ import math
 
 class Tree_extend(object):
         def __init__(self, ddpTree = None, tree_file = None, schema = "newick"):
-                if tree_file:
-                    self.ddpTree = read_tree(tree_file, schema)
-                else:
-                    self.ddpTree = ddpTree
+            if tree_file:
+                self.ddpTree = read_tree(tree_file, schema)
+            else:
+                self.ddpTree = ddpTree
 
         def Bottomup_label(self):
             # assign each node a label so that we can later relate to it
             i = 0
-            for node in self.ddpTree.postorder_node_iter():
+            for node in self.ddpTree.traverse_postorder():
                 if node.is_leaf():
                     node.name = 'L' + str(i)
                 else:
@@ -108,7 +108,7 @@ class Tree_extend(object):
                 
                 p = node.parent_node
                 #if ( cumm_l > threshold ) or ( node.child_removed and len(node.child_nodes()) == 0 ):
-                if ( cumm_l > threshold ) or ( node.child_removed and node.num_child_nodes() == 0 ):
+                if (cumm_l > threshold) or (node.child_removed and node.num_children() == 0):
                     # remove node
                     p.remove_child(node)
                     # update parent node
