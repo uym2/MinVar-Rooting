@@ -34,7 +34,7 @@ class Tree_extend(object):
                     if label_type == "all" or label_type == "internal":
                         node.name = 'I' + str(i)
                     else:
-                        node.label = node.label
+                        node.name = node.label
                 i += 1
 
         def Bottomup_update(self):
@@ -50,7 +50,7 @@ class Tree_extend(object):
             D = {}
             def __compute_dRoot__(node,cumm_l):
                 if node.is_leaf():
-                    D[node.label] = cumm_l
+                    D[node.name] = cumm_l
                 else:
                     for child in node.child_nodes():
                         __compute_dRoot__(child,cumm_l+child.edge_length)
@@ -117,10 +117,10 @@ class Tree_extend(object):
                     try:
                         print(node.label + " removed")
                     except:
-                        print(node.label + " removed") ### doen't make sense anymore
+                        print(node.name + " removed")
                 #elif len(node.child_nodes()) == 1:
                 elif node.num_children() == 1:
-                    print(node.label)
+                    print(node.name)
                     # remove node and attach its only child to its parent
                     e1 = node.edge_length
                     child = node.child_nodes()[0]
@@ -180,12 +180,12 @@ class Tree_extend(object):
         def __write_newick(self, node, outstream, label_by_name = False):
             if node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.label))
+                    outstream.write(str(node.name))
 #                    outstream.write(bytes(str(node.name), "ascii"))
                 else:
                     try:
                         outstream.write(node.label)
-#                        outstream.write(bytes(node.taxon.label, "ascii"))
+#                        outstream.write(bytes(node.label, "ascii"))
                     except:
                         outstream.write(node.label)
 #                        outstream.write(bytes(str(node.label), "ascii"))
@@ -204,7 +204,7 @@ class Tree_extend(object):
 #                outstream.write(bytes(')', "ascii"))
             if not node.is_leaf():
                 if label_by_name:
-                    outstream.write(str(node.label))
+                    outstream.write(str(node.name))
 #                    outstream.write(bytes(str(node.name), "ascii"))
                 elif node.label is not None:
                     outstream.write(str(node.label))
@@ -218,46 +218,8 @@ class Tree_extend(object):
             return self.ddpTree.root
 
         def reroot_at_edge(self, node, length): # node is node below new root and length is the distance between them
-            #self.reroot(node,length)
+            self.ddpTree.reroot(node,length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-
-
-            if not isinstance(node, Node):
-                raise TypeError("node must be a Node")
-            if length is not None and not isinstance(length, float) and not isinstance(length, int):
-                raise TypeError("length must be a float")
-            if length is not None and length < 0:
-                raise ValueError("Specified length at which to reroot must be positive")
-            if node.edge_length is None:
-                if length is not None and length != 0:
-                    raise ValueError("Specified node has no edge length, so specified length must be None or 0")
-            elif length is not None and length > node.edge_length:
-                raise ValueError("Specified length must be shorter than the edge at which to reroot")
-            if length is not None and length > 0:
-                newnode = Node(edge_length=node.edge_length - length);
-                node.edge_length -= length
-                if not node.is_root():
-                    p = node.parent;
-                    p.children.remove(node);
-                    p.add_child(newnode)
-                newnode.add_child(node);
-                node = newnode
-            if node.is_root():
-                return
-            elif self.get_root().edge_length is not None:
-                newnode = Node(label='ROOT');
-                newnode.add_child(self.root);
-                self.root = newnode
-            ancestors = [a for a in node.traverse_ancestors(include_self=True) if not a.is_root()]
-            for i in range(len(ancestors) - 1, -1, -1):
-                curr = ancestors[i];
-                curr.parent.edge_length = curr.edge_length;
-                curr.edge_length = None
-                curr.parent.children.remove(curr);
-                curr.add_child(curr.parent);
-                curr.parent = None
-            self.root = node;
-            self.is_rooted = True
 
 
 '''
