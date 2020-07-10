@@ -361,7 +361,7 @@ class OGR_Tree(Tree_extend):
                 C1 = [ c for c in C if c is not child ]
                 child.nTrpl_out = node.nTrpl_out
  
-                for i,c1 in enumerate(C1): ####DON'T FULLY UNDERSTAND
+                for i,c1 in enumerate(C1): ######DON'T FULLY UNDERSTAND
                     child.nTrpl_out += c1.nTrpl_in
                     child.nTrpl_out += (self.nIGs - node.nIGs)*c1.nIGs*child.nOGs
                     child.nTrpl_out += (self.nOGs - node.nOGs)*c1.nOGs*child.nIGs
