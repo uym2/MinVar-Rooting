@@ -218,7 +218,7 @@ class Tree_extend(object):
 
     def reroot_at_edge(self, node, length):
         #self.ddpTree.reroot(node, node.edge_length - length)
-        length = node.edge_length-length
+        #length = node.edge_length-length
 
         if not isinstance(node, Node):
             raise TypeError("node must be a Node")
@@ -242,7 +242,7 @@ class Tree_extend(object):
             node = newnode
         if node.is_root():
             return
-        elif self.root.edge_length is not None:
+        elif self.ddpTree.root.edge_length is not None:
             newnode = Node(label='ROOT');
             newnode.add_child(self.root);
             self.root = newnode
