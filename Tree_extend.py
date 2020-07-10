@@ -27,19 +27,15 @@ class Tree_extend(object):
             for node in self.ddpTree.traverse_preorder():
                 if node.is_leaf():
                     if label_type == "all" or label_type == "leaves":
-                        node.label = 'L' + str(i)
+                        node.name = 'L' + str(i)
                         #node.set_label('L' + str(i)) --alternative but same as line above
-                    '''
                     else:
-                        node.label = node.label  ### redundant bc already has label
-                        '''
+                        node.name = node.label  ### redundant bc already has label
                 else:
                     if label_type == "all" or label_type == "internal":
-                        node.label = 'I' + str(i)
-                    '''
+                        node.name = 'I' + str(i)
                     else:
                         node.label = node.label
-                        '''
                 i += 1
 
         def Bottomup_update(self):
