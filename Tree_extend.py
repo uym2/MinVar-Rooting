@@ -494,7 +494,7 @@ class minVAR_Base_Tree(Tree_extend):
 
     def reset(self):
         self.minVAR = None
-        self.opt_root = self.ddpTree.get_root() #########
+        self.opt_root = self.ddpTree.root #########
         self.opt_x = 0
 
     def Node_init(self, node, nleaf=1, sum_in=0, sum_total=0, var=-1):
