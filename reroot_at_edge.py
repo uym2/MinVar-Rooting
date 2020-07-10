@@ -30,7 +30,7 @@ base_name,ext = splitext(tree_file)
 
 a_tree = Tree_extend(tree_file=tree_file)
 for node in a_tree.ddpTree.traverse_preorder():
-	if (node.label == head) or (node.is_leaf() and node.label == head):
+	if (node.label == head) or (node.is_leaf() and node.label == head): ##############
 		if (node is not None) and node.edge_length:
 			a_tree.reroot_at_edge(node,node.edge_length-x)
 		break
