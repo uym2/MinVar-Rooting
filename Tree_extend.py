@@ -221,7 +221,17 @@ class Tree_extend(object):
             self.ddpTree.reroot(node, node.edge_length-length)
             ####self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
 
-            '''
+            if not isinstance(node, Node):
+                raise TypeError("node must be a Node")
+            if length is not None and not isinstance(length, float) and not isinstance(length, int):
+                raise TypeError("length must be a float")
+            if length is not None and length < 0:
+                raise ValueError("Specified length at which to reroot must be positive")
+            if node.edge_length is None:
+                if length is not None and length != 0:
+                    raise ValueError("Specified node has no edge length, so specified length must be None or 0")
+            elif length is not None and length > node.edge_length:
+                raise ValueError("Specified length must be shorter than the edge at which to reroot")
             if length is not None and length > 0:
                 newnode = Node(edge_length=node.edge_length - length);
                 node.edge_length -= length
@@ -233,7 +243,7 @@ class Tree_extend(object):
                 node = newnode
             if node.is_root():
                 return
-            elif self.ddpTree.root.edge_length is not None: ###########
+            elif self.root.edge_length is not None:
                 newnode = Node(label='ROOT');
                 newnode.add_child(self.root);
                 self.root = newnode
@@ -242,14 +252,14 @@ class Tree_extend(object):
                 curr = ancestors[i];
                 curr.parent.edge_length = curr.edge_length;
                 curr.edge_length = None
+                if branch_support:
+                    curr.parent.label = curr.label;
+                    curr.label = None
                 curr.parent.children.remove(curr);
                 curr.add_child(curr.parent);
                 curr.parent = None
             self.root = node;
             self.is_rooted = True
-'''
-
-
 
 
 
