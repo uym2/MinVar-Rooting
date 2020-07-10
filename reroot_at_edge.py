@@ -29,12 +29,10 @@ else:
 base_name,ext = splitext(tree_file)
 
 a_tree = Tree_extend(tree_file=tree_file)
-for node in a_tree.ddpTree.traverse_preorder():
-	if (node.label == head) or (node.is_leaf() and node.label == head): ##############
-		if (node is not None) and node.edge_length:
-			a_tree.reroot_at_edge(node,node.edge_length-x)
+for edge in a_tree.ddpTree.preorder_edge_iter():
+	if (edge.head_node.label == head) or (edge.head_node.is_leaf() and edge.head_node.label == head):
+		if (edge is not None) and edge.length:
+			a_tree.reroot_at_edge(edge,edge.length-x,x)
 		break
 
 a_tree.tree_as_newick(outfile=out_file)
-
-
