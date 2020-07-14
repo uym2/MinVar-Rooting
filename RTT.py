@@ -92,7 +92,6 @@ class RTT_Tree(Tree_extend):
         self.total_leaves = root.nleaf
         self.ddpTree.root.droot = 0
         self.ddpTree.root.troot = 0
-        T = []
         root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
         for v in self.ddpTree.traverse_preorder():
             if not v.is_root():
