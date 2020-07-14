@@ -217,55 +217,6 @@ class Tree_extend(object):
     #                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
 
     def reroot_at_edge(self, node, length):
-        #self.ddpTree.reroot(node, length)
-
-        '''
-        if not isinstance(node, Node):
-            raise TypeError("node must be a Node")
-        if length is not None and not isinstance(length, float) and not isinstance(length, int):
-            raise TypeError("length must be a float")
-        if length is not None and length < 0:
-            raise ValueError("Specified length at which to reroot must be positive")
-        if node.edge_length is None:
-            if length is not None and length != 0:
-                raise ValueError("Specified node has no edge length, so specified length must be None or 0")
-        elif length is not None and length > node.edge_length:
-            raise ValueError("Specified length must be shorter than the edge at which to reroot")
-        if length is not None and length > 0:
-            newnode = Node(edge_length=node.edge_length - length); #############
-            print(node.edge_length)
-            print(node.parent.edge_length)
-            print(length)
-            node.edge_length -= length ############
-            if not node.is_root():
-                p = node.parent;
-                p.children.remove(node);
-                p.add_child(newnode)
-            newnode.add_child(node);
-            node = newnode
-        if node.is_root():
-            return
-        elif self.ddpTree.root.edge_length is not None:
-            newnode = Node(label='ROOT');
-            newnode.add_child(self.ddpTree.root);
-            self.ddpTree.root = newnode
-        #self.ddpTree.root.label = 'r'
-        #node.label = 'nn'
-        ancestors = [a for a in node.traverse_ancestors(include_self=True) if not a.is_root()]
-        for i in range(len(ancestors) - 1, -1, -1):
-            curr = ancestors[i];
-            #print(i)
-            print(curr.parent.edge_length)
-            curr.parent.edge_length = curr.edge_length;
-            print(curr.parent.edge_length)
-            curr.edge_length = None
-            curr.parent.children.remove(curr);
-            curr.add_child(curr.parent);
-            curr.parent = None
-        self.ddpTree.root = node;
-        self.ddpTree.is_rooted = True
-        '''
-
     # the method provided by dendropy DOESN'T seem to work ...
     # change edge to opt_root
         length1 = node.edge_length-length

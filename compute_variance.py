@@ -2,7 +2,6 @@ from treeswift import *
 from sys import argv
 from Tree_extend import *
 
-
 def compute_variance(tree):  # tree is rooted
     tree.root.droot = 0
     D = []
