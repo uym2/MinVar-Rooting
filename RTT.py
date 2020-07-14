@@ -70,7 +70,7 @@ class RTT_Tree(Tree_extend):
                 node.ST += child.ST
 
     def Update_var(self, child, node, edge_length):
-        SST = self.ddpTree.SST
+        SST = self.SST
         deltaT = self.ddpTree.root.ST - 2 * child.ST
         deltaD = -2 * child.nleaf * edge_length - 2 * child.SDI + node.SD
         SDT = node.SDT

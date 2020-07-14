@@ -21,6 +21,7 @@ parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r')
                    # help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
 parser.add_argument('-m', '--method', required=False, type=str, default="RTT",
                     help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
+# temporarily changed default to RTT
 parser.add_argument('-g', '--outgroups', required=False, type=str,
                     help="Listing of the outgroups; to be used with -m OG")
 parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
@@ -51,10 +52,10 @@ for line in args.input:
     else:
         a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
-    #a_tree.Reroot()
-    a_tree.Bottomup_update()
-    a_tree.prepare_root() ########
-
+    #a_tree.Bottomup_update()
+    #a_tree.prepare_root() ########
+    a_tree.Reroot()
+    #print(a_tree.report_score())
 
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")
