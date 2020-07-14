@@ -28,7 +28,7 @@ class RTT_Tree(Tree_extend):
 
     def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD):
         n = self.total_leaves
-        m = (SDT + deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
+        m = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
         x = (deltaT * m - deltaD) / n
         if x >= 0 and x <= node.edge_length:
             curr_RTT = n * x * x + SST * m * m - 2 * deltaT * x * m + 2 * deltaD * x - 2 * SDT * m + SSD
