@@ -92,21 +92,17 @@ class RTT_Tree(Tree_extend):
         self.total_leaves = root.nleaf
         self.ddpTree.root.droot = 0
         self.ddpTree.root.troot = 0
-        D = [] # list of root to leaf distances
         T = []
+        root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
         for v in self.ddpTree.traverse_preorder():
             if not v.is_root():
-                # v.set_edge_length(4)  -- must have defined edge lengths
+                # must have defined edge lengths
                 v.droot = v.parent.droot + v.edge_length
                 if v.is_leaf():
-                    D.append(v.droot)
-                    T.append(self.smplTimes[v.label])
-        root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
-        for i,d in enumerate(D):
-            root.SSD += (d ** 2)
-            self.SST += (T[i] ** 2)
-            root.SD += d
-            root.SDT += (d * T[i])
+                    root.SSD += (v.droot ** 2)
+                    self.SST += (self.smplTimes[v.label] ** 2)
+                    root.SD += v.droot
+                    root.SDT += (v.droot * self.smplTimes[v.label])
         print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
         # function works for sample1 and sample2
 

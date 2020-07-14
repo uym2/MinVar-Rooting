@@ -39,9 +39,10 @@ assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoi
 
 OGs = args.outgroups.split() if args.outgroups else None
 smplTimes = {}
-for line in args.smplTimes:
-    sp,t = line.strip().split()
-    smplTimes[sp] = float(t)
+if args.smplTimes:
+    for line in args.smplTimes:
+        sp,t = line.strip().split()
+        smplTimes[sp] = float(t)
 
 for line in args.input:
     tree = read_tree(line, schema=args.schema.lower())
