@@ -17,7 +17,9 @@ METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r'), default=stdin,
                     help="Input File (default is STDIN)")
-parser.add_argument('-m', '--method', required=False, type=str, default="MV",
+#parser.add_argument('-m', '--method', required=False, type=str, default="MV",
+                   # help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
+parser.add_argument('-m', '--method', required=False, type=str, default="RTT",
                     help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
 parser.add_argument('-g', '--outgroups', required=False, type=str,
                     help="Listing of the outgroups; to be used with -m OG")
@@ -49,7 +51,10 @@ for line in args.input:
     else:
         a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
-    a_tree.Reroot()
+    #a_tree.Reroot()
+    a_tree.Bottomup_update()
+    a_tree.prepare_root() ########
+
 
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")

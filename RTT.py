@@ -16,11 +16,15 @@ class RTT_Tree(Tree_extend):
         node.SDI = SDI
         node.SD = SD
         node.nleaf = nleaf
-        node.var = var # is this necessary? should I take out?
+        #node.var = var # is this necessary? should I take out?
         node.ST = ST
         node.SDT = SDT
         node.SSD = SSD
 
+    '''
+        def Opt_function(self, node, a, b, c):
+            print("Abstract method! Should never be called")
+    '''
 
     def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD):
         n = self.total_leaves
@@ -33,12 +37,7 @@ class RTT_Tree(Tree_extend):
                 self.opt_root = node
                 self.opt_x = node.edge_length - x
 
-'''
-    def Opt_function(self, node, a, b, c):
-        print("Abstract method! Should never be called")
-'''
-
-'''
+    '''
     def compute_dRoot_VAR(self):################
         cumm = {'ssq': 0, 'sum': 0}
 
@@ -54,13 +53,13 @@ class RTT_Tree(Tree_extend):
         N = self.get_root().nleaf
         root_var = cumm['ssq'] / N - (cumm['sum'] / N) ** 2
         self.get_root().var = root_var
-        '''
+    '''
 
     def bUp_update(self, node):
         if node.is_leaf():
             node.nleaf = 1
             node.SDI = 0
-            node.ST = self.ddpTree.smplTimes[node.label]
+            node.ST = self.smplTimes[node.label]
         else:
             node.nleaf = 0
             node.SDI = 0
@@ -81,7 +80,7 @@ class RTT_Tree(Tree_extend):
     def tDown_update(self, node, opt_function):
         for child in node.child_nodes():
             child.SD = node.SD + (self.total_leaves - 2 * child.nleaf) * child.edge_length
-            child.SDT = node.SDT + child.edge_length * (self.tree.root.ST - 2 * child.ST)
+            child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
             SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
             opt_function(child, SST, deltaT, deltaD, SDT, SSD)
@@ -99,16 +98,17 @@ class RTT_Tree(Tree_extend):
             if not v.is_root():
                 # v.set_edge_length(4)  -- must have defined edge lengths
                 v.droot = v.parent.droot + v.edge_length
-                v.troot = v.parent.troot + self.smplTimes[v.label]
                 if v.is_leaf():
                     D.append(v.droot)
-                    T.append(v.troot)
+                    T.append(self.smplTimes[v.label])
         root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
         for i,d in enumerate(D):
             root.SSD += (d ** 2)
             self.SST += (T[i] ** 2)
             root.SD += d
             root.SDT += (d * T[i])
+        print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
+        # function works for sample1 and sample2
 
     def opt_score(self):
         return self.RTT
