@@ -12,19 +12,21 @@ class RTT_Tree(Tree_extend):
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
 
-    def Node_init(self, node, nleaf=1, sum_in=0, sum_total=0, var=-1):
-        node.sum_in = sum_in  #SDI
-        node.sum_total = sum_total  #SD
+    def Node_init(self, node, nleaf=1, SDI=0, SD=0, var=-1, ST=0, SDT=0, SSD=0):
+        node.SDI = SDI
+        node.SD = SD
         node.nleaf = nleaf
         node.var = var
-        #node.ST
-        #node.SDT
-        #node.SSD
+        node.ST = ST
+        node.SDT = SDT
+        node.SSD = SSD
 
+'''
     def Opt_function(self, node, a, b, c):
         print("Abstract method! Should never be called")
+'''
 
-    def compute_dRoot_VAR(self):
+    def compute_dRoot_VAR(self):################
         cumm = {'ssq': 0, 'sum': 0}
 
         def compute_dRoot(node, cumm_l):
@@ -44,55 +46,49 @@ class RTT_Tree(Tree_extend):
         # d = {}  -- list of root to tip distances needed to compute SSD at root
         if node.is_leaf():
             node.nleaf = 1
-            node.sum_in = 0  # node.SDI = 0
+            node.SDI = 0
             node.ST = self.smplTimes[node.label]
             #d[node.label] = node.edge_length
         else:
             node.nleaf = 0
-            node.sum_in = 0  # SDI
+            node.SDI = 0
             node.ST = 0
             for child in node.child_nodes():
                 node.nleaf += child.nleaf
-                node.sum_in += child.sum_in + child.nleaf * child.edge_length
+                node.SDI += child.SDI + child.nleaf * child.edge_length
                 node.ST += child.ST
         #return d
 
     def Update_var(self, child, node, edge_length):
-        #SST =
-        #deltaT = self.tree.root.ST - 2 * child.ST
-        #deltaD = -2 * child.nleaf * edge_length - 2 * child.SDI + node.SD
-        #SDT = node.SDT
-        #SSD = node.SSD
-        #return SST, deltaT, deltaD, SDT, SSD
-        '''
-        alpha = 2 * (node.sum_total - 2 * (child.sum_in + child.nleaf * edge_length)) / self.total_leaves
-        beta = 1 - 2 * float(child.nleaf) / self.total_leaves
-        a = 1 - beta * beta
-        b = alpha - 2 * node.sum_total * beta / self.total_leaves
-        c = node.var
-        child.var = a * edge_length * edge_length + b * edge_length + c
-        return a, b, c
-        '''
+        SST = 0########
+        deltaT = self.ddpTree.root.ST - 2 * child.ST
+        deltaD = -2 * child.nleaf * edge_length - 2 * child.SDI + node.SD
+        SDT = node.SDT
+        SSD = node.SSD
+        return SST, deltaT, deltaD, SDT, SSD
 
-    #def opt_function(self, SST, deltaT, deltaD, SDT, SSD):
-    #   n = self.tree.total_leaves
-    #   m =
-    #   x = (deltaT * m - deltaD) / n
-    #   curr_RTT = n*x*x + SST*m*m - 2*deltaT*x*m + 2*deltaD*x - 2*SDT*m + SSD
+    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD):
+        n = self.ddpTree.total_leaves
+        m = 0###########
+        x = (deltaT * m - deltaD) / n
+        if x >= 0 and x <= node.edge_length:
+            curr_RTT = n*x*x + SST*m*m - 2*deltaT*x*m + 2*deltaD*x - 2*SDT*m + SSD
+            if self.RTT is None or curr_RTT < self.RTT:
+                self.RTT = curr_RTT
+                self.opt_root = node
+                self.opt_x = node.edge_length - x
 
     def tDown_update(self, node, opt_function):
         for child in node.child_nodes():
-            child.sum_total = node.sum_total + (self.total_leaves - 2 * child.nleaf) * child.edge_length  # SD
-            a, b, c = self.Update_var(child, node, child.edge_length)
-            #SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            #child.SDT = node.SDT + child.edge_length * (self.tree.root.ST - 2 * child.ST)
-            #child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf)
-                        # * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
-            opt_function(child, a, b, c)
+            child.SD = node.SD + (self.total_leaves - 2 * child.nleaf) * child.edge_length
+            SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
+            child.SDT = node.SDT + child.edge_length * (self.tree.root.ST - 2 * child.ST)
+            child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
+            opt_function(child, a, b, c) ##########
 
     def prepare_root(self):
         root = self.get_root()
-        root.sum_total = root.sum_in  # root.SD = root.SDI
+        root.SD = root.SDI
         self.compute_dRoot_VAR()
         self.total_leaves = root.nleaf
         #root.SDT =
