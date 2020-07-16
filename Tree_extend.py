@@ -268,7 +268,7 @@ class Tree_extend(object):
             l1 = tail.edge_length
             tail.remove_child(head)
 # MAD@ add
-            head.parent = q #####
+            head.parent = q
 # End MAD@ add
 
             head.add_child(tail)

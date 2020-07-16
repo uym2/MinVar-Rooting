@@ -102,7 +102,7 @@ class RTT_Tree(Tree_extend):
                     self.SST += (self.smplTimes[v.label] ** 2)
                     root.SD += v.droot
                     root.SDT += (v.droot * self.smplTimes[v.label])
-        print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
+        #print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
         # function works for sample1 and sample2
 
     def opt_score(self):
