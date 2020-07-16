@@ -26,16 +26,21 @@ class RTT_Tree(Tree_extend):
             print("Abstract method! Should never be called")
     '''
 
-    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD):
-        n = self.total_leaves
-        m = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
-        x = (deltaT * m - deltaD) / n
-        if x >= 0 and x <= node.edge_length:
-            curr_RTT = n * x * x + SST * m * m - 2 * deltaT * x * m + 2 * deltaD * x - 2 * SDT * m + SSD
-            if self.RTT is None or curr_RTT < self.RTT:
-                self.RTT = curr_RTT
-                self.opt_root = node
-                self.opt_x = node.edge_length - x
+    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, use_quadprog=False):
+        if use_quadprog:
+            # use quadprog to compute mu_star and x_star
+            print("TODO!")
+        else:
+            # find mu_star and x_star using the closed-form formula    
+            n = self.total_leaves
+            m = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
+            x = (deltaT * m - deltaD) / n
+            if x >= 0 and x <= node.edge_length:
+                curr_RTT = n * x * x + SST * m * m - 2 * deltaT * x * m + 2 * deltaD * x - 2 * SDT * m + SSD
+                if self.RTT is None or curr_RTT < self.RTT:
+                    self.RTT = curr_RTT
+                    self.opt_root = node
+                    self.opt_x = node.edge_length - x
 
     '''
     def compute_dRoot_VAR(self):################
