@@ -19,9 +19,6 @@ parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r')
                     help="Input File (default is STDIN)")
 parser.add_argument('-m', '--method', required=False, type=str, default="MV",
                     help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
-#parser.add_argument('-m', '--method', required=False, type=str, default="RTT",
- #                   help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
-# ^ temporarily changed default to RTT
 parser.add_argument('-g', '--outgroups', required=False, type=str,
                     help="Listing of the outgroups; to be used with -m OG")
 parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
