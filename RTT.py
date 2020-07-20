@@ -1,4 +1,5 @@
 from Tree_extend import *
+from quadprog_example import *
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
@@ -30,17 +31,18 @@ class RTT_Tree(Tree_extend):
         if use_quadprog:
             # use quadprog to compute mu_star and x_star
             print("TODO!")
+            #quadprog_solve_qp(P, q, G=None, h=None, A=None, b=None)
         else:
             # find mu_star and x_star using the closed-form formula    
             n = self.total_leaves
-            m = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
-            x = (deltaT * m - deltaD) / n
-            if x >= 0 and x <= node.edge_length:
-                curr_RTT = n * x * x + SST * m * m - 2 * deltaT * x * m + 2 * deltaD * x - 2 * SDT * m + SSD
+            mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
+            x_star = (deltaT * mu_star - deltaD) / n
+            if x_star >= 0 and x_star <= node.edge_length:
+                curr_RTT = n * x_star * x_star + SST * mu_star * mu_star - 2 * deltaT * x_star * mu_star + 2 * deltaD * x_star - 2 * SDT * mu_star + SSD
                 if self.RTT is None or curr_RTT < self.RTT:
                     self.RTT = curr_RTT
                     self.opt_root = node
-                    self.opt_x = node.edge_length - x
+                    self.opt_x = node.edge_length - x_star
 
     '''
     def compute_dRoot_VAR(self):################
