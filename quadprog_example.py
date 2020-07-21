@@ -21,4 +21,4 @@ q = array([-8.,-6.])
 G = array([[-1.,0.],[0.,-1.],[1.,1.]])
 h = array([0.,0.,5.]).reshape((3,))
 
-print(quadprog_solve_qp(P, q, G, h))    
+#print(quadprog_solve_qp(P, q, G, h))
