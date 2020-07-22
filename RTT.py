@@ -25,7 +25,7 @@ class RTT_Tree(Tree_extend):
     def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, use_active_set=False, use_quadprog=False):
         n = self.total_leaves
         a, b, c, d, e, f = n, SST, (-2 * deltaT), (2 * deltaD), (-2 * SDT), SSD
-        x_star, mu_star = 0,0
+        curr_RTT = 0.0
         if use_quadprog:
             # use quadprog to compute mu_star and x_star
             P = array([[a,c/2.],[c/2,b]])
@@ -35,22 +35,45 @@ class RTT_Tree(Tree_extend):
             solution = quadprog_solve_qp(P, q, G, h)
             x_star = solution[0]
             mu_star = solution[1]
+            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
             #print(solution)
             # ^ x,m are different when using quadprog, but rooted tree is same
         elif use_active_set:
             # use active_set technique to compute mu_star and x_star
-            print("TODO")
+            mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
+            x_star = (deltaT * mu_star - deltaD) / n
+            if x_star >= 0 and x_star <= node.edge_length:
+                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
+            else:
+                if x_star < 0:
+                    x_star = 0
+                    mu_star = -e / (2 * b)
+                    if mu_star < 0:
+                        mu_star = 0
+                elif x_star > node.edge_length:
+                    x_star = node.edge_length
+                    mu_star = -(e + c * node.edge_length) / (2 * b)
+                    if mu_star < 0:
+                        mu_star = 0
+                elif mu_star < 0:
+                    mu_star = 0
+                    x_star = -d / (2 * a)
+                    if x_star < 0:
+                        x_star = 0
+                    elif x_star > node.edge_length:
+                        x_star = node.edge_length
+                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
         else:
             # find mu_star and x_star using the closed-form formula
             mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
             x_star = (deltaT * mu_star - deltaD) / n
             #print(x_star, mu_star)
-        if x_star >= 0 and x_star <= node.edge_length:
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-            if self.RTT is None or curr_RTT < self.RTT:
-                self.RTT = curr_RTT
-                self.opt_root = node
-                self.opt_x = node.edge_length - x_star
+            if x_star >= 0 and x_star <= node.edge_length:
+                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
+        if self.RTT is None or curr_RTT < self.RTT:
+            self.RTT = curr_RTT
+            self.opt_root = node
+            self.opt_x = node.edge_length - x_star
 
     '''
     def compute_dRoot_VAR(self):################
@@ -98,7 +121,7 @@ class RTT_Tree(Tree_extend):
             child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
             SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD)#, use_quadprog=True)
+            opt_function(child, SST, deltaT, deltaD, SDT, SSD, use_active_set=True)#, use_quadprog=True)
 
     def prepare_root(self):
         root = self.get_root()
