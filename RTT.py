@@ -1,5 +1,5 @@
 from Tree_extend import *
-from quadprog_example import *
+#from quadprog_example import * ###################
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
