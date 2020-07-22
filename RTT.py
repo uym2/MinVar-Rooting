@@ -121,7 +121,7 @@ class RTT_Tree(Tree_extend):
             child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
             SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD)#, use_active_set=True)#, use_quadprog=True)
+            opt_function(child, SST, deltaT, deltaD, SDT, SSD)#, use_quadprog=True)#, use_quadprog=True)
 
     def prepare_root(self):
         root = self.get_root()
