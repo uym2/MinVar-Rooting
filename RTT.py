@@ -37,7 +37,7 @@ class RTT_Tree(Tree_extend):
             mu_star = solution[1]
             curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
             #print(solution)
-            # ^ x,m are different when using quadprog, but rooted tree is same
+            # ^ x,m are different when using quadprog, but rooted tree is same for some
         elif use_active_set:
             # use active_set technique to compute mu_star and x_star
             mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
@@ -121,7 +121,7 @@ class RTT_Tree(Tree_extend):
             child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
             SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD, use_active_set=True)#, use_quadprog=True)
+            opt_function(child, SST, deltaT, deltaD, SDT, SSD)#, use_active_set=True)#, use_quadprog=True)
 
     def prepare_root(self):
         root = self.get_root()
