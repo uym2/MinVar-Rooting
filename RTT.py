@@ -1,32 +1,42 @@
 from Tree_extend import *
 from quadprog_example import *
 
+EPSILON = 1e-5
+
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick"):
+    def __init__(self,smplTimes, solver="AS", ddpTree=None, tree_file=None,schema="newick"):
         super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
         self.smplTimes = smplTimes
+        self.solver = solver
         self.reset()
 
     def reset(self):
         self.RTT = None
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
+        self.opt_mu = 0
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, var=-1, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
         node.SD = SD
         node.nleaf = nleaf
-        #node.var = var # is this necessary? should I take out?
         node.ST = ST
         node.SDT = SDT
         node.SSD = SSD
 
-    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, use_active_set=False, use_quadprog=False):
+    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, solver = "AS"):
+    # solver can be "AS" (active-set) or "QP" (quad-prog)
         n = self.total_leaves
         a, b, c, d, e, f = n, SST, (-2 * deltaT), (2 * deltaD), (-2 * SDT), SSD
-        curr_RTT = 0.0
-        if use_quadprog:
+        
+        # find global mu_star and x_star
+        mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
+        x_star = (deltaT * mu_star - deltaD) / n
+        
+        if x_star >= 0 and x_star <= node.edge_length and mu_star >= 0:
+            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
+        elif solver == "QP":
             # use quadprog to compute mu_star and x_star
             P = array([[a,c/2.],[c/2,b]])
             q = array([d/2., e/2])
@@ -38,60 +48,32 @@ class RTT_Tree(Tree_extend):
             curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
             #print(solution)
             # ^ x,m are different when using quadprog, but rooted tree is same for some
-        elif use_active_set:
+        else:
             # use active_set technique to compute mu_star and x_star
-            mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
-            x_star = (deltaT * mu_star - deltaD) / n
-            if x_star >= 0 and x_star <= node.edge_length:
-                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-            else:
+            if x_star < 0:
+                x_star = 0
+                mu_star = -e / (2 * b)
+                if mu_star < 0:
+                    mu_star = 0
+            elif x_star > node.edge_length:
+                x_star = node.edge_length
+                mu_star = -(e + c * node.edge_length) / (2 * b)
+                if mu_star < 0:
+                    mu_star = 0
+            elif mu_star < 0:
+                mu_star = 0
+                x_star = -d / (2 * a)
                 if x_star < 0:
                     x_star = 0
-                    mu_star = -e / (2 * b)
-                    if mu_star < 0:
-                        mu_star = 0
                 elif x_star > node.edge_length:
                     x_star = node.edge_length
-                    mu_star = -(e + c * node.edge_length) / (2 * b)
-                    if mu_star < 0:
-                        mu_star = 0
-                elif mu_star < 0:
-                    mu_star = 0
-                    x_star = -d / (2 * a)
-                    if x_star < 0:
-                        x_star = 0
-                    elif x_star > node.edge_length:
-                        x_star = node.edge_length
-                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-        else:
-            # find mu_star and x_star using the closed-form formula
-            mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
-            x_star = (deltaT * mu_star - deltaD) / n
-            #print(x_star, mu_star)
-            if x_star >= 0 and x_star <= node.edge_length:
-                curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-        if self.RTT is None or curr_RTT < self.RTT:
+            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
+        
+        if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT
             self.opt_root = node
             self.opt_x = node.edge_length - x_star
-
-    '''
-    def compute_dRoot_VAR(self):################
-        cumm = {'ssq': 0, 'sum': 0}
-
-        def compute_dRoot(node, cumm_l):
-            if node.is_leaf():
-                cumm['ssq'] += cumm_l ** 2
-                cumm['sum'] += cumm_l
-            else:
-                for child in node.child_nodes():
-                    compute_dRoot(child, cumm_l + child.edge_length)
-
-        compute_dRoot(self.get_root(), 0)
-        N = self.get_root().nleaf
-        root_var = cumm['ssq'] / N - (cumm['sum'] / N) ** 2
-        self.get_root().var = root_var
-    '''
+            self.opt_mu = mu_star
 
     def bUp_update(self, node):
         if node.is_leaf():
@@ -121,9 +103,7 @@ class RTT_Tree(Tree_extend):
             child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
             SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            #opt_function(child, SST, deltaT, deltaD, SDT, SSD)
-            #opt_function(child, SST, deltaT, deltaD, SDT, SSD , use_quadprog=True)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD, use_active_set=True)
+            opt_function(child, SST, deltaT, deltaD, SDT, SSD, solver=self.solver)
 
     def prepare_root(self):
         root = self.get_root()
@@ -149,4 +129,4 @@ class RTT_Tree(Tree_extend):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score())
+        return "RTT score: " + str(self.opt_score()/self.total_leaves)

@@ -12,13 +12,13 @@ from treeswift import *
 from sys import stdin, stdout
 import argparse
 
-METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
+METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTTqp': RTT_Tree, 'RTTas':RTT_Tree}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r'), default=stdin,
                     help="Input File (default is STDIN)")
 parser.add_argument('-m', '--method', required=False, type=str, default="MV",
-                    help="Method (MP for midpoint, MV for minVAR, OG for outgroup) (default is MV)")
+                    help="Method (MP for midpoint, MV for minVAR, OG for outgroup, RTTas or RTTqp for root-to-tip) (default is MV)")
 parser.add_argument('-g', '--outgroups', required=False, type=str,
                     help="Listing of the outgroups; to be used with -m OG")
 parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
@@ -45,8 +45,10 @@ for line in args.input:
     tree = read_tree(line, schema=args.schema.lower())
     if args.method == 'OG':
         a_tree = OGR_Tree(OGs, ddpTree=tree)
-    elif args.method == 'RTT':
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree)
+    elif args.method == 'RTTqp':
+        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="QP")
+    elif args.method == 'RTTas':
+        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="AS")
     else:
         a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
@@ -57,6 +59,8 @@ for line in args.input:
 
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")
+    else:
+        print(a_tree.report_score())
 
     # args.outfile.write(a_tree.ddpTree.as_string("newick"))
 
