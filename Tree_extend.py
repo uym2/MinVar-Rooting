@@ -157,7 +157,7 @@ class Tree_extend(object):
 
     def Reroot(self):
         self.find_root()
-        self.report_score()
+        #self.report_score()
         # d2currRoot = 0
         # br2currRoot = 0
         if self.opt_root != self.ddpTree.root:
