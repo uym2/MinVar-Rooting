@@ -59,8 +59,8 @@ for line in args.input:
 
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")
-    else:
-        print(a_tree.report_score())
+    #else:
+    #    print(a_tree.report_score())
 
     # args.outfile.write(a_tree.ddpTree.as_string("newick"))
 

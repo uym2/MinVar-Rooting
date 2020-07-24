@@ -157,7 +157,7 @@ class Tree_extend(object):
 
     def Reroot(self):
         self.find_root()
-        #self.report_score()
+        self.report_score()
         # d2currRoot = 0
         # br2currRoot = 0
         if self.opt_root != self.ddpTree.root:
@@ -242,7 +242,7 @@ class Tree_extend(object):
         p = tail.parent
         l = tail.edge_length
 
-        new_root.add_child(tail) #never removed tail from its possible parent
+        new_root.add_child(tail)
         tail.edge_length = length1
 
         br2currRoot = 0
