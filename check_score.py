@@ -44,4 +44,4 @@ def check_score(s,use_as=False,use_qp=False):
         '''
         i += 1
 
-check_score(4000,use_as=True)
+#check_score(4000,use_as=True)
