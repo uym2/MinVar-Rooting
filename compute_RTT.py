@@ -1,18 +1,25 @@
 from RTT import *
 
-def RTT_score(tree,time,use_as=False,use_qp=False):
+def RTT_score(tree,time):
     smplTimes = {}
     for line in time:
         sp, t = line.strip().split()
         smplTimes[sp] = float(t)
-    if use_qp:
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="QP")
-    else:
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="AS")
-    a_tree.Bottomup_update()
-    a_tree.prepare_root()
-    a_tree.Topdown_update()
-    return a_tree.opt_score()/a_tree.total_leaves
+    tree.root.droot, tree.root.SSD, tree.root.SDT, tree.SST, n = 0,0,0,0,0
+    for v in tree.traverse_preorder():
+        if not v.is_root():
+            v.droot = v.parent.droot + v.edge_length
+            if v.is_leaf():
+                n += 1
+                tree.root.SSD += (v.droot ** 2)
+                tree.SST += (smplTimes[v.label] ** 2)
+                tree.root.SDT += (v.droot * smplTimes[v.label])
+
+    b, e, f = tree.SST, (-2 * tree.root.SDT), tree.root.SSD
+    mu_star = -e / (2 * b)
+    RTT = b * mu_star * mu_star + e * mu_star + f
+    return RTT/n
+
 
 def check_score(s,use_as=False,use_qp=False):
     i = 1
@@ -24,9 +31,9 @@ def check_score(s,use_as=False,use_qp=False):
         time2 = open("Tests/R_RTT/s" + str(s) + "/Time/s" + str(s) + "_lst" + str(i) + ".txt", "r")
         if use_as and use_qp:
             tree1 = qp_
-            s1 = RTT_score(read_tree_newick(tree1), time1,use_qp=True)
+            s1 = RTT_score(read_tree_newick(tree1), time1)
             tree2 = as_
-            s2 = RTT_score(read_tree_newick(tree2), time2,use_as=True)
+            s2 = RTT_score(read_tree_newick(tree2), time2)
         else:
             tree1 = r_
             s1 = RTT_score(read_tree_newick(tree1), time1)
@@ -35,13 +42,11 @@ def check_score(s,use_as=False,use_qp=False):
             else:
                 tree2 = qp_
             s2 = RTT_score(read_tree_newick(tree2), time2)
-        print("RTT Score",s2)
-        '''
+        #print("RTT Score",s2)
         if abs(s2-s1) > 0.00001:
             print(abs(s2-s1))
         else:
             print("same")
-        '''
         i += 1
 
 #check_score(4000,use_as=True)
