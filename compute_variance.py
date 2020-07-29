@@ -21,14 +21,6 @@ def compute_variance(tree):  # tree is rooted
     return var
     # output: non-negative float # which is the variance of the root-to-tip distance of the input
 
-'''
 myTreeFile = argv[1]
 myTree = read_tree_newick(myTreeFile)
-#print(compute_variance(myTree))
-x = Tree_extend(myTree)
-y = minVAR_Base_Tree(x)
-#print(y.report_score())
-
-z = RTT_Tree(x)
-z.find_root()
-'''
+print(compute_variance(myTree))
