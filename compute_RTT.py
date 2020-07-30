@@ -50,12 +50,12 @@ def check_score(s,use_as=False,use_qp=False):
             print("same")
         i += 1
 
-check_score(1000,use_as=True)
+#check_score(1000,use_as=True)
 
-'''
+#'''
 myTreeFile = argv[1]
 timeFile = argv[2]
 time = open(timeFile,"r")
 myTree = read_tree_newick(myTreeFile)
 print(RTT_score(myTree,time))
-'''
+#'''
