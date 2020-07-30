@@ -43,19 +43,20 @@ def check_score(s,use_as=False,use_qp=False):
             else:
                 tree2 = qp_
             s2 = RTT_score(read_tree_newick(tree2), time2)
+        print(s1 - s2)
         #print("RTT Score",s2)
-        if abs(s2-s1) > 0.0001:
-            print(abs(s2-s1))
-        else:
-            print("same")
+        #if abs(s2-s1) > 0.0001:
+        #    print(abs(s2-s1))
+        #else:
+        #    print("same")
         i += 1
 
-#check_score(1000,use_as=True)
+check_score(1000,use_as=True)
 
-#'''
+'''
 myTreeFile = argv[1]
 timeFile = argv[2]
 time = open(timeFile,"r")
 myTree = read_tree_newick(myTreeFile)
 print(RTT_score(myTree,time))
-#'''
+'''
