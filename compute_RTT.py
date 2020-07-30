@@ -1,4 +1,5 @@
 from RTT import *
+from sys import argv
 
 def RTT_score(tree,time):
     smplTimes = {}
@@ -23,7 +24,7 @@ def RTT_score(tree,time):
 
 def check_score(s,use_as=False,use_qp=False):
     i = 1
-    while (i <= 20):
+    while (i <= 10):
         r_ = "Tests/R_RTT/s" + str(s) + "/Trees/s" + str(s) + "_r" + str(i) + ".tre"  # R
         as_ = "Tests/R_RTT/s" + str(s) + "/MyCodeTest/s" + str(s) + "_r" + str(i) + "test_as.tre"  # AS
         qp_ = "Tests/R_RTT/s" + str(s) + "/MyCodeTest/s" + str(s) + "_r" + str(i) + "test_qp.tre"  # QP
@@ -43,10 +44,18 @@ def check_score(s,use_as=False,use_qp=False):
                 tree2 = qp_
             s2 = RTT_score(read_tree_newick(tree2), time2)
         #print("RTT Score",s2)
-        if abs(s2-s1) > 0.00001:
+        if abs(s2-s1) > 0.0001:
             print(abs(s2-s1))
         else:
             print("same")
         i += 1
 
-#check_score(4000,use_as=True)
+check_score(1000,use_as=True)
+
+'''
+myTreeFile = argv[1]
+timeFile = argv[2]
+time = open(timeFile,"r")
+myTree = read_tree_newick(myTreeFile)
+print(RTT_score(myTree,time))
+'''
