@@ -17,6 +17,7 @@ class RTT_Tree(Tree_extend):
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
         self.opt_mu = 0
+        self.opt_y = 0
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, var=-1, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
@@ -33,59 +34,49 @@ class RTT_Tree(Tree_extend):
         h, k, m, r = n, (2 * (n - 2 * node.nleaf)), (-2 * node.ST), (2 * node.SD)
         
         # find global mu_star, x_star and y_star
-        P = np.array([[a, k / 2, c / 2], [k / 2, h, m / 2], [c / 2, m / 2, b]])
-        q = np.array([[d / 2], [r / 2], [e / 2]])
-        z_star = - 2 * np.dot(np.linalg.inv(P), q)
+        P = np.array([[a, k / 2., c / 2.], [k / 2., h, m / 2.], [c / 2., m / 2., b]])
+        q = np.array([[d / 2.], [r / 2.], [e / 2.]])
+        z_star = - np.dot(np.linalg.inv(P), q)
         x_star = z_star[0][0]
         y_star = z_star[1][0]
         mu_star = z_star[2][0]
+        #curr_RTT = 1000
 
         if x_star >= 0 and x_star <= node.edge_length and mu_star >= 0:
             curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
                        + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
-        elif solver == "QP":
-            # use quadprog to compute mu_star and x_star
-            P = array([[a,c/2.],[c/2,b]])
-            q = array([d/2., e/2])
-            G = array([[-1., 0.], [0., -1.], [1., 0.]])
-            h = array([0., 0., node.edge_length]).reshape((3,))
-            solution = quadprog_solve_qp(P, q, G, h)
-            x_star = solution[0]
-            mu_star = solution[1]
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-            #print(solution)
-            # ^ x,m are different when using quadprog, but rooted tree is same for some
         else:
             # use active_set technique to compute mu_star and x_star
-            if x_star < 0 or x_star > node.edge_length:
+            if x_star < 0:
                 x_star = 0
-                if x_star > node.edge_length:
-                    x_star = node.edge_length
                 P_x = np.array([[h, m / 2], [m / 2, b]])
                 q_x = np.array([[r / 2], [e / 2]])
-                z_star_x = -2 * np.dot(np.linalg.inv(P_x), q_x)
+                z_star_x = -np.dot(np.linalg.inv(P_x), q_x)
                 y_star = z_star_x[0][0]
                 mu_star = z_star_x[1][0]
-            #elif x_star > node.edge_length:
-            #    x_star = node.edge_length
-            #    mu_star = -(e + c * node.edge_length) / (2 * b)
-            #    if mu_star < 0:
-            #        mu_star = 0
+            elif x_star > node.edge_length:
+                x_star = node.edge_length
+                P_x = np.array([[h, m / 2], [m / 2, b]])
+                q_x = np.array([[r / 2. + k * node.edge_length /2], [e / 2. + c * node.edge_length/2]])
+                z_star_x = -  np.dot(np.linalg.inv(P_x), q_x)
+                y_star = z_star_x[0][0]
+                mu_star = z_star_x[1][0]
             elif mu_star < 0:
                 mu_star = 0
                 P_mu = np.array([[a, k / 2], [k / 2, h]])
                 q_mu = np.array([[d / 2], [r / 2]])
-                z_star_mu = -2 * np.dot(np.linalg.inv(P_mu), q_mu)
+                z_star_mu = - np.dot(np.linalg.inv(P_mu), q_mu)
                 x_star = z_star_mu[0][0]
                 y_star = z_star_mu[1][0]
             curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
                        + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
-
-        if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
+        print(curr_RTT)
+        if self.RTT is None or curr_RTT < self.RTT:
             self.RTT = curr_RTT
             self.opt_root = node
             self.opt_x = node.edge_length - x_star
             self.opt_mu = mu_star
+            self.opt_y = y_star
 
     def bUp_update(self, node):
         if node.is_leaf():
@@ -141,4 +132,4 @@ class RTT_Tree(Tree_extend):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score()/self.total_leaves)
+        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation Rate: " + str(self.opt_mu) + "\nTime at Root: " + str(self.opt_y/self.opt_mu )+ "\nOpt x: " + str(self.opt_x)

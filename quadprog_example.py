@@ -16,9 +16,9 @@ def quadprog_solve_qp(P, q, G=None, h=None, A=None, b=None):
         meq = 0
     return quadprog.solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[0]
 
-P = array([[2.,0.],[0,2.]])
-q = array([-8.,-6.])
-G = array([[-1.,0.],[0.,-1.],[1.,1.]])
-h = array([0.,0.,5.]).reshape((3,))
+##P = array([[2.,0.],[0,2.]])
+#q = array([-8.,-6.])
+#G = array([[-1.,0.],[0.,-1.],[1.,1.]])
+#h = array([0.,0.,5.]).reshape((3,))
 
 #print(quadprog_solve_qp(P, q, G, h))
