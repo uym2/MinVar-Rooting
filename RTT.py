@@ -30,13 +30,16 @@ class RTT_Tree(Tree_extend):
     # solver can be "AS" (active-set) or "QP" (quad-prog)
         n = self.total_leaves
         a, b, c, d, e, f = n, SST, (-2 * deltaT), (2 * deltaD), (-2 * SDT), SSD
-        h, k, m, r = n, (2*(n-2*node.nleaf)), (-2 * node.ST), (2 * node.SD)
+        h, k, m, r = n, (2 * (n - 2 * node.nleaf)), (-2 * node.ST), (2 * node.SD)
         
-        # find global mu_star and x_star and y_star
-        mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
-        x_star = (deltaT * mu_star - deltaD) / n
-        y_star = 0 ###
-        
+        # find global mu_star, x_star and y_star
+        P = np.array([[a, k / 2, c / 2], [k / 2, h, m / 2], [c / 2, m / 2, b]])
+        q = np.array([[d / 2], [r / 2], [e / 2]])
+        z_star = - 2 * np.dot(np.linalg.inv(P), q)
+        x_star = z_star[0][0]
+        y_star = z_star[1][0]
+        mu_star = z_star[2][0]
+
         if x_star >= 0 and x_star <= node.edge_length and mu_star >= 0:
             curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
                        + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
@@ -54,25 +57,30 @@ class RTT_Tree(Tree_extend):
             # ^ x,m are different when using quadprog, but rooted tree is same for some
         else:
             # use active_set technique to compute mu_star and x_star
-            if x_star < 0:
+            if x_star < 0 or x_star > node.edge_length:
                 x_star = 0
-                mu_star = -e / (2 * b)
-                if mu_star < 0:
-                    mu_star = 0
-            elif x_star > node.edge_length:
-                x_star = node.edge_length
-                mu_star = -(e + c * node.edge_length) / (2 * b)
-                if mu_star < 0:
-                    mu_star = 0
+                if x_star > node.edge_length:
+                    x_star = node.edge_length
+                P_x = np.array([[h, m / 2], [m / 2, b]])
+                q_x = np.array([[r / 2], [e / 2]])
+                z_star_x = -2 * np.dot(np.linalg.inv(P_x), q_x)
+                y_star = z_star_x[0][0]
+                mu_star = z_star_x[1][0]
+            #elif x_star > node.edge_length:
+            #    x_star = node.edge_length
+            #    mu_star = -(e + c * node.edge_length) / (2 * b)
+            #    if mu_star < 0:
+            #        mu_star = 0
             elif mu_star < 0:
                 mu_star = 0
-                x_star = -d / (2 * a)
-                if x_star < 0:
-                    x_star = 0
-                elif x_star > node.edge_length:
-                    x_star = node.edge_length
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
-        
+                P_mu = np.array([[a, k / 2], [k / 2, h]])
+                q_mu = np.array([[d / 2], [r / 2]])
+                z_star_mu = -2 * np.dot(np.linalg.inv(P_mu), q_mu)
+                x_star = z_star_mu[0][0]
+                y_star = z_star_mu[1][0]
+            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
+                       + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
+
         if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT
             self.opt_root = node
