@@ -1,5 +1,6 @@
 from Tree_extend import *
 from quadprog_example import *
+import numpy as np
 
 EPSILON = 1e-5
 
@@ -29,13 +30,16 @@ class RTT_Tree(Tree_extend):
     # solver can be "AS" (active-set) or "QP" (quad-prog)
         n = self.total_leaves
         a, b, c, d, e, f = n, SST, (-2 * deltaT), (2 * deltaD), (-2 * SDT), SSD
+        h, k, m, r = n, (2*(n-2*node.nleaf)), (-2 * node.ST), (2 * node.SD)
         
-        # find global mu_star and x_star
+        # find global mu_star and x_star and y_star
         mu_star = (SDT - deltaT * deltaD / n) / (SST - deltaT * deltaT / n)
         x_star = (deltaT * mu_star - deltaD) / n
+        y_star = 0 ###
         
         if x_star >= 0 and x_star <= node.edge_length and mu_star >= 0:
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star + f
+            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
+                       + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
         elif solver == "QP":
             # use quadprog to compute mu_star and x_star
             P = array([[a,c/2.],[c/2,b]])
