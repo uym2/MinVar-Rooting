@@ -1,6 +1,5 @@
 from Tree_extend import *
-from quadprog_example import *
-import numpy as np
+from quadprog_solvers import *
 
 EPSILON = 1e-5
 
@@ -15,9 +14,10 @@ class RTT_Tree(Tree_extend):
     def reset(self):
         self.RTT = None
         self.opt_root = self.ddpTree.root
+        self.opt_y = 0
         self.opt_x = 0
         self.opt_mu = 0
-        self.opt_y = 0
+        self.tmin = min(self.smplTimes.values())
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, var=-1, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
@@ -27,56 +27,30 @@ class RTT_Tree(Tree_extend):
         node.SDT = SDT
         node.SSD = SSD
 
-    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, solver = "AS"):
-    # solver can be "AS" (active-set) or "QP" (quad-prog)
+    def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, ST, SD):
         n = self.total_leaves
         a, b, c, d, e, f = n, SST, (-2 * deltaT), (2 * deltaD), (-2 * SDT), SSD
-        h, k, m, r = n, (2 * (n - 2 * node.nleaf)), (-2 * node.ST), (2 * node.SD)
-        
-        # find global mu_star, x_star and y_star
-        P = np.array([[a, k / 2., c / 2.], [k / 2., h, m / 2.], [c / 2., m / 2., b]])
-        q = np.array([[d / 2.], [r / 2.], [e / 2.]])
-        z_star = - np.dot(np.linalg.inv(P), q)
-        x_star = z_star[0][0]
-        y_star = z_star[1][0]
-        mu_star = z_star[2][0]
-        #curr_RTT = 1000
+        k, m, r = 2*(n-2*node.nleaf), -2*ST, 2*SD
 
-        if x_star >= 0 and x_star <= node.edge_length and mu_star >= 0:
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
-                       + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
-        else:
-            # use active_set technique to compute mu_star and x_star
-            if x_star < 0:
-                x_star = 0
-                P_x = np.array([[h, m / 2], [m / 2, b]])
-                q_x = np.array([[r / 2], [e / 2]])
-                z_star_x = -np.dot(np.linalg.inv(P_x), q_x)
-                y_star = z_star_x[0][0]
-                mu_star = z_star_x[1][0]
-            elif x_star > node.edge_length:
-                x_star = node.edge_length
-                P_x = np.array([[h, m / 2], [m / 2, b]])
-                q_x = np.array([[r / 2. + k * node.edge_length /2], [e / 2. + c * node.edge_length/2]])
-                z_star_x = -  np.dot(np.linalg.inv(P_x), q_x)
-                y_star = z_star_x[0][0]
-                mu_star = z_star_x[1][0]
-            elif mu_star < 0:
-                mu_star = 0
-                P_mu = np.array([[a, k / 2], [k / 2, h]])
-                q_mu = np.array([[d / 2], [r / 2]])
-                z_star_mu = - np.dot(np.linalg.inv(P_mu), q_mu)
-                x_star = z_star_mu[0][0]
-                y_star = z_star_mu[1][0]
-            curr_RTT = a * x_star * x_star + b * mu_star * mu_star + c * x_star * mu_star + d * x_star + e * mu_star \
-                       + f + h * y_star * y_star + k * x_star * y_star + m * mu_star * y_star + r * y_star
-        print(curr_RTT)
-        if self.RTT is None or curr_RTT < self.RTT:
+        tmin = self.tmin
+
+        # use quadprog to compute mu_star, y_star, and x_star
+        P = array([[a,k/2,c/2.],[k/2,n,m/2],[c/2,m/2,b]])
+        q = array([d/2.,r/2,e/2])
+        G = array([[-1.,0.,0.], [0.,0.,-1.], [1.,0.,0.],[0.,1.,-tmin]])
+        h = array([0., 0., node.edge_length,0]).reshape((4,))
+        solution = cvxopt_solve_qp(P,q,G,h)
+        x_star = solution[0]
+        y_star = solution[1]
+        mu_star = solution[2]
+        curr_RTT = a*x_star*x_star + b*mu_star*mu_star + c*x_star*mu_star + d*x_star + e*mu_star + f + n*y_star*y_star + k*x_star*y_star + m*mu_star*y_star + r*y_star
+        
+        if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT
             self.opt_root = node
             self.opt_x = node.edge_length - x_star
-            self.opt_mu = mu_star
             self.opt_y = y_star
+            self.opt_mu = mu_star
 
     def bUp_update(self, node):
         if node.is_leaf():
@@ -98,21 +72,24 @@ class RTT_Tree(Tree_extend):
         deltaD = -2 * child.nleaf * edge_length - 2 * child.SDI + node.SD
         SDT = node.SDT
         SSD = node.SSD
-        return SST, deltaT, deltaD, SDT, SSD
+        ST = self.ST
+        SD = node.SD
+        return SST, deltaT, deltaD, SDT, SSD, ST, SD
 
     def tDown_update(self, node, opt_function):
         for child in node.child_nodes():
             child.SD = node.SD + (self.total_leaves - 2 * child.nleaf) * child.edge_length
             child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
             child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
-            SST, deltaT, deltaD, SDT, SSD = self.Update_var(child, node, child.edge_length)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD, solver=self.solver)
+            SST, deltaT, deltaD, SDT, SSD, ST, SD = self.Update_var(child, node, child.edge_length)
+            opt_function(child, SST, deltaT, deltaD, SDT, SSD, ST, SD)
 
     def prepare_root(self):
         root = self.get_root()
         root.SD = root.SDI
         #self.compute_dRoot_VAR() ########
         self.total_leaves = root.nleaf
+        self.ST = root.ST
         self.ddpTree.root.droot = 0
         self.ddpTree.root.troot = 0
         root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
@@ -132,4 +109,4 @@ class RTT_Tree(Tree_extend):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation Rate: " + str(self.opt_mu) + "\nTime at Root: " + str(self.opt_y/self.opt_mu )+ "\nOpt x: " + str(self.opt_x)
+        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)

@@ -12,7 +12,7 @@ from treeswift import *
 from sys import stdin, stdout
 import argparse
 
-METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTTqp': RTT_Tree, 'RTTas':RTT_Tree}
+METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r'), default=stdin,
@@ -45,10 +45,8 @@ for line in args.input:
     tree = read_tree(line, schema=args.schema.lower())
     if args.method == 'OG':
         a_tree = OGR_Tree(OGs, ddpTree=tree)
-    elif args.method == 'RTTqp':
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="QP")
-    elif args.method == 'RTTas':
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree, solver="AS")
+    elif args.method == 'RTT':
+        a_tree = RTT_Tree(smplTimes, ddpTree=tree)
     else:
         a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
