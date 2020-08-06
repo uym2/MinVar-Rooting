@@ -21,6 +21,9 @@ def RTT_score(tree,time):
     b, e, h, m, r, f = tree.SST, (-2 * tree.root.SDT), n, (-2*tree.ST), tree.root.SD, tree.root.SSD
     y_star = ((m * e)/(2*b) - r) / (2*h - (m*m)/(2*b))
     mu_star = - (e + m * y_star)/(2*b)
+    if mu_star < 0:
+        mu_star = 0
+        y_star = -r/(2*h)
     RTT = b*mu_star*mu_star + e*mu_star + f + h*y_star*y_star + m*mu_star*y_star + r*y_star
     return RTT/n
 
