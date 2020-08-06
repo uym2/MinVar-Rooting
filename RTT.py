@@ -109,4 +109,4 @@ class RTT_Tree(Tree_extend):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score()/self.total_leaves) #+ "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)
+        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)
