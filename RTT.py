@@ -19,7 +19,7 @@ class RTT_Tree(Tree_extend):
         self.opt_mu = 0
         self.tmin = min(self.smplTimes.values())
 
-    def Node_init(self, node, nleaf=1, SDI=0, SD=0, var=-1, ST=0, SDT=0, SSD=0):
+    def Node_init(self, node, nleaf=1, SDI=0, SD=0, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
         node.SD = SD
         node.nleaf = nleaf
@@ -109,4 +109,4 @@ class RTT_Tree(Tree_extend):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)
+        return "RTT score: " + str(self.opt_score()/self.total_leaves) #+ "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)
