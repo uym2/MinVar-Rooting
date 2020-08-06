@@ -38,7 +38,7 @@ class RTT_Tree(Tree_extend):
         P = array([[a,k/2,c/2.],[k/2,n,m/2],[c/2,m/2,b]])
         q = array([d/2.,r/2,e/2])
         G = array([[-1.,0.,0.], [0.,0.,-1.], [1.,0.,0.],[0.,1.,-tmin]])
-        h = array([0., 0., node.edge_length,0]).reshape((4,))
+        h = array([0., EPSILON, node.edge_length,0]).reshape((4,))
         solution = cvxopt_solve_qp(P,q,G,h)
         x_star = solution[0]
         y_star = solution[1]
