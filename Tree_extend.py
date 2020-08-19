@@ -312,7 +312,10 @@ class OGR_Tree(Tree_extend):
     # of the specified outgroups.
     def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick"):
         super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
-        L = self.ddpTree.leaf_nodes()
+        #L = self.ddpTree.leaf_nodes()
+        L = []
+        for leaf in self.ddpTree.traverse_leaves():
+            L.append(leaf)
         self.OGs = set([x.label for x in L if x.label in set(outgroups)])
         self.nOGs = len(self.OGs)
         self.nIGs = len(L) - self.nOGs
