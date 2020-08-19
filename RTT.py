@@ -87,7 +87,6 @@ class RTT_Tree(Tree_extend):
     def prepare_root(self):
         root = self.get_root()
         root.SD = root.SDI
-        #self.compute_dRoot_VAR() ########
         self.total_leaves = root.nleaf
         self.ST = root.ST
         self.ddpTree.root.droot = 0
@@ -103,7 +102,6 @@ class RTT_Tree(Tree_extend):
                     root.SD += v.droot
                     root.SDT += (v.droot * self.smplTimes[v.label])
         #print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
-        # function works for sample1 and sample2
 
     def opt_score(self):
         return self.RTT
