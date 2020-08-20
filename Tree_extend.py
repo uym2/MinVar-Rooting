@@ -162,7 +162,7 @@ class Tree_extend(object):
         # br2currRoot = 0
         if self.opt_root != self.ddpTree.root:
             # d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-            self.reroot_at_edge(self.opt_root, self.opt_x) ########?
+            self.reroot_at_edge(self.opt_root, self.opt_x)
             #self.ddpTree.reroot(self.opt_root,self.opt_x)
         
         # return head_id, tail_id, edge_length, self.opt_x
@@ -312,7 +312,10 @@ class OGR_Tree(Tree_extend):
     # of the specified outgroups.
     def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick"):
         super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
-        L = self.ddpTree.leaf_nodes()
+        #L = self.ddpTree.leaf_nodes()
+        L = []
+        for leaf in self.ddpTree.traverse_leaves():
+            L.append(leaf)
         self.OGs = set([x.label for x in L if x.label in set(outgroups)])
         self.nOGs = len(self.OGs)
         self.nIGs = len(L) - self.nOGs

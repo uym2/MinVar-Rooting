@@ -1,24 +1,34 @@
 from RTT import *
 from sys import argv
 
+
+EPSILON_mu = 1e-5
+
 def RTT_score(tree,time):
     smplTimes = {}
     for line in time:
         sp, t = line.strip().split()
         smplTimes[sp] = float(t)
-    tree.root.droot, tree.root.SSD, tree.root.SDT, tree.SST, n = 0,0,0,0,0
+    tree.root.droot, tree.root.SSD, tree.root.SD, tree.root.SDT, tree.SST, tree.ST, n = 0,0,0,0,0,0,0
+    tmin = min(smplTimes.values())
     for v in tree.traverse_preorder():
         if not v.is_root():
             v.droot = v.parent.droot + v.edge_length
             if v.is_leaf():
                 n += 1
+                tree.root.SD += v.droot
                 tree.root.SSD += (v.droot ** 2)
                 tree.SST += (smplTimes[v.label] ** 2)
                 tree.root.SDT += (v.droot * smplTimes[v.label])
-
-    b, e, f = tree.SST, (-2 * tree.root.SDT), tree.root.SSD
-    mu_star = -e / (2 * b)
-    RTT = b * mu_star * mu_star + e * mu_star + f
+                tree.ST += smplTimes[v.label]
+    b, e, h, m, r, f = tree.SST, (-2 * tree.root.SDT), n, (-2*tree.ST), 2*tree.root.SD, tree.root.SSD
+    y_star = ((m * e)/(2*b) - r) / (2*h - (m*m)/(2*b))
+    mu_star = - (e + m * y_star)/(2*b)
+    if mu_star < 0:
+        mu_star = EPSILON_mu
+        y_star = -r/(2*h)
+    print("t0:",y_star/mu_star, " mu:",mu_star)
+    RTT = b*mu_star*mu_star + e*mu_star + f + h*y_star*y_star + m*mu_star*y_star + r*y_star
     return RTT/n
 
 
@@ -43,7 +53,7 @@ def check_score(s,use_as=False,use_qp=False):
             else:
                 tree2 = qp_
             s2 = RTT_score(read_tree_newick(tree2), time2)
-        print(s1 - s2)
+        print(s2)
         #print("RTT Score",s2)
         #if abs(s2-s1) > 0.0001:
         #    print(abs(s2-s1))
@@ -51,11 +61,8 @@ def check_score(s,use_as=False,use_qp=False):
         #    print("same")
         i += 1
 
-#check_score(1000,use_as=True)
-
 
 myTreeFile = argv[1]
 timeFile = argv[2]
 time = open(timeFile,"r")
 myTree = read_tree_newick(myTreeFile)
-print(RTT_score(myTree,time))
