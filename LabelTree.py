@@ -4,7 +4,8 @@
 
 import os
 from Tree_extend import Tree_extend
-from dendropy import Tree,TreeList
+#from dendropy import Tree,TreeList
+from treeswift import *
 
 from sys import argv
 from os.path import splitext
@@ -35,7 +36,7 @@ try:
 except:
 	pass
 
-trees = TreeList.get_from_path(tree_file,schema)
+trees = read_tree(tree_file,schema)
 
 for tree in trees:
     a_tree = Tree_extend(ddpTree=tree)
