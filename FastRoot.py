@@ -22,7 +22,7 @@ parser.add_argument('-m', '--method', required=False, type=str, default="MV",
 parser.add_argument('-g', '--outgroups', required=False, type=str,
                     help="Listing of the outgroups; to be used with -m OG")
 parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
-                    help="The file containing the sampling Times at leaves; to be used with -m RTT")
+                    help="The file containing the sampling times at leaves; to be used with -m RTT")
 parser.add_argument('-o', '--outfile', required=False, type=argparse.FileType('w'), default=stdout,
                     help="Output File (default is STDOUT)")
 parser.add_argument('-s', '--schema', required=False, type=str, default="newick",

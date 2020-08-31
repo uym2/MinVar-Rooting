@@ -20,7 +20,7 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 
 ```bash
-FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE]
+FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE]
 ```
 
 optional arguments:
@@ -34,7 +34,7 @@ optional arguments:
   -g OUTGROUPS, --outgroups OUTGROUPS
                         Listing of the outgroups; to be used with -m OG
   -t SMPLTIMES, --smplTimes SMPLTIMES
-                        The file containing the sampling Times at leaves; to be used with -m RTT
+                        The file containing the sampling times at leaves; to be used with -m RTT
   -o OUTFILE, --outfile OUTFILE
                         Output File (default is STDOUT)
   -s SCHEMA, --schema SCHEMA
