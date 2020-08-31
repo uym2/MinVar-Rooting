@@ -13,7 +13,8 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 ## Dependencies
 - Python (either 2.x or 3.x)
-- Dendropy (version 4.2.0 recommended)
+- treeswift (version 1.1.14)
+- cvxopt (version 1.2.5)
 
 ## Usage
 
@@ -28,10 +29,12 @@ optional arguments:
   -i INPUT, --input INPUT
                         Input File (default is STDIN)
   -m METHOD, --method METHOD
-                        Method (MP for midpoint, MV for minVAR, OG for
-                        outgroup) (default is MV)
+                        Method (MP for midpoint, MV for minVAR, OG for outgroup, RTTas or RTTqp for root-to-tip)
+                        (default is MV)
   -g OUTGROUPS, --outgroups OUTGROUPS
                         Listing of the outgroups; to be used with -m OG
+  -t SMPLTIMES, --smplTimes SMPLTIMES
+                        The file containing the sampling Times at leaves; to be used with -m RTT
   -o OUTFILE, --outfile OUTFILE
                         Output File (default is STDOUT)
   -s SCHEMA, --schema SCHEMA
