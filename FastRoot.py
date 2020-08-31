@@ -2,11 +2,9 @@
 
 # usage: python MP_reroot.py <tree_file>
 
-import os
-from Tree_extend import MPR_Tree, OGR_Tree
-from MinVar import *
-from RTT import *
-#from dendropy import Tree,TreeList
+from FastRoot.Tree_extend import MPR_Tree, OGR_Tree
+from FastRoot.MinVar import *
+from FastRoot.RTT import *
 from treeswift import *
 
 from sys import stdin, stdout
@@ -50,10 +48,7 @@ for line in args.input:
     else:
         a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
-    #a_tree.Bottomup_update()
-    #a_tree.prepare_root() ########
     a_tree.Reroot()
-    #print(a_tree.report_score())
 
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")

@@ -1,5 +1,5 @@
-from Tree_extend import *
-from quadprog_solvers import *
+from FastRoot.Tree_extend import *
+from FastRoot.quadprog_solvers import *
 
 EPSILON = 1e-5
 

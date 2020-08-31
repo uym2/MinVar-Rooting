@@ -1,4 +1,4 @@
-from RTT import *
+from FastRoot.RTT import *
 from sys import argv
 
 

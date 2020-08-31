@@ -1,4 +1,4 @@
-from Tree_extend import *
+from FastRoot.Tree_extend import *
 
 class minVAR_Base_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
