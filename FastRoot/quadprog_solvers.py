@@ -1,7 +1,8 @@
 import numpy
-import quadprog
+#import quadprog
 import cvxopt
 from numpy import *
+import logging
 
 def quadprog_solve_qp(P, q, G=None, h=None, A=None, b=None):
 # minimize x^T*P*x + q^T*x s.t. Gx <= h and Ax = b
@@ -34,5 +35,5 @@ if __name__ == "__main__":
     q = array([-8.,-6.])
     G = array([[-1.,0.],[0.,-1.],[1.,1.]])
     h = array([0.,0.,5.]).reshape((3,))
-    print(quadprog_solve_qp(P,q,G,h))
-    print(cvxopt_solve_qp(P,q,G,h))
+    logging.info(quadprog_solve_qp(P,q,G,h))
+    logging.info(cvxopt_solve_qp(P,q,G,h))

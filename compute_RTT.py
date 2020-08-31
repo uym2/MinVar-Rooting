@@ -27,42 +27,13 @@ def RTT_score(tree,time):
     if mu_star < 0:
         mu_star = EPSILON_mu
         y_star = -r/(2*h)
-    print("t0:",y_star/mu_star, " mu:",mu_star)
+    logging.info("t0:",y_star/mu_star, " mu:",mu_star)
     RTT = b*mu_star*mu_star + e*mu_star + f + h*y_star*y_star + m*mu_star*y_star + r*y_star
     return RTT/n
-
-
-def check_score(s,use_as=False,use_qp=False):
-    i = 1
-    while (i <= 10):
-        r_ = "Tests/R_RTT/s" + str(s) + "/Trees/s" + str(s) + "_r" + str(i) + ".tre"  # R
-        as_ = "Tests/R_RTT/s" + str(s) + "/MyCodeTest/s" + str(s) + "_r" + str(i) + "test_as.tre"  # AS
-        qp_ = "Tests/R_RTT/s" + str(s) + "/MyCodeTest/s" + str(s) + "_r" + str(i) + "test_qp.tre"  # QP
-        time1 = open("Tests/R_RTT/s" + str(s) + "/Time/s" + str(s) + "_lst" + str(i) + ".txt", "r")
-        time2 = open("Tests/R_RTT/s" + str(s) + "/Time/s" + str(s) + "_lst" + str(i) + ".txt", "r")
-        if use_as and use_qp:
-            tree1 = qp_
-            s1 = RTT_score(read_tree_newick(tree1), time1)
-            tree2 = as_
-            s2 = RTT_score(read_tree_newick(tree2), time2)
-        else:
-            tree1 = r_
-            s1 = RTT_score(read_tree_newick(tree1), time1)
-            if use_as:
-                tree2 = as_
-            else:
-                tree2 = qp_
-            s2 = RTT_score(read_tree_newick(tree2), time2)
-        print(s2)
-        #print("RTT Score",s2)
-        #if abs(s2-s1) > 0.0001:
-        #    print(abs(s2-s1))
-        #else:
-        #    print("same")
-        i += 1
 
 
 myTreeFile = argv[1]
 timeFile = argv[2]
 time = open(timeFile,"r")
 myTree = read_tree_newick(myTreeFile)
+logging.info(RTT_score(myTree,time))

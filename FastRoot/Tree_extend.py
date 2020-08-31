@@ -1,4 +1,6 @@
 # from dendropy import Tree
+import logging
+
 from treeswift import *
 import sys
 import math
@@ -86,15 +88,15 @@ class Tree_extend(object):
     def filter_branch(self, threshold=None):
         # filter out abnormally long branches
         i = 1
-        print("Iteration: " + str(i))
+        logging.info("Iteration: " + str(i))
         self.Reroot()
         while 1:
             check = self.filter_by_threshold(threshold=threshold)
             if (not check):
-                print("I could not remove anything more! I stop here!")
+                logging.info("I could not remove anything more! I stop here!")
                 break
             i += 1
-            print("Iteration: " + str(i))
+            logging.info("Iteration: " + str(i))
             self.reset()
             self.Reroot()
 
@@ -118,12 +120,12 @@ class Tree_extend(object):
                 p.child_removed = True
                 removed = True
                 try:
-                    print(node.label + " removed")
+                    logging.info(node.label + " removed")
                 except:
-                    print(node.name + " removed")
+                    logging.info(node.name + " removed")
             # elif len(node.child_nodes()) == 1:
             elif node.num_child_nodes() == 1:
-                print(node.name)
+                logging.info(node.name)
                 # remove node and attach its only child to its parent
                 e1 = node.edge_length
                 child = node.child_nodes()[0]
@@ -137,11 +139,11 @@ class Tree_extend(object):
         return __filter__(self.get_root(), 0)
 
     def compute_threhold(self, k=3.5):
-        print("Abstract class! Should never be called")
+        logging.info("Abstract class! Should never be called")
         return 0
 
     def reset(self):
-        print("Abstract class! Should never be called")
+        logging.info("Abstract class! Should never be called")
 
     def find_root(self):
         self.Topdown_label()  # temporarily included for debugging
@@ -150,10 +152,10 @@ class Tree_extend(object):
         self.Topdown_update()
 
     def opt_score(self):
-        print("Abstract class! Should never be called")
+        logging.info("Abstract class! Should never be called")
 
     def report_score(self):
-        print("Abstract class! Should never be called")
+        logging.info("Abstract class! Should never be called")
 
     def Reroot(self):
         self.find_root()
@@ -169,7 +171,7 @@ class Tree_extend(object):
         # return d2currRoot,br2currRoot
 
     def Opt_function(self, node):
-        print("Abstract method! Should never be called")
+        logging.info("Abstract method! Should never be called")
 
     def tree_as_newick(self, outstream=sys.stdout, label_by_name=False):
         # dendropy's method to write newick seems to have problem ...
@@ -295,7 +297,7 @@ class Tree_extend(object):
 #            for node in self.ddpTree.traverse_postorder():
 #                for child in node.child_nodes():
 #                    if child.parent_node is not node:
-#                        print("Error found!")
+#                        logging.info("Error found!")
 #                        child.parent_node = node
 ### MAD@ add
 
@@ -430,7 +432,7 @@ class MPR_Tree(Tree_extend):
         pass
 
     def compute_threhold(self, k=3.5):
-        print("We don't do thresholding for MPR_Tree. How come it got here?")
+        logging.info("We don't do thresholding for MPR_Tree. How come it got here?")
         return 0
 
     def opt_score(self):

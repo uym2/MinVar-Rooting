@@ -23,4 +23,4 @@ def compute_variance(tree):  # tree is rooted
 
 myTreeFile = argv[1]
 myTree = read_tree_newick(myTreeFile)
-print(compute_variance(myTree))
+logging.info(compute_variance(myTree))
