@@ -4,6 +4,7 @@ import cvxopt
 from numpy import *
 import logging
 
+'''
 def quadprog_solve_qp(P, q, G=None, h=None, A=None, b=None):
 # minimize x^T*P*x + q^T*x s.t. Gx <= h and Ax = b
     qp_G = .5 * (P + P.T)   # make sure P is symmetric
@@ -17,6 +18,7 @@ def quadprog_solve_qp(P, q, G=None, h=None, A=None, b=None):
         qp_b = -h
         meq = 0
     return quadprog.solve_qp(qp_G, qp_a, qp_C, qp_b, meq)[0]
+'''
 
 def cvxopt_solve_qp(P, q, G=None, h=None, A=None, b=None):
     P = .5 * (P + P.T)  # make sure P is symmetric

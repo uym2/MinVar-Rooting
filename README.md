@@ -15,6 +15,7 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 - Python (either 2.x or 3.x)
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
+- numpy (version 1.19.0)
 
 ## Usage
 
