@@ -19,7 +19,7 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 ## Install using Pip
 ```bash
-pip install -i https://test.pypi.org/simple/ FastRoot==1.0
+pip install FastRoot==1.0
 ```
 
 ## Usage
