@@ -17,10 +17,33 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
 
-## Install using Pip
+### Install using Pip
 ```bash
 pip install FastRoot==1.0
 ```
+
+## Install from source code
+1. Download the source code.  
+
+	```bash
+	   git clone https://github.com/uym2/MinVar-Rooting.git
+	```
+
+2. To install, go to the MinVar-Rooting folder. 
+	* If you have ```pip```, use
+	```bash
+	   python3 -m pip install .
+	```
+	* Otherwise, type
+	``` bash
+	   python3 setup.py install
+	```
+After installation, run:
+
+```bash
+FastRoot.py -h
+```
+to see the commandline help of FastRoot.
 
 ## Usage
 
