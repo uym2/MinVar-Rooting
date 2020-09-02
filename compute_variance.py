@@ -1,7 +1,7 @@
 from treeswift import *
 from sys import argv
-from FastRoot.RTT import *
-from FastRoot.Tree_extend import *
+from fastroot.RTT import *
+from fastroot.Tree_extend import *
 
 def compute_variance(tree):  # tree is rooted
     tree.root.droot = 0

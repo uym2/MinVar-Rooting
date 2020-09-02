@@ -2,7 +2,7 @@
 
 # usage: python reroot_at_edge.py <tree_file> <head_node> <d2head> <out_file>
 
-from FastRoot.Tree_extend import Tree_extend
+from fastroot.Tree_extend import Tree_extend
 #from sys import argv
 from os.path import splitext
 

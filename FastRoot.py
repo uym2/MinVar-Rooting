@@ -2,9 +2,9 @@
 
 # usage: python MP_reroot.py <tree_file>
 
-from FastRoot.Tree_extend import MPR_Tree, OGR_Tree
-from FastRoot.MinVar import *
-from FastRoot.RTT import *
+from fastroot.Tree_extend import MPR_Tree, OGR_Tree
+from fastroot.MinVar import *
+from fastroot.RTT import *
 from treeswift import *
 
 from sys import stdin, stdout

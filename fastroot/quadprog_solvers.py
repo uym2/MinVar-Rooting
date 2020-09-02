@@ -37,5 +37,5 @@ if __name__ == "__main__":
     q = array([-8.,-6.])
     G = array([[-1.,0.],[0.,-1.],[1.,1.]])
     h = array([0.,0.,5.]).reshape((3,))
-    logging.info(quadprog_solve_qp(P,q,G,h))
+    #logging.info(quadprog_solve_qp(P,q,G,h))
     logging.info(cvxopt_solve_qp(P,q,G,h))

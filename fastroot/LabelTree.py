@@ -3,7 +3,7 @@
 # usage: python LabelTree.py <tree_file>
 
 import os
-from FastRoot.Tree_extend import Tree_extend
+from fastroot.Tree_extend import Tree_extend
 #from dendropy import Tree,TreeList
 from treeswift import *
 
