@@ -24,10 +24,11 @@ pip install FastRoot==1.0
 
 ## Install from source code
 1. Download the source code.  
-
+	* Either clone the repository to your machine
 	```bash
 	   git clone https://github.com/uym2/MinVar-Rooting.git
 	```
+	* or simply download [this zip file](https://github.com/uym2/MinVar-Rooting/archive/master.zip) to your machine and unzip it in your preferred destination.
 
 2. To install, go to the MinVar-Rooting folder. 
 	* If you have ```pip```, use
