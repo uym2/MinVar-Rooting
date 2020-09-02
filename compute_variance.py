@@ -1,7 +1,14 @@
-from treeswift import *
 from sys import argv
 from fastroot.RTT import *
 from fastroot.Tree_extend import *
+
+logger = logging.getLogger("compute_variance")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 def compute_variance(tree):  # tree is rooted
     tree.root.droot = 0
@@ -23,4 +30,4 @@ def compute_variance(tree):  # tree is rooted
 
 myTreeFile = argv[1]
 myTree = read_tree_newick(myTreeFile)
-logging.info(compute_variance(myTree))
+logger.info(compute_variance(myTree))

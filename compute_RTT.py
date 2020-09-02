@@ -4,6 +4,14 @@ from sys import argv
 
 EPSILON_mu = 1e-5
 
+logger = logging.getLogger("compute_RTT")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
+
 def RTT_score(tree,time):
     smplTimes = {}
     for line in time:
@@ -27,7 +35,7 @@ def RTT_score(tree,time):
     if mu_star < 0:
         mu_star = EPSILON_mu
         y_star = -r/(2*h)
-    logging.info("t0:",y_star/mu_star, " mu:",mu_star)
+    logger.info("t0:" + str(y_star/mu_star) + " mu:" + str(mu_star))
     RTT = b*mu_star*mu_star + e*mu_star + f + h*y_star*y_star + m*mu_star*y_star + r*y_star
     return RTT/n
 
@@ -36,4 +44,4 @@ myTreeFile = argv[1]
 timeFile = argv[2]
 time = open(timeFile,"r")
 myTree = read_tree_newick(myTreeFile)
-logging.info(RTT_score(myTree,time))
+logger.info(RTT_score(myTree,time))

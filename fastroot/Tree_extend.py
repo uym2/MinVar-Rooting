@@ -5,6 +5,13 @@ from treeswift import *
 import sys
 import math
 
+logger = logging.getLogger("Tree_extend")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 class Tree_extend(object):
     def __init__(self, ddpTree=None, tree_file=None, schema="newick"):
@@ -88,15 +95,15 @@ class Tree_extend(object):
     def filter_branch(self, threshold=None):
         # filter out abnormally long branches
         i = 1
-        logging.info("Iteration: " + str(i))
+        logger.info("Iteration: " + str(i))
         self.Reroot()
         while 1:
             check = self.filter_by_threshold(threshold=threshold)
             if (not check):
-                logging.info("I could not remove anything more! I stop here!")
+                logger.info("I could not remove anything more! I stop here!")
                 break
             i += 1
-            logging.info("Iteration: " + str(i))
+            logger.info("Iteration: " + str(i))
             self.reset()
             self.Reroot()
 
@@ -120,12 +127,12 @@ class Tree_extend(object):
                 p.child_removed = True
                 removed = True
                 try:
-                    logging.info(node.label + " removed")
+                    logger.info(node.label + " removed")
                 except:
-                    logging.info(node.name + " removed")
+                    logger.info(node.name + " removed")
             # elif len(node.child_nodes()) == 1:
             elif node.num_child_nodes() == 1:
-                logging.info(node.name)
+                logger.info(node.name)
                 # remove node and attach its only child to its parent
                 e1 = node.edge_length
                 child = node.child_nodes()[0]
@@ -139,11 +146,11 @@ class Tree_extend(object):
         return __filter__(self.get_root(), 0)
 
     def compute_threhold(self, k=3.5):
-        logging.info("Abstract class! Should never be called")
+        logger.info("Abstract class! Should never be called")
         return 0
 
     def reset(self):
-        logging.info("Abstract class! Should never be called")
+        logger.info("Abstract class! Should never be called")
 
     def find_root(self):
         self.Topdown_label()  # temporarily included for debugging
@@ -152,10 +159,10 @@ class Tree_extend(object):
         self.Topdown_update()
 
     def opt_score(self):
-        logging.info("Abstract class! Should never be called")
+        logger.info("Abstract class! Should never be called")
 
     def report_score(self):
-        logging.info("Abstract class! Should never be called")
+        logger.info("Abstract class! Should never be called")
 
     def Reroot(self):
         self.find_root()
@@ -171,7 +178,7 @@ class Tree_extend(object):
         # return d2currRoot,br2currRoot
 
     def Opt_function(self, node):
-        logging.info("Abstract method! Should never be called")
+        logger.info("Abstract method! Should never be called")
 
     def tree_as_newick(self, outstream=sys.stdout, label_by_name=False):
         # dendropy's method to write newick seems to have problem ...
@@ -297,7 +304,7 @@ class Tree_extend(object):
 #            for node in self.ddpTree.traverse_postorder():
 #                for child in node.child_nodes():
 #                    if child.parent_node is not node:
-#                        logging.info("Error found!")
+#                        logger.info("Error found!")
 #                        child.parent_node = node
 ### MAD@ add
 
@@ -432,7 +439,7 @@ class MPR_Tree(Tree_extend):
         pass
 
     def compute_threhold(self, k=3.5):
-        logging.info("We don't do thresholding for MPR_Tree. How come it got here?")
+        logger.info("We don't do thresholding for MPR_Tree. How come it got here?")
         return 0
 
     def opt_score(self):

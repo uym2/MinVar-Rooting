@@ -39,6 +39,14 @@ if args.smplTimes:
         sp,t = line.strip().split()
         smplTimes[sp] = float(t)
 
+logger = logging.getLogger("FastRoot")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(stdout)
+formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
+
 for line in args.input:
     tree = read_tree(line, schema=args.schema.lower())
     if args.method == 'OG':
@@ -53,7 +61,7 @@ for line in args.input:
     if args.infofile:
         args.infofile.write(a_tree.report_score() + "\n")
     else:
-        logging.info(a_tree.report_score())
+        logger.info(a_tree.report_score())
 
     # args.outfile.write(a_tree.ddpTree.as_string("newick"))
 
