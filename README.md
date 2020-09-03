@@ -19,7 +19,7 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 
 ### Install using Pip
 ```bash
-pip install FastRoot==1.0
+python3 -m pip install FastRoot
 ```
 
 ## Install from source code
@@ -35,10 +35,15 @@ pip install FastRoot==1.0
 	```bash
 	   python3 -m pip install .
 	```
-	* Otherwise, type
+	* Otherwise, if you have root access, type
 	``` bash
-	   python3 setup.py install
+	   sudo python3 setup.py install
 	```
+	* If you do not have user access, type
+	``` bash
+	   python3 setup.py install --user
+	```
+	
 After installation, run:
 
 ```bash
