@@ -17,7 +17,7 @@ Complexity: all rooting methods are linear (with the number of species) in time 
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
 
-### Install using Pip
+## Install using Pip
 ```bash
 python3 -m pip install FastRoot
 ```
