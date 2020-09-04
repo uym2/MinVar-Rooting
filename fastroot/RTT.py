@@ -101,10 +101,9 @@ class RTT_Tree(Tree_extend):
                     self.SST += (self.smplTimes[v.label] ** 2)
                     root.SD += v.droot
                     root.SDT += (v.droot * self.smplTimes[v.label])
-        #print("SD:",root.SD,"  SSD:",root.SSD,"  SDT:", root.SDT, "  SST:", self.SST, "  ST:", root.ST)
 
     def opt_score(self):
         return self.RTT
 
     def report_score(self):
-        return "RTT score: " + str(self.opt_score()/self.total_leaves) + "\nMutation rate: " + str(self.opt_mu) +  "\nt0: " + str(self.opt_y/self.opt_mu)
+        return "RTT=" + str(self.opt_score()/self.total_leaves) + "\tmu=" + str(self.opt_mu) +  "\tt0=" + str(self.opt_y/self.opt_mu)

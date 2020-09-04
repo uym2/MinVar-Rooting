@@ -1,71 +1,72 @@
-#! /usr/bin/env python
-
-# usage: python MP_reroot.py <tree_file>
+#! /usr/bin/env python3
 
 from fastroot.Tree_extend import MPR_Tree, OGR_Tree
 from fastroot.MinVar import *
 from fastroot.RTT import *
 from treeswift import *
-
-from sys import stdin, stdout
+import fastroot
+from sys import stdin, stdout, argv, exit, stderr
 import argparse
 
-METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
+def main():
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r'), default=stdin,
-                    help="Input File (default is STDIN)")
-parser.add_argument('-m', '--method', required=False, type=str, default="MV",
-                    help="Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)")
-parser.add_argument('-g', '--outgroups', required=False, type=str,
-                    help="Listing of the outgroups; to be used with -m OG")
-parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
-                    help="The file containing the sampling times at leaves; to be used with -m RTT")
-parser.add_argument('-o', '--outfile', required=False, type=argparse.FileType('w'), default=stdout,
-                    help="Output File (default is STDOUT)")
-parser.add_argument('-s', '--schema', required=False, type=str, default="newick",
-                    help="Schema of your input treefile (default is newick)")
-parser.add_argument('-f', '--infofile', required=False, type=argparse.FileType('w'), default=None,
-                    help="Report the optimization score to file")
+    # parse arguments
+    parser = argparse.ArgumentParser()
+    
+    
+    parser.add_argument('-i', '--input', required=False, type=argparse.FileType('r'), default=stdin,
+                        help="Input File (default is STDIN)")
+    parser.add_argument('-m', '--method', required=False, type=str, default="MV",
+                        help="Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)")
+    parser.add_argument('-g', '--outgroups', required=False, type=str,
+                        help="Listing of the outgroups; to be used with -m OG")
+    parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
+                        help="The file containing the sampling times at leaves; to be used with -m RTT")
+    parser.add_argument('-o', '--outfile', required=False, type=argparse.FileType('w'), default=stdout,
+                        help="Output File (default is STDOUT)")
+    parser.add_argument('-s', '--schema', required=False, type=str, default="newick",
+                        help="Schema of your input treefile (default is newick)")
+    parser.add_argument('-f', '--infofile', required=False, type=argparse.FileType('w'), default=None,
+                        help="Save all the logging to this file. Default: print to stderr")
+    
+    # print help message if no argument is given
+    if len(argv) == 1:
+        logger = fastroot.new_logger(__name__)
+        logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION) 
+        parser.print_help()
+        exit(0) 
 
-args = parser.parse_args()
+    args = parser.parse_args()
+    stream = args.infofile if args.infofile else stderr
+    logger = fastroot.new_logger(__name__,myStream=stream)
 
-assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR"
+    METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
+    
+    assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
 
-OGs = args.outgroups.split() if args.outgroups else None
-smplTimes = {}
-if args.smplTimes:
-    for line in args.smplTimes:
-        sp,t = line.strip().split()
-        smplTimes[sp] = float(t)
+    # reading outgroups
+    OGs = args.outgroups.split() if args.outgroups else None
 
-logger = logging.getLogger("FastRoot")
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler(stdout)
-formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.propagate = False
+    # reading sampling times
+    if args.smplTimes:
+        smplTimes = {}
+        for line in args.smplTimes:
+            sp,t = line.strip().split()
+            smplTimes[sp] = float(t)
 
-for line in args.input:
-    tree = read_tree(line, schema=args.schema.lower())
-    if args.method == 'OG':
-        a_tree = OGR_Tree(OGs, ddpTree=tree)
-    elif args.method == 'RTT':
-        a_tree = RTT_Tree(smplTimes, ddpTree=tree)
-    else:
-        a_tree = METHOD2FUNC[args.method](ddpTree=tree)
+    # read and root each tree
+    for i,line in enumerate(args.input):
+        tree = read_tree(line, schema=args.schema.lower())
+        if args.method == 'OG':
+            a_tree = OGR_Tree(OGs, ddpTree=tree)
+        elif args.method == 'RTT':
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree)
+        else:
+            a_tree = METHOD2FUNC[args.method](ddpTree=tree)
 
-    a_tree.Reroot()
+        a_tree.Reroot()
+        logger.info("Tree " + str(i+1) + " " + a_tree.report_score())
+        a_tree.tree_as_newick(outstream=args.outfile)
 
-    if args.infofile:
-        args.infofile.write(a_tree.report_score() + "\n")
-    else:
-        logger.info(a_tree.report_score())
-
-    # args.outfile.write(a_tree.ddpTree.as_string("newick"))
-
-    a_tree.tree_as_newick(outstream=args.outfile)
-
-# if args.infofile:
-# args.infofile.close()
+if __name__ == "__main__":
+    main()
