@@ -9,6 +9,8 @@ from sys import stdin, stdout, argv, exit, stderr
 import argparse
 
 def main():
+    logger = fastroot.new_logger(__name__)
+    logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION) 
 
     # parse arguments
     parser = argparse.ArgumentParser()
@@ -31,8 +33,6 @@ def main():
     
     # print help message if no argument is given
     if len(argv) == 1:
-        logger = fastroot.new_logger(__name__)
-        logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION) 
         parser.print_help()
         exit(0) 
 
