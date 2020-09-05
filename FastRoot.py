@@ -59,11 +59,11 @@ def main():
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
         if args.method == 'OG':
-            a_tree = OGR_Tree(OGs, ddpTree=tree)
+            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream)
         elif args.method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream)
         else:
-            a_tree = METHOD2FUNC[args.method](ddpTree=tree)
+            a_tree = METHOD2FUNC[args.method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
 
         a_tree.Reroot()
         logger.info("Tree " + str(i+1) + " " + a_tree.report_score())

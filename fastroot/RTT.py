@@ -1,14 +1,15 @@
 from fastroot.Tree_extend import *
 from fastroot.quadprog_solvers import *
+from sys import stderr
 
 EPSILON = 1e-5
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, solver="AS", ddpTree=None, tree_file=None,schema="newick"):
+    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr):
         super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
+        self.logger = new_logger("RTT_Tree_" + str(logger_id),myStream=logger_stream)
         self.smplTimes = smplTimes
-        self.solver = solver
         self.reset()
 
     def reset(self):

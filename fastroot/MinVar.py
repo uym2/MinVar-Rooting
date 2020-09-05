@@ -1,5 +1,6 @@
 from fastroot.Tree_extend import *
 
+'''
 logger = logging.getLogger("MinVar")
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
@@ -7,11 +8,13 @@ formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False
+'''
 
 class minVAR_Base_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr):
         super(minVAR_Base_Tree, self).__init__(ddpTree, tree_file, schema)
+        self.logger = new_logger("MinVar_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
 
     def reset(self):
@@ -26,7 +29,7 @@ class minVAR_Base_Tree(Tree_extend):
         node.var = var
 
     def Opt_function(self, node, a, b, c):
-        logger.info("Abstract method! Should never be called")
+        self.logger.info("Abstract method! Should never be called")
 
     def compute_dRoot_VAR(self):
         cumm = {'ssq': 0, 'sum': 0}
@@ -118,7 +121,7 @@ class MVDF_Tree(minVAR_Base_Tree):
                 self.opt_root = node
                 self.opt_x = node.edge_length - x
 
-    #                logger.info(str(curr_minVAR) + "\t" + node.label
+    #                self.logger.info(str(curr_minVAR) + "\t" + node.label
     #                      + "\t" + str(node.edge_length-x) + "\t" + str(self.Tree_records[node.idx].var)
     #                      + "\t" + (str(node.parent_node.label) if node.parent_node else "None")
     #                      + "\t" + str(self.Tree_records[node.parent_node.idx].var))
@@ -130,8 +133,8 @@ class MVDF_Tree(minVAR_Base_Tree):
         factor = float(self.opt_root.nleaf) / self.total_leaves
         factor = factor * (1 - factor)
         rootVar = self.minVAR * factor
-        logger.info(mean)
-        logger.info(rootVar)
+        self.logger.info(mean)
+        self.logger.info(rootVar)
         std = math.sqrt(rootVar)
         return mean + k * std
 
@@ -169,7 +172,7 @@ class MVD0_Tree(minVAR_Base_Tree):
                 self.opt_root = node
                 self.opt_x = node.edge_length - x
 
-    #                logger.info(str(curr_minVAR) + "\t" + node.label
+    #                self.logger.info(str(curr_minVAR) + "\t" + node.label
     #                      + "\t" + str(node.edge_length-x) + "\t" + str(self.Tree_records[node.idx].var)
     #                      + "\t" + (str(node.parent_node.label) if node.parent_node else "None")
     #                      + "\t" + str(self.Tree_records[node.parent_node.idx].var))
@@ -178,8 +181,8 @@ class MVD0_Tree(minVAR_Base_Tree):
         # should be called only AFTER the MV root was found
         mean = (self.opt_root.sum_total - self.opt_x *
                 (self.total_leaves - 2 * self.opt_root.nleaf)) / self.total_leaves
-        logger.info(mean)
-        logger.info(self.minVAR)
+        self.logger.info(mean)
+        self.logger.info(self.minVAR)
         std = math.sqrt(self.minVAR)
         return mean + k * std
 
@@ -201,7 +204,7 @@ class MV0F_Tree(minVAR_Base_Tree):
                 self.opt_root = node
                 self.opt_x = node.edge_length - x
 
-    #                logger.info(str(curr_minVAR) + "\t" + node.label
+    #                self.logger.info(str(curr_minVAR) + "\t" + node.label
     #                      + "\t" + str(node.edge_length-x) + "\t" + str(self.Tree_records[node.idx].var)
     #                      + "\t" + (str(node.parent_node.label) if node.parent_node else "None")
     #                      + "\t" + str(self.Tree_records[node.parent_node.idx].var))
@@ -213,8 +216,8 @@ class MV0F_Tree(minVAR_Base_Tree):
         factor = float(self.opt_root.nleaf) / self.total_leaves
         factor = factor * (1 - factor)
         rootVar = self.minVAR * factor
-        logger.info(mean)
-        logger.info(rootVar)
+        self.logger.info(mean)
+        self.logger.info(rootVar)
         std = math.sqrt(rootVar)
         return mean + k * std
 
@@ -237,8 +240,8 @@ class MV00_Tree(minVAR_Base_Tree):
         # should be called only AFTER the MV root was found
         mean = (self.opt_root.sum_total - self.opt_x *
                 (self.total_leaves - 2 * self.opt_root.nleaf)) / self.total_leaves
-        logger.info(mean)
-        logger.info(self.minVAR)
+        self.logger.info(mean)
+        self.logger.info(self.minVAR)
         std = math.sqrt(self.minVAR)
         return mean + k * std
 
@@ -303,10 +306,10 @@ class MBR_Tree(Tree_extend):
 
         for (node, x, mean) in self.BPs:
             if node.is_leaf():
-                #                  logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
-                logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
+                #                  self.logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
+                self.logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
             else:
-                logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
+                self.logger.info(node.label + "\t" + str(x) + "\t" + str(mean))
 
     def build_balance_tree(self):
         self.Topdown_label()  # keep this step for now for debugging purpose
@@ -324,15 +327,15 @@ class MBR_Tree(Tree_extend):
             node.BPbelow = False
 
             '''if node.is_leaf():
-                logger.info("parent: " + node.label)# + "\t" + str(node.extraction_source.x))
+                self.logger.info("parent: " + node.label)# + "\t" + str(node.extraction_source.x))
             else:
-                logger.info("parent: " + node.label)#+ "\t" + str(node.extraction_source.x))'''
+                self.logger.info("parent: " + node.label)#+ "\t" + str(node.extraction_source.x))'''
 
             for ch in node.child_nodes():
                 '''try:
-                    logger.info("child: " + ch.label)# + "\t" + str(ch.extraction_source.x))
+                    self.logger.info("child: " + ch.label)# + "\t" + str(ch.extraction_source.x))
                 except:
-                    logger.info("child: " + ch.label) #+ "\t" + str(ch.extraction_source.x))'''
+                    self.logger.info("child: " + ch.label) #+ "\t" + str(ch.extraction_source.x))'''
 
                 if ch.BPbelow or (ch.extraction_source.x is not None):
                     node.BPbelow = True
@@ -421,16 +424,16 @@ class MBR_Tree(Tree_extend):
         mptre.tree_as_newick()
         mptre.find_root()
 
-        logger.info(mptre.opt_root.type)
+        self.logger.info(mptre.opt_root.type)
 
         if mptre.opt_root.type == "bp":
             self.opt_root = mptre.opt_root.ref_child
             self.opt_x = mptre.opt_root.ref_child.x + mptre.opt_x
         elif mptre.opt_root.type == "dm":
-            logger.info("Hmm... Is it possible that a dummy was found as the opt_root?")
+            self.logger.info("Hmm... Is it possible that a dummy was found as the opt_root?")
         else:
             self.opt_root = mptre.opt_root.extraction_source
             self.opt_x = mptre.opt_x
 
-        logger.info(self.opt_root.label)
-        logger.info(self.opt_x)
+        self.logger.info(self.opt_root.label)
+        self.logger.info(self.opt_x)

@@ -6,7 +6,7 @@
 #############################################################################
 
 PROGRAM_NAME = "TreeRooter"
-PROGRAM_AUTHOR = ["Uyen Mai","Erfan Sayyari","Siavash Mirarab","Merve Kilic"]
+PROGRAM_AUTHOR = ["Uyen Mai","Merve Kilic","Erfan Sayyari","Siavash Mirarab"]
 PROGRAM_LICENSE = "MIT License"
 PROGRAM_VERSION = "1.1"
 PROGRAM_YEAR = "2017"

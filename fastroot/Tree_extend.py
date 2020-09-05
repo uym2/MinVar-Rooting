@@ -17,8 +17,8 @@ logger.propagate = False
 '''
 
 class Tree_extend(object):
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logStream=sys.stderr):
-        self.logger = new_logger(__name__,myStream=logStream) 
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):#,logger_id=1,logger_stream=sys.stderr):
+        #self.logger = new_logger(__name__+ "_" + str(logger_id),myStream=logger_stream)
         if tree_file:
             self.ddpTree = read_tree(tree_file, schema)
         else:
@@ -322,8 +322,9 @@ class OGR_Tree(Tree_extend):
     # this rooting method solve the difficulty in finding the root when there are mulitple outgroups
     # and they are not monophyletic. It seeks for the rooting place that maximizes the triplet score
     # of the specified outgroups.
-    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick"):
+    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr):
         super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
+        self.logger = new_logger("OGR_Tree_" + str(logger_id),myStream=logger_stream)
         #L = self.ddpTree.leaf_nodes()
         L = []
         for leaf in self.ddpTree.traverse_leaves():
@@ -403,9 +404,10 @@ class OGR_Tree(Tree_extend):
 
 
 class MPR_Tree(Tree_extend):
-    # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):
+    # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)G
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr):
         super(MPR_Tree, self).__init__(ddpTree, tree_file, schema)
+        self.logger = new_logger("MPR_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
 
     def reset(self):
