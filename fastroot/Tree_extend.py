@@ -4,17 +4,21 @@ import logging
 from treeswift import *
 import sys
 import math
+from fastroot import new_logger
 
-logger = logging.getLogger("Tree_extend")
+'''
+logger = logging.getLogger("Tree_extend.py")
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False
+'''
 
 class Tree_extend(object):
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logStream=sys.stderr):
+        self.logger = new_logger(__name__,myStream=logStream) 
         if tree_file:
             self.ddpTree = read_tree(tree_file, schema)
         else:
@@ -100,10 +104,10 @@ class Tree_extend(object):
         while 1:
             check = self.filter_by_threshold(threshold=threshold)
             if (not check):
-                logger.info("I could not remove anything more! I stop here!")
+                self.logger.info("I could not remove anything more! I stop here!")
                 break
             i += 1
-            logger.info("Iteration: " + str(i))
+            self.logger.info("Iteration: " + str(i))
             self.reset()
             self.Reroot()
 
@@ -127,12 +131,11 @@ class Tree_extend(object):
                 p.child_removed = True
                 removed = True
                 try:
-                    logger.info(node.label + " removed")
+                    self.logger.info(node.label + " removed")
                 except:
-                    logger.info(node.name + " removed")
+                    self.logger.info(node.name + " removed")
             # elif len(node.child_nodes()) == 1:
             elif node.num_child_nodes() == 1:
-                logger.info(node.name)
                 # remove node and attach its only child to its parent
                 e1 = node.edge_length
                 child = node.child_nodes()[0]
@@ -146,11 +149,11 @@ class Tree_extend(object):
         return __filter__(self.get_root(), 0)
 
     def compute_threhold(self, k=3.5):
-        logger.info("Abstract class! Should never be called")
+        self.logger.warning("Abstract class! Should never be called")
         return 0
 
     def reset(self):
-        logger.info("Abstract class! Should never be called")
+        self.logger.warning("Abstract class! Should never be called")
 
     def find_root(self):
         self.Topdown_label()  # temporarily included for debugging
@@ -159,14 +162,14 @@ class Tree_extend(object):
         self.Topdown_update()
 
     def opt_score(self):
-        logger.info("Abstract class! Should never be called")
+        self.logger.warning("Abstract class! Should never be called")
 
     def report_score(self):
-        logger.info("Abstract class! Should never be called")
+        self.logger.warning("Abstract class! Should never be called")
 
     def Reroot(self):
         self.find_root()
-        self.report_score()
+        #self.report_score()
         # d2currRoot = 0
         # br2currRoot = 0
         if self.opt_root != self.ddpTree.root:
@@ -178,7 +181,7 @@ class Tree_extend(object):
         # return d2currRoot,br2currRoot
 
     def Opt_function(self, node):
-        logger.info("Abstract method! Should never be called")
+        self.logger.warning("Abstract method! Should never be called")
 
     def tree_as_newick(self, outstream=sys.stdout, label_by_name=False):
         # dendropy's method to write newick seems to have problem ...
@@ -393,8 +396,10 @@ class OGR_Tree(Tree_extend):
         return self.opt_nTrpls / float(self.max_nTrpls) if self.max_nTrpls != 0 else None
 
     def report_score(self):
-        return "Triplet score: " + str(
-            self.opt_score()) if self.opt_score() is not None else "Warning: OG rooting failed because the tree has no outgroup"
+        myScore = self.opt_score()
+        if myScore is None:
+            self.logger.warning("OG rooting failed because the tree has no outgroup")
+        return "Triplet score: " + str(self.opt_score())
 
 
 class MPR_Tree(Tree_extend):
@@ -439,7 +444,7 @@ class MPR_Tree(Tree_extend):
         pass
 
     def compute_threhold(self, k=3.5):
-        logger.info("We don't do thresholding for MPR_Tree. How come it got here?")
+        self.logger.warning("Trying to compute threshold for MPR_Tree, which is not supported.")
         return 0
 
     def opt_score(self):
