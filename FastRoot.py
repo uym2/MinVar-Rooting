@@ -7,6 +7,7 @@ from treeswift import *
 import fastroot
 from sys import stdin, stdout, argv, exit, stderr
 import argparse
+from os import path
 
 def main():
 
@@ -49,7 +50,6 @@ def main():
     assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
 
     # reading outgroups
-    from os import path
     if path.exists(args.outgroups):
         OGs= []
         for line in open(args.outgroups,'r'):
