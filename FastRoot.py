@@ -49,7 +49,13 @@ def main():
     assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
 
     # reading outgroups
-    OGs = args.outgroups.split() if args.outgroups else None
+    from os import path
+    if path.exists(args.outgroups):
+        OGs= []
+        for line in open(args.outgroups,'r'):
+            OGs.append(line.strip())
+    else:
+        OGs = args.outgroups.split() if args.outgroups else None
 
     # reading sampling times
     if args.smplTimes:
