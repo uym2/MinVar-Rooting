@@ -99,7 +99,7 @@ class Tree_extend(object):
     def filter_branch(self, threshold=None):
         # filter out abnormally long branches
         i = 1
-        logger.info("Iteration: " + str(i))
+        self.logger.info("Iteration: " + str(i))
         self.Reroot()
         while 1:
             check = self.filter_by_threshold(threshold=threshold)

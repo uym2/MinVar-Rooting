@@ -28,6 +28,9 @@ def main():
                         help="Schema of your input treefile (default is newick)")
     parser.add_argument('-f', '--infofile', required=False, type=argparse.FileType('w'), default=None,
                         help="Save all the logging to this file. Default: print to stderr")
+    parser.add_argument("-v", "--version", action='version',
+                        version=fastroot.PROGRAM_NAME + " " + fastroot.PROGRAM_VERSION,
+                        help="Show FastRoot version and exit")
     
     # print help message if no argument is given
     if len(argv) == 1:
