@@ -83,9 +83,9 @@ NOTE: `FastRoot.py` works for a list of trees
 ## Output
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output.
 
-< ## Pseudocode >
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq4.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq6.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq7.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)>
+[//]: <> ## Pseudocode
+[//]: <> ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
+[//]: <> ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq4.png)
+[//]: <> ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq6.png)
+[//]: <> ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq7.png)
+[//]: <> ![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)>
