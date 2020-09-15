@@ -39,7 +39,7 @@ python3 -m pip install FastRoot
 	``` bash
 	   sudo python3 setup.py install
 	```
-	* If you do not have user access, type
+	* If you do not have root access, type
 	``` bash
 	   python3 setup.py install --user
 	```
