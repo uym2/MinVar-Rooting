@@ -12,7 +12,7 @@ This is a dendropy-based implementation of the MinVar-Rooting, which seeks to ro
 Complexity: all rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies
-- Python (either 2.x or 3.x)
+- Python3
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
