@@ -12,7 +12,7 @@ This is a dendropy-based implementation of the MinVar-Rooting, which seeks to ro
 Complexity: all rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies
-- Python (either 2.x or 3.x)
+- Python3
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
@@ -59,15 +59,15 @@ FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFIL
 ```
 
 optional arguments:
-```
+```		
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         Input File (default is STDIN)
   -m METHOD, --method METHOD
-                        Method (MP for midpoint, MV for minVAR, OG for outgroup, RTTas or RTTqp for root-to-tip)
-                        (default is MV)
+                        Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)
   -g OUTGROUPS, --outgroups OUTGROUPS
-                        Listing of the outgroups; to be used with -m OG
+                        Specify the outgroups. If specifying a list of outgroups, put them between quotes (i.e. ").
+                        Otherwise, specifying a file which containts all the outgroups. Can only be used with -m OG
   -t SMPLTIMES, --smplTimes SMPLTIMES
                         The file containing the sampling times at leaves; to be used with -m RTT
   -o OUTFILE, --outfile OUTFILE
@@ -75,10 +75,31 @@ optional arguments:
   -s SCHEMA, --schema SCHEMA
                         Schema of your input treefile (default is newick)
   -f INFOFILE, --infofile INFOFILE
-                        Report the optimization score to file
+                        Save all the logging to this file. Default: print to stderr
+  -v, --version         Show FastRoot version and exit
 ```
 
 NOTE: `FastRoot.py` works for a list of trees
+
+### Sampling Times
+
+* The sampling time file (example file: `use_cases/RTT/sampling_times.txt`) is a tab-delimited file, with one pair of species-time per line.
+* It must have two columns: the species names and the corresponding sampling times.
+* The sampling time for every leaf must be specified.
+* This file is necessary for the root-to-tip rooting method.
+
+
+ For example, lines
+
+```
+000009  9.36668
+000010  9.36668
+000011  11.3667
+000012  11.3667
+```
+show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `000011` and `000012` are sampled at time 11.3667. 
+
+**Note:** These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree. The top of the branch above the root is assumed to be 0.
 
 ## Output
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). The optimal score of each tree is printed to stderr by default; you can direct it to a file using `-f`.

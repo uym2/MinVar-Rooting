@@ -20,8 +20,7 @@ def main():
     parser.add_argument('-m', '--method', required=False, type=str, default="MV",
                         help="Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)")
     parser.add_argument('-g', '--outgroups', required=False, type=str,
-                        help="Specify the outgroups. If specifying a list of outgroups, put them between quotes (i.e. \"). 
-                        Otherwise, specifying a file which containts all the outgroups. Can only be used with -m OG")
+                        help="Specify the outgroups. If specifying a list of outgroups, put them between quotes (i.e. \"). Otherwise, specifying a file which containts all the outgroups. Can only be used with -m OG")
     parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
                         help="The file containing the sampling times at leaves; to be used with -m RTT")
     parser.add_argument('-o', '--outfile', required=False, type=argparse.FileType('w'), default=stdout,
@@ -44,19 +43,26 @@ def main():
     args = parser.parse_args()
     stream = args.infofile if args.infofile else stderr
     logger = fastroot.new_logger(__name__,myStream=stream)
-    logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION) 
+    logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION)
+    logger.info(fastroot.PROGRAM_NAME + " was called as follows: " + " ".join(argv))
 
     METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
-    
-    assert args.method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
+    METHOD2DESC = {'MP': "Midpoint", 'MV': "MinVar", 'OG': "Outgroup", 'RTT': "Root-to-Tip"}
+    method = args.method.upper()
 
     # reading outgroups
-    if args.outgroups and path.exists(args.outgroups):
-        OGs= []
-        for line in open(args.outgroups,'r'):
-            OGs.append(line.strip())
+    if args.outgroups:
+        if method != 'OG':
+            method = 'OG'
+            logger.warning("The rooting method is set to outgroup rooting (OG) due to the presence of outgroups")
+        if path.exists(args.outgroups):
+            OGs = []
+            for line in open(args.outgroups, 'r'):
+                OGs.append(line.strip())
+        else:
+            OGs = args.outgroups.split()
     else:
-        OGs = args.outgroups.split() if args.outgroups else None
+        OGs = None
 
     # reading sampling times
     if args.smplTimes:
@@ -64,16 +70,29 @@ def main():
         for line in args.smplTimes:
             sp,t = line.strip().split()
             smplTimes[sp] = float(t)
+        if method != 'RTT':
+            method = 'RTT'
+            logger.warning("The rooting method is set to root-to-tip rooting (RTT) due to the presence of sampling times")
+
+    if method == 'RTT' and args.smplTimes is None:
+        logger.error("Need sampling times for root-to-tip rooting")
+        exit()
+    elif method == 'OG' and args.outgroups is None:
+        logger.error("Need outgroups for outgroup rooting")
+        exit()
+
+    assert method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
+    logger.info("Rooting Method: " + METHOD2DESC[method] + " Rooting")
 
     # read and root each tree
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
-        if args.method == 'OG':
+        if method == 'OG':
             a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream)
-        elif args.method == 'RTT':
+        elif method == 'RTT':
             a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream)
         else:
-            a_tree = METHOD2FUNC[args.method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
+            a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
 
         a_tree.Reroot()
         logger.info("Tree " + str(i+1) + " " + a_tree.report_score())
