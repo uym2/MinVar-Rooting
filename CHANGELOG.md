@@ -1,10 +1,5 @@
 * Version 1.4:
-    * 
+    * Improved user friendliness
+    * Provide example use cases
 * Version 1.3:
-    * 
-* Version 1.2:
-    * 
-* Version 1.1:
-    * 
-* Version 1.0:
-    * 
+    * Built pip package
