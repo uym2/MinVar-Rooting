@@ -20,7 +20,8 @@ def main():
     parser.add_argument('-m', '--method', required=False, type=str, default="MV",
                         help="Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)")
     parser.add_argument('-g', '--outgroups', required=False, type=str,
-                        help="Listing of the outgroups; to be used with -m OG")
+                        help="Specify the outgroups. If specifying a list of outgroups, put them between quotes (i.e. \"). 
+                        Otherwise, specifying a file which containts all the outgroups. Can only be used with -m OG")
     parser.add_argument('-t', '--smplTimes', required=False, type=argparse.FileType('r'),
                         help="The file containing the sampling times at leaves; to be used with -m RTT")
     parser.add_argument('-o', '--outfile', required=False, type=argparse.FileType('w'), default=stdout,

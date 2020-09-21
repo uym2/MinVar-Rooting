@@ -12,7 +12,7 @@ This is a dendropy-based implementation of the MinVar-Rooting, which seeks to ro
 Complexity: all rooting methods are linear (with the number of species) in time and memory.
 
 ## Dependencies
-- Python (either 2.x or 3.x)
+- Python3
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
@@ -39,7 +39,7 @@ python3 -m pip install FastRoot
 	``` bash
 	   sudo python3 setup.py install
 	```
-	* If you do not have user access, type
+	* If you do not have root access, type
 	``` bash
 	   python3 setup.py install --user
 	```
@@ -81,11 +81,4 @@ optional arguments:
 NOTE: `FastRoot.py` works for a list of trees
 
 ## Output
-`FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output.
-
-## Pseudocode
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MV_alg.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq4.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq6.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/Eq7.png)
-![alt tag](https://github.com/uym2/MinVar-Rooting/blob/master/imgs/MP_alg.png)
+`FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). The optimal score of each tree is printed to stderr by default; you can direct it to a file using `-f`.
