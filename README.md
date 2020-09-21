@@ -59,8 +59,7 @@ FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFIL
 ```
 
 optional arguments:
-```
-			
+```		
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         Input File (default is STDIN)
@@ -78,7 +77,6 @@ optional arguments:
   -f INFOFILE, --infofile INFOFILE
                         Save all the logging to this file. Default: print to stderr
   -v, --version         Show FastRoot version and exit
-  
 ```
 
 NOTE: `FastRoot.py` works for a list of trees
