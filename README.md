@@ -80,5 +80,25 @@ optional arguments:
 
 NOTE: `FastRoot.py` works for a list of trees
 
+### Sampling Times
+
+* The sampling time file (example file: `use_cases/RTT/sampling_times.txt`) is a tab-delimited file, with one pair of species-time per line.
+* It must have two columns: the species names and the corresponding sampling times.
+* The sampling time for every leaf must be specified.
+* This file is necessary for the root-to-tip rooting method.
+
+
+ For example, lines
+
+```
+000009  9.36668
+000010  9.36668
+000011  11.3667
+000012  11.3667
+```
+show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `000011` and `000012` are sampled at time 11.3667. 
+
+**Note:** These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree. The top of the branch above the root is assumed to be 0.
+
 ## Output
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). The optimal score of each tree is printed to stderr by default; you can direct it to a file using `-f`.
