@@ -8,6 +8,7 @@ import fastroot
 from sys import stdin, stdout, argv, exit, stderr
 import argparse
 from os import path
+import re
 
 def main():
 
@@ -44,7 +45,8 @@ def main():
     stream = args.infofile if args.infofile else stderr
     logger = fastroot.new_logger(__name__,myStream=stream)
     logger.info("Running " +  fastroot.PROGRAM_NAME +  " version " + fastroot.PROGRAM_VERSION)
-    logger.info(fastroot.PROGRAM_NAME + " was called as follows: " + " ".join(argv))
+    new_argv = re.sub(' +', ' ', " ".join(argv).replace("\n", " "))
+    logger.info(fastroot.PROGRAM_NAME + " was called as follows: " + new_argv)
 
     METHOD2FUNC = {'MP': MPR_Tree, 'MV': MV00_Tree, 'OG': OGR_Tree, 'RTT': RTT_Tree}
     METHOD2DESC = {'MP': "Midpoint", 'MV': "MinVar", 'OG': "Outgroup", 'RTT': "Root-to-Tip"}
