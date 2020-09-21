@@ -60,14 +60,15 @@ FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFIL
 
 optional arguments:
 ```
+			
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         Input File (default is STDIN)
   -m METHOD, --method METHOD
-                        Method (MP for midpoint, MV for minVAR, OG for outgroup, RTTas or RTTqp for root-to-tip)
-                        (default is MV)
+                        Method (MP for midpoint, MV for minVAR, OG for outgroup, RTT for root-to-tip) (default is MV)
   -g OUTGROUPS, --outgroups OUTGROUPS
-                        Listing of the outgroups; to be used with -m OG
+                        Specify the outgroups. If specifying a list of outgroups, put them between quotes (i.e. ").
+                        Otherwise, specifying a file which containts all the outgroups. Can only be used with -m OG
   -t SMPLTIMES, --smplTimes SMPLTIMES
                         The file containing the sampling times at leaves; to be used with -m RTT
   -o OUTFILE, --outfile OUTFILE
@@ -75,7 +76,9 @@ optional arguments:
   -s SCHEMA, --schema SCHEMA
                         Schema of your input treefile (default is newick)
   -f INFOFILE, --infofile INFOFILE
-                        Report the optimization score to file
+                        Save all the logging to this file. Default: print to stderr
+  -v, --version         Show FastRoot version and exit
+  
 ```
 
 NOTE: `FastRoot.py` works for a list of trees
