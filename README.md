@@ -1,20 +1,20 @@
-## Implementation
-This is a dendropy-based implementation of the MinVar-Rooting, which seeks to root the tree at the point that minimizes the variance of the root to tip distances. The code was designed to be easily generalized for a class of 'optimization-based' rooting methods (some of which are under development), which includes a linear-time version of the traditional midpoint (MP) rooting as well.
+FastRoot is a python implementation of a class of 'optimization-based' rooting methods for phylogenetic trees: Minimum Variance (MV), Midpoint (MP), Outgroups (OG), and Root-to-tip (RTT). All rooting methods are linear in time and memory.
 
-Complexity: all rooting methods are linear (with the number of species) in time and memory.
+## Installation
 
-## Dependencies
+### Dependencies
 - Python3
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
 
-## Install using Pip
+### Install using Pip
+You need to have Python3 and Pip, all the other dependencies will be automatically installed together with FastRoot.
 ```bash
 python3 -m pip install FastRoot
 ```
 
-## Install from source code
+### Install from source code
 1. Download the source code.  
 	* Either clone the repository to your machine
 	```bash
@@ -45,7 +45,6 @@ to see the commandline help of FastRoot.
 
 ## Usage
 
-
 ```bash
 FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE]
 ```
@@ -73,21 +72,20 @@ optional arguments:
 
 NOTE: `FastRoot.py` works for a list of trees
 
-### Outgroups
+## Rooting methods
+There are 4 rooting methods: minVAR (MV), midpoint (MP), outgroups (OG), and root-to-tip (RTT).
 
-* Outgroup Rooting `-m OG -g <OUTGROUPS>` maximizes the number of outgroup to ingroup triplets in the tree.
-* Outgroups may be defined with a file `-g <OUTGROUP_FILE>` or with a list surrounded by quotation marks `-g "OUTGROUP1 OUTGROUP2 ..."`.
-* The outgroups must be defined when using the outgroup rooting method.
+### MinVAR rooting (MV)
+* Root the tree at the point that minimizes the variance of the root to tip distances.
 
-### Sampling Times
+### Midpoint rooting (MP)
+* Root the tree at the midpoint of the longest path between any pair of leaves (i.e. midpoint of the diameter).
 
-* The sampling time file (example file: `use_cases/RTT/sampling_times.txt`) is a tab-delimited file, with one pair of species-time per line.
-* It must have two columns: the species names and the corresponding sampling times.
-* The sampling time for every leaf must be specified.
-* The sampling times must be defined when using the root-to-tip rooting method.
-
-
- For example, lines
+### Root-to-tip (RTT)
+* When there are sampling times given for the leaves (i.e. phylodynamics data), minVAR rooting is generalized to the root-to-tip (RTT) rooting method.
+* RTT optimizes the least squares regression of the root-to-tip time and substitutions.
+* To use RTT rooting, the sampling times must be defined via ```-t``` (example file: `use_cases/RTT/sampling_times.txt`): a tab-delimited file, with one pair of species-time per line.
+For example, lines
 
 ```
 000009  9.36668
@@ -97,7 +95,15 @@ NOTE: `FastRoot.py` works for a list of trees
 ```
 show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `000011` and `000012` are sampled at time 11.3667. 
 
-**Note:** These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree.
+**Note:** 
+- The sampling time for every leaf must be specified.
+- These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree.
+
+### Outgroups Rooting (OG)
+* Outgroup Rooting `-m OG -g <OUTGROUPS>` maximizes the number of outgroup to ingroup triplets in the tree (i.e. maximizes the number of triplets of the forms (o,(i,i)) and (i,(o,o)) where i is an ingroup species and o is an outgroup species).
+* The outgroups must be defined when using the outgroup rooting method.
+* Outgroups may be defined with a file `-g <OUTGROUP_FILE>` or with a list surrounded by quotation marks `-g "OUTGROUP1 OUTGROUP2 ..."`.
+
 
 ### Output
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). The optimal score of each tree is printed to stderr by default; you can direct it to a file using `-f`.
