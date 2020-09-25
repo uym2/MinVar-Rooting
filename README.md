@@ -113,7 +113,7 @@ show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `
 The optimal score of each tree (depends on the rooting method) is printed to stderr by default; you can direct it to a file using `-f`.
 
 ### Example usage
-You can checkout the [tutorial](turorial.md) for some examples.
+You can checkout the [tutorial](https://github.com/uym2/MinVar-Rooting/blob/master/tutorial.md) for some examples.
 
 ## Publications
 If you find MinVar-Rooting helpful for your research, please cite the following paper
