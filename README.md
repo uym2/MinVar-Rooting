@@ -1,15 +1,16 @@
-FastRoot is a python implementation of a class of 'optimization-based' rooting methods for phylogenetic trees: Minimum Variance (MV), Midpoint (MP), Outgroups (OG), and Root-to-tip (RTT). All rooting methods are linear in time and memory.
+FastRoot is a python implementation of a class of 'optimization-based' rooting methods for phylogenetic trees: Minimum Variance (MV), Midpoint (MP), Outgroups (OG), and Root-to-tip (RTT). All rooting methods are linear in time and memory. FastRoot was tested on Linux or MacOS.
 
 ## Installation
-
-### Dependencies
+FastRoot needs the following dependencies
 - Python3
 - treeswift (version 1.1.14)
 - cvxopt (version 1.2.5)
 - numpy (version 1.19.0)
 
+You can either install from PyPI (i.e. pip) or from source code.
+
 ### Install using Pip
-You need to have Python3 and Pip, all the other dependencies will be automatically installed together with FastRoot.
+You need to have Python3 and Pip (in most cases are already installed with Python3, if not, please see https://pip.pypa.io/en/stable/installing/). All the other dependencies of FastRoot will be automatically installed together with FastRoot.
 ```bash
 python3 -m pip install FastRoot
 ```
@@ -76,14 +77,17 @@ NOTE: `FastRoot.py` works for a list of trees
 There are 4 rooting methods: minVAR (MV), midpoint (MP), outgroups (OG), and root-to-tip (RTT).
 
 #### MinVAR rooting (MV)
+* Usage: `-m MV`
 * Root the tree at the point that minimizes the variance of the root to tip distances.
 
 #### Midpoint rooting (MP)
+* Usage: `-m MP`
 * Root the tree at the midpoint of the longest path between any pair of leaves (i.e. midpoint of the diameter).
 
 #### Root-to-tip (RTT)
-* Root-to-tip (RTT) `-m RTT -g <SAMPLING_TIMES>` optimizes the least squares regression of the root-to-tip time and substitutions.
-* The sampling times must be defined via ```-t```: a tab-delimited file, with one pair of species-time per line.
+* Usage: `-m RTT -g <SAMPLING_TIMES>
+* Optimizes the least squares regression of the root-to-tip time and substitutions.
+* The sampling times MUST be defined via ```-t```: a tab-delimited file, with one pair of species-time per line.
 * Example file: `use_cases/RTT/sampling_times.txt`.
 For example, lines
 
@@ -100,19 +104,19 @@ show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `
 - These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree.
 
 #### Outgroups Rooting (OG)
-* Outgroup Rooting `-m OG -g <OUTGROUPS>` maximizes the number of outgroup to ingroup triplets in the tree (i.e. maximizes the number of triplets of the forms (o,(i,i)) and (i,(o,o)) where i is an ingroup species and o is an outgroup species).
-* The outgroups must be defined via ```-g```: can either by a file `-g <OUTGROUP_FILE>` or a list surrounded by quotation marks `-g "OUTGROUP1 OUTGROUP2 ..."`.
+* Usage: `-m OG -g <OUTGROUPS>`
+* Maximizes the number of outgroup to ingroup triplets in the tree (i.e. maximizes the number of triplets of the forms (o,(i,i)) and (i,(o,o)) where i is an ingroup species and o is an outgroup species).
+* The outgroups MUST be defined via ```-g```: can either by a file `-g <OUTGROUP_FILE>` or a list surrounded by quotation marks `-g "OUTGROUP1 OUTGROUP2 ..."`.
 
 ### Output
-`FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). The optimal score of each tree is printed to stderr by default; you can direct it to a file using `-f`.
+`FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). 
+The optimal score of each tree (depends on the rooting method) is printed to stderr by default; you can direct it to a file using `-f`.
 
 ### Example Usage
 
 Below we give examples on running each rooting method (Outgroup, Midpoint, MinVar, Root-to-Tip) found in the ```use_cases``` folder. 
 
-* If you installed FastRoot using PyPI, download [use_cases.zip](https://github.com/uym2/MinVar-Rooting/edit/master/use_cases.zip) to your machine and unzip it before trying the examples.
-	
-Note: the examples below assume you are using Linux or MacOS.
+* If you installed FastRoot using PyPI (i.e. pip), download [use_cases.zip](https://github.com/uym2/MinVar-Rooting/edit/master/use_cases.zip) to your machine and unzip it before trying the examples.
 
 #### Outgroup Rooting
 
