@@ -155,7 +155,7 @@ or call as follows:
    FastRoot.py -m MP -i input.trees -o output.trees
 ```
 
-### MinVar Rooting
+#### MinVar Rooting
 
 An example is given in the folder `use_cases/MV`. Starting from the base directory,
 
