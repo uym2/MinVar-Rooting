@@ -10,7 +10,7 @@ An example is given in the folder `use_cases/OG`. Starting from the base directo
    cd use_cases/OG
 ```
 
-Inside this folder you will find a list of input trees (`input.trees`), a list of outgroups (`outgroups.txt`), and two bash scripts to root these trees using Outgroup Rooting. One scripts defines the outgroups as a file (`run_OG_file.sh`) while the other defines them as a list (`run_OG_list.sh`).
+Inside this folder you will find a list of input trees (`input.trees`), a list of outgroups (`outgroups.txt`), and two bash scripts to root these trees using Outgroup Rooting. One script defines the outgroups as a file (`run_OG_file.sh`) while the other defines them as a list (`run_OG_list.sh`).
 To root the input trees using this method, either run one of the scripts
 ```bash
    ./run_OG_file.sh
@@ -64,7 +64,7 @@ An example is given in the folder `use_cases/RTT`. Starting from the base direct
    cd use_cases/RTT
 ```
 
-Inside this folder you will find a list of input trees (`input.trees`), the sampling times (`sampling_times.txt`) and a bash script to root these trees using Root-to-Tip Rooting (`run_RTT.sh`).
+Inside this folder you will find a list of input trees (`input.trees`), the sampling times (`sampling_times.txt`), and a bash script to root these trees using Root-to-Tip Rooting (`run_RTT.sh`).
 To root the input trees using this method, either run the script 
 ```bash
    ./run_RTT.sh
