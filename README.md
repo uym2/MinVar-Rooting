@@ -112,6 +112,9 @@ show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `
 `FastRoot.py` with `-o` will output to the specified destination. Without `-o`, it prints the tree to standard output (stdout). 
 The optimal score of each tree (depends on the rooting method) is printed to stderr by default; you can direct it to a file using `-f`.
 
+### Example usage
+You can checkout the [tutorial](turorial.md) for some examples.
+
 ## Publications
 If you find MinVar-Rooting helpful for your research, please cite the following paper
 - Mai, Uyen, Erfan Sayyari, and Siavash Mirarab. “Minimum Variance Rooting of Phylogenetic Trees and Implications for Species Tree Reconstruction.” Edited by Gabriel Moreno-Hagelsieb. PLOS ONE 12, no. 8 (2017): e0182238. doi:10.1371/journal.pone.0182238.
