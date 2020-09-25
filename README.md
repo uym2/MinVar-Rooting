@@ -76,15 +76,15 @@ NOTE: `FastRoot.py` works for a list of trees
 ### Rooting methods
 There are 4 rooting methods: minVAR (MV), midpoint (MP), outgroups (OG), and root-to-tip (RTT).
 
-#### MinVAR rooting (MV)
+#### MinVAR Rooting (MV)
 * Usage: `-m MV`
 * Root the tree at the point that minimizes the variance of the root to tip distances.
 
-#### Midpoint rooting (MP)
+#### Midpoint Rooting (MP)
 * Usage: `-m MP`
 * Root the tree at the midpoint of the longest path between any pair of leaves (i.e. midpoint of the diameter).
 
-#### Root-to-tip rooting (RTT)
+#### Root-to-tip Rooting (RTT)
 * Usage: `-m RTT -t <SAMPLING_TIMES>`
 * Optimizes the least squares regression of the root-to-tip time and substitutions.
 * The sampling times MUST be defined via ```-t```: a tab-delimited file, with one pair of species-time per line.
@@ -103,7 +103,7 @@ show that leaves `000009` and `000010` are sampled at time 9.36668 while nodes `
 - The sampling time for every leaf must be specified.
 - These times are assumed to be forward; i.e, smaller values mean closer to the root of the tree.
 
-#### Outgroups Rooting (OG)
+#### Outgroup Rooting (OG)
 * Usage: `-m OG -g <OUTGROUPS>`
 * Maximizes the number of outgroup to ingroup triplets in the tree (i.e. maximizes the number of triplets of the forms (o,(i,i)) and (i,(o,o)) where i is an ingroup species and o is an outgroup species).
 * The outgroups MUST be defined via ```-g```: can either by a file `-g <OUTGROUP_FILE>` or a list surrounded by quotation marks `-g "OUTGROUP1 OUTGROUP2 ..."`.
