@@ -1,4 +1,4 @@
-This is a mini tutorial where we give examples on running each rooting method (Outgroup, Midpoint, MinVar, Root-to-Tip) found in the ```use_cases``` folder. 
+This is a mini tutorial where we give examples on running each rooting method (Outgroup, Midpoint, MinVAR, Root-to-Tip) found in the ```use_cases``` folder. 
 
 If you installed FastRoot using PyPI (i.e. pip), download [use_cases.zip](https://github.com/uym2/MinVar-Rooting/edit/master/use_cases.zip) to your machine and unzip it before trying the examples.
 
@@ -38,7 +38,7 @@ or call as follows:
    FastRoot.py -m MP -i input.trees -o output.trees
 ```
 
-## MinVar Rooting
+## MinVAR Rooting
 
 An example is given in the folder `use_cases/MV`. Starting from the base directory,
 
@@ -46,7 +46,7 @@ An example is given in the folder `use_cases/MV`. Starting from the base directo
    cd use_cases/MV
 ```
 
-Inside this folder you will find a list of input trees (`input.trees`) and a bash script to root these trees using MinVar Rooting (`run_MV.sh`).
+Inside this folder you will find a list of input trees (`input.trees`) and a bash script to root these trees using MinVAR Rooting (`run_MV.sh`).
 To root the input trees using this method, either run the script 
 ```bash
    ./run_MV.sh
