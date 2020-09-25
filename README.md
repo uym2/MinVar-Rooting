@@ -85,7 +85,7 @@ There are 4 rooting methods: minVAR (MV), midpoint (MP), outgroups (OG), and roo
 * Root the tree at the midpoint of the longest path between any pair of leaves (i.e. midpoint of the diameter).
 
 #### Root-to-tip rooting (RTT)
-* Usage: `-m RTT -g <SAMPLING_TIMES>`
+* Usage: `-m RTT -t <SAMPLING_TIMES>`
 * Optimizes the least squares regression of the root-to-tip time and substitutions.
 * The sampling times MUST be defined via ```-t```: a tab-delimited file, with one pair of species-time per line.
 * Example file: `use_cases/RTT/sampling_times.txt`.
