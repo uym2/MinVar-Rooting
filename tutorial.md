@@ -1,6 +1,5 @@
-This is a mini tutorial where we give examples on running each rooting method (Outgroup, Midpoint, MinVar, Root-to-Tip) found in the ```use_cases``` folder. 
-
-* If you installed FastRoot using PyPI (i.e. pip), download [use_cases.zip](https://github.com/uym2/MinVar-Rooting/edit/master/use_cases.zip) to your machine and unzip it before trying the examples.
+- This is a mini tutorial where we give examples on running each rooting method (Outgroup, Midpoint, MinVar, Root-to-Tip) found in the ```use_cases``` folder. 
+- If you installed FastRoot using PyPI (i.e. pip), download [use_cases.zip](https://github.com/uym2/MinVar-Rooting/edit/master/use_cases.zip) to your machine and unzip it before trying the examples.
 
 ## Outgroup Rooting
 
