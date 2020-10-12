@@ -106,5 +106,9 @@ class RTT_Tree(Tree_extend):
     def opt_score(self):
         return self.RTT
 
+    def return_values(self):
+        # returns RTT score, mu, t0
+        return (self.opt_score() / self.total_leaves), (self.opt_mu), (self.opt_y / self.opt_mu)
+
     def report_score(self):
         return "RTT=" + str(self.opt_score()/self.total_leaves) + "\tmu=" + str(self.opt_mu) +  "\tt0=" + str(self.opt_y/self.opt_mu)
