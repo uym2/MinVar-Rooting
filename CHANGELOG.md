@@ -1,3 +1,5 @@
+* Version 1.5:
+    * Added unit testing
 * Version 1.4:
     * Improved user friendliness
     * Provide example use cases
