@@ -1,6 +1,6 @@
 import unittest
 from os.path import dirname, realpath
-from test_suite.utils import *
+from fastroot_tests.utils import *
 
 path=dirname(realpath(__file__))
 
@@ -9,7 +9,7 @@ class RootingTestCase(unittest.TestCase):
 
     def test_OG(self):
         """Does OG root properly?"""
-        print("Testing OG")
+        #print("Testing OG")
         EPSILON_SCORE = 0.0001
         correct_nwk = True
         correct_score = True
@@ -38,7 +38,7 @@ class RootingTestCase(unittest.TestCase):
 
     def test_MP(self):
         """Does MP root properly?"""
-        print("Testing MP")
+        #print("Testing MP")
         EPSILON_SCORE = 0.0001
         EPSILON_BRANCH = 0.0001
         correct_nwk = True
@@ -69,7 +69,7 @@ class RootingTestCase(unittest.TestCase):
 
     def test_MP_special_trees(self):
         """Does MP root special trees properly?"""
-        print("Testing MP for special trees")
+        #print("Testing MP for special trees")
         EPSILON_SCORE = 0.0001
         EPSILON_BRANCH = 0.0001
         correct_nwk = True
@@ -122,7 +122,7 @@ class RootingTestCase(unittest.TestCase):
 
     def test_MV(self):
         """Does MV root properly?"""
-        print("Testing MV")
+        #print("Testing MV")
         EPSILON_SCORE = 0.0001
         EPSILON_BRANCH = 0.0001
         correct_nwk = True
@@ -155,7 +155,7 @@ class RootingTestCase(unittest.TestCase):
 
     def test_MV_special_trees(self):
         """Does MV root special trees properly?"""
-        print("Testing MV for special trees")
+        #print("Testing MV for special trees")
         EPSILON_SCORE = 0.0001
         EPSILON_BRANCH = 0.0001
         correct_nwk = True

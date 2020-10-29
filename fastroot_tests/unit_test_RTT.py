@@ -1,7 +1,7 @@
 import unittest
 from random import gauss
 from os.path import dirname, realpath
-from test_suite.utils import *
+from fastroot_tests.utils import *
 
 path=dirname(realpath(__file__))
 
@@ -10,7 +10,7 @@ class RTTTestCase(unittest.TestCase):
 
     def test_RTT_true_trees(self):
         """Does RTT root true trees properly?"""
-        print("Testing RTT for true trees")
+        #print("Testing RTT for true trees")
         EPSILON_SCORE = 0.0001
         EPSILON_MU = 0.0001
         EPSILON_TIME = 0.001
@@ -74,7 +74,7 @@ class RTTTestCase(unittest.TestCase):
 
     def test_RTT_random_trees(self):
         """Does RTT root random trees properly?"""
-        print("Testing RTT for random trees")
+        #print("Testing RTT for random trees")
         EPSILON_SCORE = 0.0001
         EPSILON_MU = 0.0001
         EPSILON_TIME = 0.001
@@ -110,5 +110,5 @@ class RTTTestCase(unittest.TestCase):
         self.assertTrue(correct_score and correct_t0 and correct_mu, msg="RTT rooting for random trees failed.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()
