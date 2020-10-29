@@ -110,5 +110,5 @@ class RTTTestCase(unittest.TestCase):
         self.assertTrue(correct_score and correct_t0 and correct_mu, msg="RTT rooting for random trees failed.")
 
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()
