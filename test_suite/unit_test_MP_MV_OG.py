@@ -1,9 +1,4 @@
 import unittest
-from fastroot.Tree_extend import MPR_Tree, OGR_Tree
-from treeswift import *
-from fastroot.MinVar import MV00_Tree, minVAR_Base_Tree
-from fastroot.RTT import RTT_Tree
-from random import gauss
 from os.path import dirname, realpath
 from test_suite.utils import *
 
@@ -81,7 +76,7 @@ class RootingTestCase(unittest.TestCase):
         correct_score = True
         correct_branches = True
 
-        types = {1:["(balanced & ultrametric)",True,True,True], 2:["(caterpillar & ultrametric)",True,True,True], 3:["(random & not ultrametric)",True,True,True], 4:["(balanced & ultrametric)",True,True,True], 5:["(caterpillar & not ultrametric)",True,True,True]}
+        types = {1:["ultrametric balanced",True,True,True], 2:["ultrametric caterpillar",True,True,True], 3:["not ultrametric random",True,True,True], 4:["not ultrametric balanced",True,True,True], 5:["not ultrametric caterpillar",True,True,True]}
 
         MP = open(path+"/unit_test/MP/special/output.trees")
         score = score_from_file(path+"/unit_test/MP/special/score.txt")
@@ -167,7 +162,7 @@ class RootingTestCase(unittest.TestCase):
         correct_score = True
         correct_branches = True
 
-        types = {1:["(balanced & ultrametric)",True,True,True], 2:["(caterpillar & ultrametric)",True,True,True], 3:["(random & not ultrametric)",True,True,True], 4:["(balanced & ultrametric)",True,True,True], 5:["(caterpillar & not ultrametric)",True,True,True]}
+        types = {1:["ultrametric balanced",True,True,True], 2:["ultrametric caterpillar",True,True,True], 3:["not ultrametric random",True,True,True], 4:["not ultrametric balanced",True,True,True], 5:["not ultrametric caterpillar",True,True,True]}
 
         MV = open(path+"/unit_test/MV/special/output.trees")
         score = score_from_file(path+"/unit_test/MV/special/score.txt")

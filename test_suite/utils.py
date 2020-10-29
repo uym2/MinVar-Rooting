@@ -1,10 +1,7 @@
-import unittest
 from fastroot.Tree_extend import MPR_Tree, OGR_Tree
 from treeswift import *
 from fastroot.MinVar import MV00_Tree, minVAR_Base_Tree
 from fastroot.RTT import RTT_Tree
-from random import gauss
-from os.path import dirname, realpath
 
 # check if two newick strings are equal (same clades):
 def compute_clades(tree):
