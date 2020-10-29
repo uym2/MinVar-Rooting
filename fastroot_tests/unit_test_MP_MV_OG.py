@@ -206,5 +206,5 @@ class RootingTestCase(unittest.TestCase):
 
         self.assertTrue(correct_nwk and correct_score and correct_branches, msg="MV rooting for special trees failed.")
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()

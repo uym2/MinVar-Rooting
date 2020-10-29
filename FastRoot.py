@@ -32,8 +32,10 @@ def main():
                         help="Save all the logging to this file. Default: print to stderr")
     parser.add_argument("-v", "--version", action='version',
                         version=fastroot.PROGRAM_NAME + " " + fastroot.PROGRAM_VERSION,
-                        help="Show FastRoot version and exit")
-    
+                        help="Show FastRoot version and exit") 
+    parser.add_argument("-x", "--maxIter", required=False, type=int, default=1000,
+                        help="Maximum number of iterations to run cvxopt")
+
     # print help message if no argument is given
     if len(argv) == 1:
         logger = fastroot.new_logger(__name__)
@@ -92,7 +94,7 @@ def main():
         if method == 'OG':
             a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream)
         elif method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=args.maxIter)
         else:
             a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
 
