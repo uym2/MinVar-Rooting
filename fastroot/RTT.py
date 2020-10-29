@@ -6,11 +6,12 @@ EPSILON = 1e-5
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr):
+    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000):
         super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("RTT_Tree_" + str(logger_id),myStream=logger_stream)
         self.smplTimes = smplTimes
         self.reset()
+        self.maxIter = maxIter
 
     def reset(self):
         self.RTT = None
@@ -40,7 +41,7 @@ class RTT_Tree(Tree_extend):
         q = array([d/2.,r/2,e/2])
         G = array([[-1.,0.,0.], [0.,0.,-1.], [1.,0.,0.],[0.,1.,-tmin]])
         h = array([0., EPSILON, node.edge_length,0]).reshape((4,))
-        solution = cvxopt_solve_qp(P,q,G,h)
+        solution = cvxopt_solve_qp(P,q,G,h,maxIter=self.maxIter)
         x_star = solution[0]
         y_star = solution[1]
         mu_star = solution[2]

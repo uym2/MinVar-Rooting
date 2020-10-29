@@ -12,17 +12,20 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False
 
-def cvxopt_solve_qp(P, q, G=None, h=None, A=None, b=None):
+def cvxopt_solve_qp(P, q, G=None, h=None, A=None, b=None, maxIter=1000):
     P = .5 * (P + P.T)  # make sure P is symmetric
     args = [cvxopt.matrix(P), cvxopt.matrix(q)]
     if G is not None:
         args.extend([cvxopt.matrix(G), cvxopt.matrix(h)])
         if A is not None:
             args.extend([cvxopt.matrix(A), cvxopt.matrix(b)])
-    sol = cvxopt.solvers.qp(*args,options={'show_progress':False,'maxiters':1000})
+    sol = cvxopt.solvers.qp(*args,options={'show_progress':False,'maxiters':maxIter})
     if 'optimal' not in sol['status']:
-        print(sol['status'])
-        return None
+        if "unknown" in sol['status']:
+            logger.warning("Couldn't find optimal solution on one branch. Perhaps due to maximum iterations exceeded. Consider increasing the maximum iterations via -x.")
+        else:
+            logger.warning("Couldn't find optimal solution on one branch. Solution status: " + sol['status'])
+	#return None
     return numpy.array(sol['x']).reshape((P.shape[1],))
 
 if __name__ == "__main__":
