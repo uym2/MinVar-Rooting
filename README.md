@@ -47,7 +47,7 @@ to see the commandline help of FastRoot.
 ## Usage
 
 ```bash
-FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE]
+FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE] [-v] [-x MAXITER]
 ```
 
 optional arguments:
@@ -69,6 +69,8 @@ optional arguments:
   -f INFOFILE, --infofile INFOFILE
                         Save all the logging to this file. Default: print to stderr
   -v, --version         Show FastRoot version and exit
+  -x MAXITER, --maxIter MAXITER
+                        Maximum number of iterations to run cvxopt
 ```
 
 NOTE: `FastRoot.py` works for a list of trees
