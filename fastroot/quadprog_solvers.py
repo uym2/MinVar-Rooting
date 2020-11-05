@@ -25,7 +25,7 @@ def cvxopt_solve_qp(P, q, G=None, h=None, A=None, b=None, maxIter=1000):
             logger.warning("Couldn't find optimal solution on one branch. Perhaps due to maximum iterations exceeded. Consider increasing the maximum iterations via -x.")
         else:
             logger.warning("Couldn't find optimal solution on one branch. Solution status: " + sol['status'])
-	#return None
+    #return None
     return numpy.array(sol['x']).reshape((P.shape[1],))
 
 if __name__ == "__main__":

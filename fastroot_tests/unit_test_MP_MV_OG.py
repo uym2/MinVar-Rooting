@@ -22,7 +22,7 @@ class RootingTestCase(unittest.TestCase):
         for line, line_test in zip(OG.readlines(), OG_test):
             correct_nwk &= check_two_nwk_str(line,line_test)
         for i in score:
-            correct_score &= score[i] - score_test[i] < EPSILON_SCORE
+            correct_score &= abs(score[i] - score_test[i]) < EPSILON_SCORE
         #for i in branches:
         #    self.assertTrue(branches[i][0] - branches_test[i][0] < 0.001)
         #    self.assertTrue(branches[i][1] - branches_test[i][1] < 0.001)
@@ -52,10 +52,10 @@ class RootingTestCase(unittest.TestCase):
         for line, line_test in zip(MP.readlines(), MP_test):
             correct_nwk &= check_two_nwk_str(line, line_test)
         for i in score:
-            correct_score &= score[i]-score_test[i] < EPSILON_SCORE
+            correct_score &= abs(score[i]-score_test[i]) < EPSILON_SCORE
         for i in branches:
-            correct_branches &= branches[i][0]-branches_test[i][0] < EPSILON_BRANCH
-            correct_branches &= branches[i][1] - branches_test[i][1] < EPSILON_BRANCH
+            correct_branches &= abs(branches[i][0]-branches_test[i][0]) < EPSILON_BRANCH
+            correct_branches &= abs(branches[i][1] - branches_test[i][1]) < EPSILON_BRANCH
         MP.close()
 
         if not correct_nwk:
@@ -87,11 +87,11 @@ class RootingTestCase(unittest.TestCase):
             types[i+1][1] &= check_two_nwk_str(line[0], line[1])
             correct_nwk &= types[i+1][1]
         for i,j in enumerate(score):
-            types[i+1][2] &= score[j] - score_test[j] < EPSILON_SCORE
+            types[i+1][2] &= abs(score[j] - score_test[j]) < EPSILON_SCORE
             correct_score &= types[i+1][2]
         for i,j in enumerate(branches):
-            types[i + 1][3] &= branches[j][0] - branches_test[j][0] < EPSILON_BRANCH
-            types[i + 1][3] &= branches[j][1] - branches_test[j][1] < EPSILON_BRANCH
+            types[i + 1][3] &= abs(branches[j][0] - branches_test[j][0]) < EPSILON_BRANCH
+            types[i + 1][3] &= abs(branches[j][1] - branches_test[j][1]) < EPSILON_BRANCH
             correct_branches &= types[i + 1][3]
 
         MP.close()
@@ -137,10 +137,10 @@ class RootingTestCase(unittest.TestCase):
         for line, line_test in zip(MV.readlines(), MV_test):
             correct_nwk &= check_two_nwk_str(line, line_test)
         for i in score:
-            correct_score &= score[i]-score_test[i] < EPSILON_SCORE
+            correct_score &= abs(score[i]-score_test[i]) < EPSILON_SCORE
         for i in branches:
-            correct_branches &= branches[i][0]-branches_test[i][0] < EPSILON_BRANCH
-            correct_branches &= branches[i][1] - branches_test[i][1] < EPSILON_BRANCH
+            correct_branches &= abs(branches[i][0]-branches_test[i][0]) < EPSILON_BRANCH
+            correct_branches &= abs(branches[i][1] - branches_test[i][1]) < EPSILON_BRANCH
 
         MV.close()
 
@@ -173,11 +173,11 @@ class RootingTestCase(unittest.TestCase):
             types[i+1][1] &= check_two_nwk_str(line[0], line[1])
             correct_nwk &= types[i+1][1]
         for i,j in enumerate(score):
-            types[i+1][2] &= score[j] - score_test[j] < EPSILON_SCORE
+            types[i+1][2] &= abs(score[j] - score_test[j]) < EPSILON_SCORE
             correct_score &= types[i+1][2]
         for i,j in enumerate(branches):
-            types[i + 1][3] &= branches[j][0] - branches_test[j][0] < EPSILON_BRANCH
-            types[i + 1][3] &= branches[j][1] - branches_test[j][1] < EPSILON_BRANCH
+            types[i + 1][3] &= abs(branches[j][0] - branches_test[j][0]) < EPSILON_BRANCH
+            types[i + 1][3] &= abs(branches[j][1] - branches_test[j][1]) < EPSILON_BRANCH
             correct_branches &= types[i + 1][3]
 
         MV.close()
