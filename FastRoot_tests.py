@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from fastroot_tests.unit_test_RTT import *
 from fastroot_tests.unit_test_MP_MV_OG import *
