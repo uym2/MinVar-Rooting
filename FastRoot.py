@@ -88,6 +88,12 @@ def main():
     assert method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
     logger.info("Rooting Method: " + METHOD2DESC[method] + " Rooting")
 
+    if args.maxIter != 1000:
+        if method != 'RTT':
+            logger.warning("The maximum number of iterations (-x) is only used with the root-to-tip rooting (RTT)")
+        else:
+            logger.info("Maximum iterations: " + str(args.maxIter))
+
     # read and root each tree
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
