@@ -33,7 +33,7 @@ def main():
     parser.add_argument("-v", "--version", action='version',
                         version=fastroot.PROGRAM_NAME + " " + fastroot.PROGRAM_VERSION,
                         help="Show FastRoot version and exit") 
-    parser.add_argument("-x", "--maxIter", required=False, type=int, default=1000,
+    parser.add_argument("-x", "--maxIter", required=False, type=int, default=None,
                         help="Maximum number of iterations to run cvxopt")
 
     # print help message if no argument is given
@@ -88,11 +88,13 @@ def main():
     assert method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
     logger.info("Rooting Method: " + METHOD2DESC[method] + " Rooting")
 
-    if args.maxIter != 1000:
-        if method != 'RTT':
-            logger.warning("The maximum number of iterations (-x) is only used with the root-to-tip rooting (RTT)")
-        else:
-            logger.info("Maximum iterations: " + str(args.maxIter))
+    if method == 'RTT':
+        if args.maxIter and args.maxIter < 1000:
+            logger.warning("Invalid number of maximum iterations (-x). Must be at least 1000. Set back to 1000 by default.")
+        maxIter = max(1000, args.maxIter) if args.maxIter else 1000
+        logger.info("Maximum iterations: " + str(maxIter))
+    elif args.maxIter is not None:
+        logger.warning("The maximum number of iterations (-x) is only used with root-to-tip rooting (RTT)")
 
     # read and root each tree
     for i,line in enumerate(args.input):
@@ -100,7 +102,7 @@ def main():
         if method == 'OG':
             a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream)
         elif method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=args.maxIter)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter)
         else:
             a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
 

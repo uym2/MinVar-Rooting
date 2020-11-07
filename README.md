@@ -37,12 +37,12 @@ python3 -m pip install FastRoot
 	   python3 setup.py install --user
 	```
 	
-After installation, run:
+##Testing
 
 ```bash
-FastRoot.py -h
+FastRoot_test.py 
 ```
-to see the commandline help of FastRoot.
+- description.......
 
 ## Usage
 
