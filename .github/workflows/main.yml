@@ -26,5 +26,5 @@ jobs:
 
       # Runs a single command using the runners shell
       - run: |
-          python3 -m pip install treeswift cvxopt numpy,
+          python3 -m pip install treeswift cvxopt numpy
           python3 FastRoot_tests.py
