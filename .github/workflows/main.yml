@@ -7,6 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,6 +27,9 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - run: |
-          python3 -m pip install treeswift cvxopt numpy
-          python3 FastRoot_tests.py
+      - name: Install dependencies
+        run: python3 -m pip install treeswift cvxopt numpy
+          
+      - name: Run tests
+        run: python3 FastRoot_tests.py
+
