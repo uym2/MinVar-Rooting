@@ -35,6 +35,12 @@ def main():
                         help="Show FastRoot version and exit") 
     parser.add_argument("-x", "--maxIter", required=False, type=int, default=None,
                         help="Maximum number of iterations to run cvxopt")
+    parser.add_argument("-a", "--annotations", action='store_true',
+                        help="Adds annotations to the output tree")
+    parser.add_argument("-A", "--alternatives", required=False, type=int, default=None,
+                        help="Returns the specified number of alternative tree rootings")
+    parser.add_argument("-k","--keepLabel",action='store_true',help="Suppress auto label assignment to internal nodes. WARNING: Use this option only if your tree has UNIQUE LABELING FOR ALL nodes. Default: NO")
+
 
     # print help message if no argument is given
     if len(argv) == 1:
@@ -78,12 +84,14 @@ def main():
             method = 'RTT'
             logger.warning("The rooting method is set to root-to-tip rooting (RTT) due to the presence of sampling times")
 
-    if method == 'RTT' and args.smplTimes is None:
-        logger.error("Need sampling times for root-to-tip rooting")
-        exit()
-    elif method == 'OG' and args.outgroups is None:
-        logger.error("Need outgroups for outgroup rooting")
-        exit()
+    assert not (method == 'RTT' and args.smplTimes is None), "Need sampling times for root-to-tip rooting"
+    #if method == 'RTT' and args.smplTimes is None:
+    #    logger.error("Need sampling times for root-to-tip rooting")
+    #    exit()
+    assert not (method == 'OG' and args.outgroups is None), "Need outgroups for outgroup rooting"
+    #elif method == 'OG' and args.outgroups is None:
+    #    logger.error("Need outgroups for outgroup rooting")
+    #    exit()
 
     assert method in METHOD2FUNC, "Invalid method! Valid options: MP for midpoint, MV for minVAR, OG for outgroups, RTT for root-to-tip"
     logger.info("Rooting Method: " + METHOD2DESC[method] + " Rooting")
@@ -100,11 +108,11 @@ def main():
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
         if method == 'OG':
-            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream)
+            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=args.annotations, keepLabel=args.keepLabel)
         elif method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter, annotations=args.annotations, keepLabel=args.keepLabel)
         else:
-            a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream)
+            a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=args.annotations, keepLabel=args.keepLabel)
 
         a_tree.Reroot()
         logger.info("Tree " + str(i+1) + " " + a_tree.report_score())

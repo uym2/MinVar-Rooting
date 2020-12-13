@@ -17,12 +17,14 @@ logger.propagate = False
 '''
 
 class Tree_extend(object):
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):#,logger_id=1,logger_stream=sys.stderr):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick", annotations=False, keepLabel=False):#,logger_id=1,logger_stream=sys.stderr):
         #self.logger = new_logger(__name__+ "_" + str(logger_id),myStream=logger_stream)
         if tree_file:
             self.ddpTree = read_tree(tree_file, schema)
         else:
             self.ddpTree = ddpTree
+        self.annotations = annotations
+        self.keepLabel = keepLabel
 
     def Bottomup_label(self):
         # assign each node a label so that we can later relate to it
@@ -40,6 +42,14 @@ class Tree_extend(object):
 
         for node in self.ddpTree.traverse_preorder():
             if node.is_leaf():
+                '''
+                keepCurrent would only label nodes with no current label 
+                if label_type == "keepCurrent":
+                    if node.label is None:
+                        node.name = 'L' + str(i)
+                    else:
+                        node.name = node.label
+                '''
                 if label_type == "all" or label_type == "leaves":
                     node.name = 'L' + str(i)
                 else:
@@ -59,6 +69,13 @@ class Tree_extend(object):
     def Topdown_update(self):
         for node in self.ddpTree.traverse_preorder():
             self.tDown_update(node, self.Opt_function)
+        if self.annotations:
+            self.find_rankings()
+            for node in self.ddpTree.traverse_preorder():
+                if self.keepLabel:
+                    self.add_annotations(node, keepLabel=True)
+                else:
+                    self.add_annotations(node)
 
     def compute_distances(self):
         D = {}
@@ -316,13 +333,33 @@ class Tree_extend(object):
     def get_root(self):
         return self.ddpTree.root
 
+    def find_rankings(self):
+        self.rankings = {key: rank for rank, key in enumerate(sorted(self.scores, key=self.scores.get), 1)}
+
+    def add_annotations(self, node, keepLabel=False):
+        if node is not self.get_root():
+            if keepLabel:
+                # assert node.label is not None, "All internal nodes must be labeled while using -k"
+                if self.scores[node.name] and self.rankings[node.name] and self.x[node.name]:
+                    if node.label is None:
+                        node.label = "[score=" + str(self.scores[node.name]) + ", r=" + str(
+                            self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
+                    else:
+                        node.label += "[score=" + str(self.scores[node.name]) + ", r=" + str(
+                            self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
+            else:
+                if node.name in self.scores and node.name in self.rankings and node.name in self.x:
+                    node.label = node.name + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
+                else:
+                    print(node.name)
+                    node.label = node.name
 
 class OGR_Tree(Tree_extend):
     # supportive class to implement outgroup-reroot (OGR = outgroup reroot, hence the name)
     # this rooting method solve the difficulty in finding the root when there are mulitple outgroups
     # and they are not monophyletic. It seeks for the rooting place that maximizes the triplet score
     # of the specified outgroups.
-    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr):
+    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False):
         super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("OGR_Tree_" + str(logger_id),myStream=logger_stream)
         #L = self.ddpTree.leaf_nodes()
@@ -334,10 +371,15 @@ class OGR_Tree(Tree_extend):
         self.nIGs = len(L) - self.nOGs
         self.max_nTrpls = self.nIGs * self.nOGs * (self.nOGs - 1) / 2 + self.nOGs * self.nIGs * (self.nIGs - 1) / 2
         self.reset()
+        self.annotations = annotations
+        self.keepLabel = keepLabel
 
     def reset(self):
         self.opt_root = self.ddpTree.root
         self.opt_nTrpls = 0
+        self.scores = {}
+        self.rankings = {}
+        self.x = {}
 
     def Node_init(self, node, nTrpl_in=0, nTrpl_out=0, nOGs=0, nIGs=0):
         node.nTrpl_in = nTrpl_in
@@ -347,10 +389,18 @@ class OGR_Tree(Tree_extend):
 
     def Opt_function(self, node):
         curr_nTrpls = node.nTrpl_in + node.nTrpl_out
+
+        if self.max_nTrpls != 0:
+            self.scores[node.name] = curr_nTrpls / float(self.max_nTrpls)
+        self.x[node.name] = node.edge_length / 2
+
         if curr_nTrpls > self.opt_nTrpls:
             self.opt_nTrpls = curr_nTrpls
             self.opt_root = node
             self.opt_x = node.edge_length / 2  # NOTE: this method does not consider branch length, the *middle point* of the edge is just arbitrarily chosen
+
+    def find_rankings(self):
+        self.rankings = {key: rank for rank, key in enumerate(sorted(self.scores, key=self.scores.get, reverse=True), 1)}
 
     def bUp_update(self, node):
         if node.is_leaf():
@@ -405,15 +455,20 @@ class OGR_Tree(Tree_extend):
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)G
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False):
         super(MPR_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("MPR_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
+        self.annotations = annotations
+        self.keepLabel = keepLabel
 
     def reset(self):
         self.max_distance = -1
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
+        self.scores = {}
+        self.rankings = {}
+        self.x = {}
 
     def Node_init(self, node, max_in=None, max_out=-1):
         node.max_in = max_in if max_in else [0, 0]
@@ -423,10 +478,17 @@ class MPR_Tree(Tree_extend):
         m = max(node.max_in)
         curr_max_distance = m + node.max_out
         x = (node.max_out - m) / 2
+
+        self.scores[node.name] = curr_max_distance / 2
+        self.x[node.name] = x
+
         if curr_max_distance > self.max_distance and x >= 0 and x <= node.edge_length:
             self.max_distance = curr_max_distance
             self.opt_x = x
             self.opt_root = node
+
+    def find_rankings(self):
+        self.rankings = {key: rank for rank, key in enumerate(sorted(self.scores, key=self.scores.get, reverse=True), 1)}
 
     def bUp_update(self, node):
         if not node.is_leaf():

@@ -6,12 +6,14 @@ EPSILON = 1e-5
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000):
+    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000, annotations=False, keepLabel=False):
         super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("RTT_Tree_" + str(logger_id),myStream=logger_stream)
         self.smplTimes = smplTimes
         self.reset()
         self.maxIter = maxIter
+        self.annotations = annotations
+        self.keepLabel = keepLabel
 
     def reset(self):
         self.RTT = None
@@ -20,6 +22,9 @@ class RTT_Tree(Tree_extend):
         self.opt_x = 0
         self.opt_mu = 0
         self.tmin = min(self.smplTimes.values())
+        self.scores = {}
+        self.rankings = {}
+        self.x = {}
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
@@ -43,14 +48,19 @@ class RTT_Tree(Tree_extend):
         h = array([0., EPSILON, node.edge_length,0]).reshape((4,))
         solution = cvxopt_solve_qp(P,q,G,h,maxIter=self.maxIter)
         x_star = solution[0]
+        # x_star is distance from parent node down to the new root
         y_star = solution[1]
         mu_star = solution[2]
         curr_RTT = a*x_star*x_star + b*mu_star*mu_star + c*x_star*mu_star + d*x_star + e*mu_star + f + n*y_star*y_star + k*x_star*y_star + m*mu_star*y_star + r*y_star
-        
+
+        self.scores[node.name] = curr_RTT / self.total_leaves
+        self.x[node.name] = node.edge_length - x_star
+
         if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT
             self.opt_root = node
             self.opt_x = node.edge_length - x_star
+            # opt_x is the distance from the current node up to the new root
             self.opt_y = y_star
             self.opt_mu = mu_star
 
