@@ -42,7 +42,7 @@ python3 -m pip install FastRoot
 ```bash
 FastRoot_test.py 
 ```
-- Running `FastRoot_test.py` will test the accuracy of the program.
+- After you installed FastRoot, run `FastRoot_test.py` to test if the program installed correctly.
 - First, `Running tests for FastRoot ...` will be printed.
 - Next, 12 tests will run.
 - If `OK` is printed last, the tests have passed successfully.
