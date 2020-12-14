@@ -6,7 +6,7 @@ EPSILON = 1e-5
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000, annotations=False, keepLabel=False):
+    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000, annotations=False, keepLabel=False, alternatives=1):
         super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("RTT_Tree_" + str(logger_id),myStream=logger_stream)
         self.smplTimes = smplTimes
@@ -14,6 +14,7 @@ class RTT_Tree(Tree_extend):
         self.maxIter = maxIter
         self.annotations = annotations
         self.keepLabel = keepLabel
+        self.alternatives = alternatives
 
     def reset(self):
         self.RTT = None
@@ -25,6 +26,7 @@ class RTT_Tree(Tree_extend):
         self.scores = {}
         self.rankings = {}
         self.x = {}
+        self.nodes = {}
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
@@ -55,6 +57,7 @@ class RTT_Tree(Tree_extend):
 
         self.scores[node.name] = curr_RTT / self.total_leaves
         self.x[node.name] = node.edge_length - x_star
+        self.nodes[node.name] = node
 
         if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT

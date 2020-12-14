@@ -12,12 +12,13 @@ logger.propagate = False
 
 class minVAR_Base_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
         super(minVAR_Base_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("MinVar_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
         self.annotations = annotations
         self.keepLabel = keepLabel
+        self.alternatives = alternatives
 
     def reset(self):
         self.minVAR = None
@@ -26,6 +27,7 @@ class minVAR_Base_Tree(Tree_extend):
         self.scores = {}
         self.rankings = {}
         self.x = {}
+        self.nodes = {}
 
     def Node_init(self, node, nleaf=1, sum_in=0, sum_total=0, var=-1):
         node.sum_in = sum_in
@@ -234,14 +236,20 @@ class MV00_Tree(minVAR_Base_Tree):
 
     def Opt_function(self, node, a, b, c):
         x = -b / (2 * a)
-        if x >= 0 and x <= node.edge_length:
-            curr_minVAR = a * x * x + b * x + c
-            self.scores[node.name] = curr_minVAR
-            self.x[node.name] = node.edge_length - x
-            if self.minVAR is None or curr_minVAR < self.minVAR:
-                self.minVAR = curr_minVAR
-                self.opt_root = node
-                self.opt_x = node.edge_length - x
+        if x < 0:
+            x = 0
+        elif x > node.edge_length:
+            x = node.edge_length
+
+        curr_minVAR = a * x * x + b * x + c
+        self.scores[node.name] = curr_minVAR
+        self.x[node.name] = node.edge_length - x
+        self.nodes[node.name] = node
+
+        if self.minVAR is None or curr_minVAR < self.minVAR:
+            self.minVAR = curr_minVAR
+            self.opt_root = node
+            self.opt_x = node.edge_length - x
 
     def compute_threshold(self, k=3.5):
         # should be called only AFTER the MV root was found

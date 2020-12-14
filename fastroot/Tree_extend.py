@@ -17,14 +17,12 @@ logger.propagate = False
 '''
 
 class Tree_extend(object):
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick", annotations=False, keepLabel=False):#,logger_id=1,logger_stream=sys.stderr):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):#,logger_id=1,logger_stream=sys.stderr):
         #self.logger = new_logger(__name__+ "_" + str(logger_id),myStream=logger_stream)
         if tree_file:
             self.ddpTree = read_tree(tree_file, schema)
         else:
             self.ddpTree = ddpTree
-        self.annotations = annotations
-        self.keepLabel = keepLabel
 
     def Bottomup_label(self):
         # assign each node a label so that we can later relate to it
@@ -76,6 +74,8 @@ class Tree_extend(object):
                     self.add_annotations(node, keepLabel=True)
                 else:
                     self.add_annotations(node)
+        elif self.alternatives > 1:
+            self.find_rankings()
 
     def compute_distances(self):
         D = {}
@@ -165,7 +165,7 @@ class Tree_extend(object):
 
         return __filter__(self.get_root(), 0)
 
-    def compute_threhold(self, k=3.5):
+    def compute_threshold(self, k=3.5):
         self.logger.warning("Abstract class! Should never be called")
         return 0
 
@@ -189,10 +189,13 @@ class Tree_extend(object):
         #self.report_score()
         # d2currRoot = 0
         # br2currRoot = 0
-        if self.opt_root != self.ddpTree.root:
-            # d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
-            self.reroot_at_edge(self.opt_root, self.opt_x)
-            #self.ddpTree.reroot(self.opt_root,self.opt_x)
+        if self.alternatives == 1:
+            if self.opt_root != self.ddpTree.root:
+                # d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
+                self.reroot_at_edge(self.opt_root, self.opt_x)
+                #self.ddpTree.reroot(self.opt_root,self.opt_x)
+        else:
+            return self.alternative_trees()
         
         # return head_id, tail_id, edge_length, self.opt_x
         # return d2currRoot,br2currRoot
@@ -351,15 +354,27 @@ class Tree_extend(object):
                 if node.name in self.scores and node.name in self.rankings and node.name in self.x:
                     node.label = node.name + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
                 else:
-                    print(node.name)
                     node.label = node.name
+
+    def alternative_trees(self):
+        def get_key(dict, val):
+            key_list = list(dict.keys())
+            val_list = list(dict.values())
+            return key_list[val_list.index(val)] if key_list[val_list.index(val)] else None
+
+        trees = []
+        for i in range(1,self.alternatives + 1):
+            name = get_key(self.rankings,i)
+            self.reroot_at_edge(self.nodes[name], self.x[name])
+            trees.append(self.ddpTree.newick())
+        return trees
 
 class OGR_Tree(Tree_extend):
     # supportive class to implement outgroup-reroot (OGR = outgroup reroot, hence the name)
     # this rooting method solve the difficulty in finding the root when there are mulitple outgroups
     # and they are not monophyletic. It seeks for the rooting place that maximizes the triplet score
     # of the specified outgroups.
-    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False):
+    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
         super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("OGR_Tree_" + str(logger_id),myStream=logger_stream)
         #L = self.ddpTree.leaf_nodes()
@@ -373,6 +388,7 @@ class OGR_Tree(Tree_extend):
         self.reset()
         self.annotations = annotations
         self.keepLabel = keepLabel
+        self.alternatives = alternatives
 
     def reset(self):
         self.opt_root = self.ddpTree.root
@@ -455,12 +471,13 @@ class OGR_Tree(Tree_extend):
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)G
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
         super(MPR_Tree, self).__init__(ddpTree, tree_file, schema)
         self.logger = new_logger("MPR_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
         self.annotations = annotations
         self.keepLabel = keepLabel
+        self.alternatives = alternatives
 
     def reset(self):
         self.max_distance = -1
@@ -478,17 +495,21 @@ class MPR_Tree(Tree_extend):
         m = max(node.max_in)
         curr_max_distance = m + node.max_out
         x = (node.max_out - m) / 2
+        if x < 0:
+            y = 0
+        elif x > node.edge_length:
+            y = node.edge_length
+        else:
+            y = x
 
-        self.scores[node.name] = curr_max_distance / 2
+        # the difference between the max distance of the left and right sides of the tree if we root on this node
+        self.scores[node.name] = abs(node.max_out - m - 2*y)
         self.x[node.name] = x
 
         if curr_max_distance > self.max_distance and x >= 0 and x <= node.edge_length:
             self.max_distance = curr_max_distance
             self.opt_x = x
             self.opt_root = node
-
-    def find_rankings(self):
-        self.rankings = {key: rank for rank, key in enumerate(sorted(self.scores, key=self.scores.get, reverse=True), 1)}
 
     def bUp_update(self, node):
         if not node.is_leaf():
@@ -507,7 +528,7 @@ class MPR_Tree(Tree_extend):
     def prepare_root(self):
         pass
 
-    def compute_threhold(self, k=3.5):
+    def compute_threshold(self, k=3.5):
         self.logger.warning("Trying to compute threshold for MPR_Tree, which is not supported.")
         return 0
 
@@ -516,7 +537,3 @@ class MPR_Tree(Tree_extend):
 
     def report_score(self):
         return "Tree height: " + str(self.opt_score())
-
-
-
-
