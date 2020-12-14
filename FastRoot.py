@@ -9,6 +9,7 @@ from sys import stdin, stdout, argv, exit, stderr
 import argparse
 from os import path
 import re
+from pathlib import Path
 
 def main():
 
@@ -111,9 +112,9 @@ def main():
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
         if method == 'OG':
-            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=do_annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
+            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=do_annotations, alternatives=args.alternatives)
         elif method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter, annotations=do_annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter, annotations=do_annotations, alternatives=args.alternatives)
         else:
             a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=do_annotations, alternatives=args.alternatives)
 
@@ -127,7 +128,6 @@ def main():
         if args.alternatives == 1:
             args.outfile.write(outTrees[0] + "\n")
         else:
-            from pathlib import Path
             p = Path(args.outfile.name)
             extensions = "".join(p.suffixes)
             newFile = str(p).replace(extensions, "_tree" + str(i+1) + extensions)

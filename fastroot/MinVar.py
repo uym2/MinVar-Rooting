@@ -12,22 +12,16 @@ logger.propagate = False
 
 class minVAR_Base_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
-        super(minVAR_Base_Tree, self).__init__(ddpTree, tree_file, schema)
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, alternatives=1):
+        super(minVAR_Base_Tree, self).__init__(ddpTree, tree_file, schema, annotations=annotations, alternatives=alternatives)
         self.logger = new_logger("MinVar_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
-        self.annotations = annotations
-        self.keepLabel = keepLabel
-        self.alternatives = alternatives
 
     def reset(self):
         self.minVAR = None
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
-        self.scores = {}
-        self.rankings = {}
-        self.x = {}
-        self.nodes = {}
+        self.init_dict()
 
     def Node_init(self, node, nleaf=1, sum_in=0, sum_total=0, var=-1):
         node.sum_in = sum_in
@@ -244,7 +238,6 @@ class MV00_Tree(minVAR_Base_Tree):
         curr_minVAR = a * x * x + b * x + c
         self.scores[node.name] = curr_minVAR
         self.x[node.name] = node.edge_length - x
-        self.nodes[node.name] = node
 
         if self.minVAR is None or curr_minVAR < self.minVAR:
             self.minVAR = curr_minVAR

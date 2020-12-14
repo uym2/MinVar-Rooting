@@ -384,13 +384,18 @@ class Tree_extend(object):
             trees.append(clone_tree.ddpTree.newick())
         return trees
 
+    def init_dict(self):
+        self.scores = {}
+        self.rankings = {}
+        self.x = {}
+
 class OGR_Tree(Tree_extend):
     # supportive class to implement outgroup-reroot (OGR = outgroup reroot, hence the name)
     # this rooting method solve the difficulty in finding the root when there are mulitple outgroups
     # and they are not monophyletic. It seeks for the rooting place that maximizes the triplet score
     # of the specified outgroups.
-    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
-        super(OGR_Tree, self).__init__(ddpTree, tree_file, schema)
+    def __init__(self, outgroups, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, alternatives=1):
+        super(OGR_Tree, self).__init__(ddpTree, tree_file, schema, annotations=annotations, alternatives=alternatives)
         self.logger = new_logger("OGR_Tree_" + str(logger_id),myStream=logger_stream)
         #L = self.ddpTree.leaf_nodes()
         L = []
@@ -401,16 +406,11 @@ class OGR_Tree(Tree_extend):
         self.nIGs = len(L) - self.nOGs
         self.max_nTrpls = self.nIGs * self.nOGs * (self.nOGs - 1) / 2 + self.nOGs * self.nIGs * (self.nIGs - 1) / 2
         self.reset()
-        self.annotations = annotations
-        self.keepLabel = keepLabel
-        self.alternatives = alternatives
 
     def reset(self):
         self.opt_root = self.ddpTree.root
         self.opt_nTrpls = 0
-        self.scores = {}
-        self.rankings = {}
-        self.x = {}
+        self.init_dict()
 
     def Node_init(self, node, nTrpl_in=0, nTrpl_out=0, nOGs=0, nIGs=0):
         node.nTrpl_in = nTrpl_in
@@ -490,16 +490,12 @@ class MPR_Tree(Tree_extend):
         super(MPR_Tree, self).__init__(ddpTree, tree_file, schema, annotations=annotations, alternatives=alternatives)
         self.logger = new_logger("MPR_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
-        #self.annotations = annotations
-        #self.alternatives = alternatives
 
     def reset(self):
         self.max_distance = -1
         self.opt_root = self.ddpTree.root
         self.opt_x = 0
-        self.scores = {}
-        self.rankings = {}
-        self.x = {}
+        self.init_dict()
 
     def Node_init(self, node, max_in=None, max_out=-1):
         node.max_in = max_in if max_in else [0, 0]
@@ -517,7 +513,7 @@ class MPR_Tree(Tree_extend):
             y = x
 
         # the difference between the max distance of the left and right sides of the tree if we root on this node
-        self.scores[node.name] = abs(node.max_out - m - 2*y)
+        self.scores[node.name] = abs(node.max_out - m - 2 * y)
         self.x[node.name] = y
 
         if curr_max_distance > self.max_distance: # and x >= 0 and x <= node.edge_length:

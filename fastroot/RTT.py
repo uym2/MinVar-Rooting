@@ -6,15 +6,12 @@ EPSILON = 1e-5
 
 class RTT_Tree(Tree_extend):
     # supportive base class to implement VAR-reroot, hence the name
-    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000, annotations=False, keepLabel=False, alternatives=1):
-        super(RTT_Tree, self).__init__(ddpTree, tree_file, schema)
+    def __init__(self,smplTimes, ddpTree=None, tree_file=None,schema="newick",logger_id=1,logger_stream=stderr, maxIter=1000, annotations=False, alternatives=1):
+        super(RTT_Tree, self).__init__(ddpTree, tree_file, schema, annotations=annotations, alternatives=alternatives)
         self.logger = new_logger("RTT_Tree_" + str(logger_id),myStream=logger_stream)
         self.smplTimes = smplTimes
         self.reset()
         self.maxIter = maxIter
-        self.annotations = annotations
-        self.keepLabel = keepLabel
-        self.alternatives = alternatives
 
     def reset(self):
         self.RTT = None
@@ -23,10 +20,9 @@ class RTT_Tree(Tree_extend):
         self.opt_x = 0
         self.opt_mu = 0
         self.tmin = min(self.smplTimes.values())
-        self.scores = {}
-        self.rankings = {}
-        self.x = {}
-        self.nodes = {}
+        self.init_dict()
+        self.mu = {}
+        self.t0 = {}
 
     def Node_init(self, node, nleaf=1, SDI=0, SD=0, ST=0, SDT=0, SSD=0):
         node.SDI = SDI
@@ -57,7 +53,8 @@ class RTT_Tree(Tree_extend):
 
         self.scores[node.name] = curr_RTT / self.total_leaves
         self.x[node.name] = node.edge_length - x_star
-        self.nodes[node.name] = node
+        self.mu[node.name] = mu_star
+        self.t0[node.name] = y_star/mu_star
 
         if self.RTT is None or (curr_RTT - self.RTT < -EPSILON):
             self.RTT = curr_RTT
@@ -116,6 +113,17 @@ class RTT_Tree(Tree_extend):
                     self.SST += (self.smplTimes[v.label] ** 2)
                     root.SD += v.droot
                     root.SDT += (v.droot * self.smplTimes[v.label])
+
+    def annotate(self):
+        # assume that find_rankings has been called before
+        clone_tree = deepcopy(self)
+        for node in clone_tree.ddpTree.traverse_preorder():
+            if node is not clone_tree.get_root():
+                nm = node.name
+                if nm in self.scores and nm in self.rankings and nm in self.x and nm in self.mu and nm in self.t0:
+                    lb = node.label if node.label else ''
+                    node.label = lb + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + ", mu=" + str(self.mu[node.name]) + ", t0=" + str(self.t0[node.name]) + "]"
+        return clone_tree.ddpTree.newick()
 
     def opt_score(self):
         return self.RTT
