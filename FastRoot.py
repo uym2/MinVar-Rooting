@@ -35,11 +35,11 @@ def main():
                         help="Show FastRoot version and exit") 
     parser.add_argument("-x", "--maxIter", required=False, type=int, default=None,
                         help="Maximum number of iterations to run cvxopt")
-    parser.add_argument("-a", "--annotations", action='store_true',
-                        help="Adds annotations to the output tree")
+    parser.add_argument("-a", "--annotations", default=None,
+                        help="Adds annotations to the specified tree")
     parser.add_argument("-A", "--alternatives", required=False, type=int, default=1,
                         help="Returns the specified number of alternative tree rootings")
-    parser.add_argument("-k","--keepLabel",action='store_true',help="Suppress auto label assignment to internal nodes. WARNING: Use this option only if your tree has UNIQUE LABELING FOR ALL nodes. Default: NO")
+    #parser.add_argument("-k","--keepLabel",action='store_true',help="Suppress auto label assignment to internal nodes. WARNING: Use this option only if your tree has UNIQUE LABELING FOR ALL nodes. Default: NO")
 
 
     # print help message if no argument is given
@@ -104,32 +104,39 @@ def main():
     elif args.maxIter is not None:
         logger.warning("The maximum number of iterations (-x) is only used with root-to-tip rooting (RTT)")
 
+    do_annotations = args.annotations is not None
+    if do_annotations:
+        fout_ann = open(args.annotations,'w')
     # read and root each tree
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
         if method == 'OG':
-            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=args.annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
+            a_tree = OGR_Tree(OGs, ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=do_annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
         elif method == 'RTT':
-            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter, annotations=args.annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
+            a_tree = RTT_Tree(smplTimes, ddpTree=tree,logger_id=i+1,logger_stream=stream, maxIter=maxIter, annotations=do_annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
         else:
-            a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=args.annotations, keepLabel=args.keepLabel, alternatives=args.alternatives)
+            a_tree = METHOD2FUNC[method](ddpTree=tree,logger_id=i+1,logger_stream=stream, annotations=do_annotations, alternatives=args.alternatives)
 
+        # produce output for this tree
+        outTrees,annTree = a_tree.Reroot()
+        logger.info("Tree " + str(i + 1) + " " + a_tree.report_score())
+        
+        if annTree is not None:
+            fout_ann.write(annTree + "\n")        
+        
         if args.alternatives == 1:
-            a_tree.Reroot()
-            logger.info("Tree " + str(i+1) + " " + a_tree.report_score())
-            a_tree.tree_as_newick(outstream=args.outfile)
+            args.outfile.write(outTrees[0] + "\n")
         else:
-            trees = a_tree.Reroot()
-            logger.info("Tree " + str(i + 1) + " " + a_tree.report_score())
             from pathlib import Path
             p = Path(args.outfile.name)
             extensions = "".join(p.suffixes)
             newFile = str(p).replace(extensions, "_tree" + str(i+1) + extensions)
             with open(newFile, "w") as f:
                 for j in range(1, args.alternatives + 1):
-                    f.write(trees[j-1])
+                    f.write(outTrees[j-1])
                     f.write("\n")
-                f.close()
+    if do_annotations:
+        fout_ann.close()
 
 if __name__ == "__main__":
     main()

@@ -5,6 +5,7 @@ from treeswift import *
 import sys
 import math
 from fastroot import new_logger
+from copy import deepcopy
 
 '''
 logger = logging.getLogger("Tree_extend.py")
@@ -17,12 +18,15 @@ logger.propagate = False
 '''
 
 class Tree_extend(object):
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick"):#,logger_id=1,logger_stream=sys.stderr):
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick", annotations=False, alternatives=1):
         #self.logger = new_logger(__name__+ "_" + str(logger_id),myStream=logger_stream)
         if tree_file:
             self.ddpTree = read_tree(tree_file, schema)
         else:
             self.ddpTree = ddpTree
+
+        self.annotations = annotations
+        self.alternatives = alternatives    
 
     def Bottomup_label(self):
         # assign each node a label so that we can later relate to it
@@ -67,15 +71,6 @@ class Tree_extend(object):
     def Topdown_update(self):
         for node in self.ddpTree.traverse_preorder():
             self.tDown_update(node, self.Opt_function)
-        if self.annotations:
-            self.find_rankings()
-            for node in self.ddpTree.traverse_preorder():
-                if self.keepLabel:
-                    self.add_annotations(node, keepLabel=True)
-                else:
-                    self.add_annotations(node)
-        elif self.alternatives > 1:
-            self.find_rankings()
 
     def compute_distances(self):
         D = {}
@@ -173,7 +168,7 @@ class Tree_extend(object):
         self.logger.warning("Abstract class! Should never be called")
 
     def find_root(self):
-        self.Topdown_label()  # temporarily included for debugging
+        self.Topdown_label() 
         self.Bottomup_update()
         self.prepare_root()
         self.Topdown_update()
@@ -186,19 +181,27 @@ class Tree_extend(object):
 
     def Reroot(self):
         self.find_root()
-        #self.report_score()
-        # d2currRoot = 0
-        # br2currRoot = 0
-        if self.alternatives == 1:
+        self.find_rankings()
+
+        if self.alternatives > 0:
+            outTrees = self.alternative_trees()
+
+        annTree = None
+        if self.annotations:
+            annTree = self.annotate()
+
+        return outTrees, annTree
+        '''
+        if not self.annotations and self.opt_root != self.ddpTree.root:
+            self.reroot_at_edge(self.opt_root, self.opt_x)         
+        elif self.alternatives == 1:
             if self.opt_root != self.ddpTree.root:
                 # d2currRoot,br2currRoot = self.reroot_at_edge(self.opt_root.edge, self.opt_root.edge_length-self.opt_x, self.opt_x)
                 self.reroot_at_edge(self.opt_root, self.opt_x)
                 #self.ddpTree.reroot(self.opt_root,self.opt_x)
         else:
             return self.alternative_trees()
-        
-        # return head_id, tail_id, edge_length, self.opt_x
-        # return d2currRoot,br2currRoot
+    '''
 
     def Opt_function(self, node):
         self.logger.warning("Abstract method! Should never be called")
@@ -338,35 +341,47 @@ class Tree_extend(object):
 
     def find_rankings(self):
         self.rankings = {key: rank for rank, key in enumerate(sorted(self.scores, key=self.scores.get), 1)}
-
-    def add_annotations(self, node, keepLabel=False):
-        if node is not self.get_root():
-            if keepLabel:
-                # assert node.label is not None, "All internal nodes must be labeled while using -k"
-                if self.scores[node.name] and self.rankings[node.name] and self.x[node.name]:
-                    if node.label is None:
-                        node.label = "[score=" + str(self.scores[node.name]) + ", r=" + str(
-                            self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
-                    else:
-                        node.label += "[score=" + str(self.scores[node.name]) + ", r=" + str(
-                            self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
-            else:
+    
+    def annotate(self):
+        # assume that find_rankings has been called before
+        #self.find_rankings()
+        clone_tree = deepcopy(self)
+        for node in clone_tree.ddpTree.traverse_preorder():
+            if node is not clone_tree.get_root():
                 if node.name in self.scores and node.name in self.rankings and node.name in self.x:
-                    node.label = node.name + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
-                else:
-                    node.label = node.name
+                    lb = node.label if node.label else ''
+                    node.label = lb + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
+        return clone_tree.ddpTree.newick()    
 
     def alternative_trees(self):
-        def get_key(dict, val):
-            key_list = list(dict.keys())
-            val_list = list(dict.values())
+        def get_key(D, val):
+            key_list = list(D.keys())
+            val_list = list(D.values())
             return key_list[val_list.index(val)] if key_list[val_list.index(val)] else None
-
+        
+        # assume that find_rankings has been called before
+        #self.find_rankings()
         trees = []
+         
         for i in range(1,self.alternatives + 1):
             name = get_key(self.rankings,i)
-            self.reroot_at_edge(self.nodes[name], self.x[name])
-            trees.append(self.ddpTree.newick())
+            if name is None:
+                # TODO: add a warning here ...
+                continue
+            clone_tree = deepcopy(self)
+            opt_node = None
+            for node in clone_tree.ddpTree.traverse_preorder():
+                if node.name == name:
+                    opt_node = node
+                    break # assume naming is unique
+    
+            if opt_node is not None:
+                if opt_node is not clone_tree.ddpTree.root:         
+                    clone_tree.reroot_at_edge(opt_node,self.x[name])
+            else:
+                # TODO: warning / error message
+                continue            
+            trees.append(clone_tree.ddpTree.newick())
         return trees
 
 class OGR_Tree(Tree_extend):
@@ -471,13 +486,12 @@ class OGR_Tree(Tree_extend):
 
 class MPR_Tree(Tree_extend):
     # supportive class to implement midpoint-reroot (mpr = mid point reroot, hence the name)G
-    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, keepLabel=False, alternatives=1):
-        super(MPR_Tree, self).__init__(ddpTree, tree_file, schema)
+    def __init__(self, ddpTree=None, tree_file=None, schema="newick",logger_id=1,logger_stream=sys.stderr, annotations=False, alternatives=1):
+        super(MPR_Tree, self).__init__(ddpTree, tree_file, schema, annotations=annotations, alternatives=alternatives)
         self.logger = new_logger("MPR_Tree_" + str(logger_id),myStream=logger_stream)
         self.reset()
-        self.annotations = annotations
-        self.keepLabel = keepLabel
-        self.alternatives = alternatives
+        #self.annotations = annotations
+        #self.alternatives = alternatives
 
     def reset(self):
         self.max_distance = -1
@@ -504,11 +518,11 @@ class MPR_Tree(Tree_extend):
 
         # the difference between the max distance of the left and right sides of the tree if we root on this node
         self.scores[node.name] = abs(node.max_out - m - 2*y)
-        self.x[node.name] = x
+        self.x[node.name] = y
 
-        if curr_max_distance > self.max_distance and x >= 0 and x <= node.edge_length:
+        if curr_max_distance > self.max_distance: # and x >= 0 and x <= node.edge_length:
             self.max_distance = curr_max_distance
-            self.opt_x = x
+            self.opt_x = y
             self.opt_root = node
 
     def bUp_update(self, node):
