@@ -34,8 +34,6 @@ param = {
                     "Programming Language :: Python",
                     "Topic :: Scientific/Engineering :: Bio-Informatics",
                     ],
-    #'test_suite': 'test_suite',
-    #'tests_require': ['nose'],                
 }
 
 setup(**param)
