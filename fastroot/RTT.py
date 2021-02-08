@@ -31,6 +31,8 @@ class RTT_Tree(Tree_extend):
         node.ST = ST
         node.SDT = SDT
         node.SSD = SSD
+        node.is_active = False
+        node.as_leaf = False
 
     def Opt_function(self, node, SST, deltaT, deltaD, SDT, SSD, ST, SD):
         n = self.total_leaves
@@ -65,18 +67,34 @@ class RTT_Tree(Tree_extend):
             self.opt_mu = mu_star
 
     def bUp_update(self, node):
-        if node.is_leaf():
-            node.nleaf = 1
-            node.SDI = 0
+        # mark whether node is active
+        if node.label in self.smplTimes:
             node.ST = self.smplTimes[node.label]
+            node.is_active = True
+            if not node.is_leaf():
+                for child in node.child_nodes():
+                    node.as_leaf = False if child.is_active else True
+            else:
+                node.as_leaf = True
         else:
-            node.nleaf = 0
-            node.SDI = 0
-            node.ST = 0
-            for child in node.child_nodes():
-                node.nleaf += child.nleaf
-                node.SDI += child.SDI + child.nleaf * child.edge_length
-                node.ST += child.ST
+            for c in node.child_nodes():
+                if c.is_active:
+                    node.is_active = True
+                    break
+
+        if node.is_active:
+            if node.as_leaf:
+                node.nleaf = 1
+                node.SDI = 0
+            else:
+                node.nleaf = 0
+                node.SDI = 0
+                node.ST = 0
+                for child in node.child_nodes():
+                    if child.is_active:
+                        node.nleaf += child.nleaf
+                        node.SDI += child.SDI + child.nleaf * child.edge_length
+                        node.ST += child.ST
 
     def Update_var(self, child, node, edge_length):
         SST = self.SST
@@ -89,12 +107,14 @@ class RTT_Tree(Tree_extend):
         return SST, deltaT, deltaD, SDT, SSD, ST, SD
 
     def tDown_update(self, node, opt_function):
-        for child in node.child_nodes():
-            child.SD = node.SD + (self.total_leaves - 2 * child.nleaf) * child.edge_length
-            child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
-            child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
-            SST, deltaT, deltaD, SDT, SSD, ST, SD = self.Update_var(child, node, child.edge_length)
-            opt_function(child, SST, deltaT, deltaD, SDT, SSD, ST, SD)
+        if node.is_active:
+            for child in node.child_nodes():
+                if child.is_active:
+                    child.SD = node.SD + (self.total_leaves - 2 * child.nleaf) * child.edge_length
+                    child.SDT = node.SDT + child.edge_length * (self.ddpTree.root.ST - 2 * child.ST)
+                    child.SSD = node.SSD + (self.total_leaves - 4 * child.nleaf) * (child.edge_length ** 2) + 2 * (node.SD - 2 * child.SDI) * child.edge_length
+                    SST, deltaT, deltaD, SDT, SSD, ST, SD = self.Update_var(child, node, child.edge_length)
+                    opt_function(child, SST, deltaT, deltaD, SDT, SSD, ST, SD)
 
     def prepare_root(self):
         root = self.get_root()
@@ -105,10 +125,13 @@ class RTT_Tree(Tree_extend):
         self.ddpTree.root.troot = 0
         root.SD, root.SSD, root.SDT, self.SST = 0, 0, 0, 0
         for v in self.ddpTree.traverse_preorder():
-            if not v.is_root():
+            if not v.is_root() and v.is_active:
+                #if not v.is_active:
+                #    v.parent.remove_child(v)
+                #else:
                 # must have defined edge lengths
                 v.droot = v.parent.droot + v.edge_length
-                if v.is_leaf():
+                if v.as_leaf:
                     root.SSD += (v.droot ** 2)
                     self.SST += (self.smplTimes[v.label] ** 2)
                     root.SD += v.droot

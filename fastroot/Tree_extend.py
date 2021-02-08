@@ -366,8 +366,7 @@ class Tree_extend(object):
         for i in range(1,self.alternatives + 1):
             name = get_key(self.rankings,i)
             if name is None:
-                # TODO: add a warning here ...
-                continue
+                self.logger.warning("This tree does not have alternative rooting", str(i))
             clone_tree = deepcopy(self)
             opt_node = None
             for node in clone_tree.ddpTree.traverse_preorder():
@@ -379,8 +378,7 @@ class Tree_extend(object):
                 if opt_node is not clone_tree.ddpTree.root:         
                     clone_tree.reroot_at_edge(opt_node,self.x[name])
             else:
-                # TODO: warning / error message
-                continue            
+                self.logger.warning(str(name), "was not found as a node name in this tree. The tree has not been rerooted.")
             trees.append(clone_tree.ddpTree.newick())
         return trees
 

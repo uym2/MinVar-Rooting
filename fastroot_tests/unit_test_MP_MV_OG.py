@@ -82,7 +82,6 @@ class RootingTestCase(unittest.TestCase):
         score = score_from_file(path+"/unit_test/MP/special/score.txt")
         branches = branch_lengths(path+"/unit_test/MP/special/branches.txt")
         score_test, MP_test, branches_test = root_trees(path+"/unit_test/MP/special/input.trees", method='MP')
-
         for i, line in enumerate(zip(MP.readlines(), MP_test)):
             types[i+1][1] &= check_two_nwk_str(line[0], line[1])
             correct_nwk &= types[i+1][1]

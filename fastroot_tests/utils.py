@@ -81,18 +81,18 @@ def root_trees(inputFile,method='MV',timeFile=None,OGFile=None,t0=0.0):
         else:
             a_tree = METHOD2FUNC[method](ddpTree=tree, logger_id=i + 1)
 
-        a_tree.Reroot()
+        outTrees, annTree = a_tree.Reroot()
 
         if method == 'RTT':
             score[i+1] = a_tree.return_values()  # tree number: RTT score, mu, t0
         else:
             score[i+1]= a_tree.opt_score()
 
-        tree_list.append(a_tree.ddpTree.newick())
+        tree_list.append(outTrees[0])
 
-        branches[i + 1] = sorted([child.edge_length for child in a_tree.ddpTree.root.child_nodes()])
+        branches[i + 1] = sorted([child.edge_length for child in read_tree_newick(outTrees[0]).root.child_nodes()])
     inputTrees.close()
-    return score,tree_list, branches
+    return score, tree_list, branches
 
 
 def branch_lengths(file):

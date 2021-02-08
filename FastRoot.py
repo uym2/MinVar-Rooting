@@ -40,8 +40,6 @@ def main():
                         help="Adds annotations to the specified tree")
     parser.add_argument("-A", "--alternatives", required=False, type=int, default=1,
                         help="Returns the specified number of alternative tree rootings")
-    #parser.add_argument("-k","--keepLabel",action='store_true',help="Suppress auto label assignment to internal nodes. WARNING: Use this option only if your tree has UNIQUE LABELING FOR ALL nodes. Default: NO")
-
 
     # print help message if no argument is given
     if len(argv) == 1:

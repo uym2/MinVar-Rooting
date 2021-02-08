@@ -8,7 +8,7 @@
 PROGRAM_NAME = "FastRoot"
 PROGRAM_AUTHOR = ["Uyen Mai","Merve Kilic","Erfan Sayyari","Siavash Mirarab"]
 PROGRAM_LICENSE = "MIT License"
-PROGRAM_VERSION = "1.6b"
+PROGRAM_VERSION = "1.6"
 PROGRAM_YEAR = "2017"
 PROGRAM_INSTITUTE = "University of California at San Diego"
 
