@@ -206,50 +206,71 @@ class Tree_extend(object):
     def Opt_function(self, node):
         self.logger.warning("Abstract method! Should never be called")
 
-    def tree_as_newick(self, outstream=sys.stdout, label_by_name=False):
+    def tree_as_newick(self, outstream=sys.stdout, as_stream=True, label_by_name=False):
         # dendropy's method to write newick seems to have problem ...
-        self.__write_newick(self.ddpTree.root, outstream, label_by_name=label_by_name)
-        outstream.write(";\n")
+        outstring = self.__write_newick(self.ddpTree.root, outstream, "", as_stream=as_stream, label_by_name=label_by_name)
+        if as_stream:
+            outstream.write(";\n")
+        outstring += ";\n"
+        return outstring
 
     #            outstream.write(bytes(";\n", "ascii"))
 
-    def __write_newick(self, node, outstream, label_by_name=False):
+    def __write_newick(self, node, outstream, outstring, as_stream=True, label_by_name=False):
         if node.is_leaf():
             if label_by_name:
-                outstream.write(str(node.name))
+                if as_stream:
+                    outstream.write(str(node.name))
+                outstring += str(node.name)
             #                    outstream.write(bytes(str(node.name), "ascii"))
             else:
                 try:
-                    outstream.write(node.label)
+                    if as_stream:
+                        outstream.write(node.label)
+                    outstring += str(node.label)
                 #                        outstream.write(bytes(node.label, "ascii"))
                 except:
-                    outstream.write(node.label)
+                    if as_stream:
+                        outstream.write(node.label)
+                    outstring += str(node.label)
         #                        outstream.write(bytes(str(node.label), "ascii"))
         else:
-            outstream.write('(')
+            if as_stream:
+                outstream.write('(')
+            outstring += "("
             # outstream.write(bytes('(', "ascii"))
             is_first_child = True
             for child in node.child_nodes():
                 if is_first_child:
                     is_first_child = False
                 else:
-                    outstream.write(',')
+                    if as_stream:
+                        outstream.write(',')
+                    outstring += ","
                 #                        outstream.write(bytes(',', "ascii"))
-                self.__write_newick(child, outstream, label_by_name=label_by_name)
-            outstream.write(')')
+                outstring = self.__write_newick(child, outstream, outstring, as_stream=as_stream, label_by_name=label_by_name)
+            if as_stream:
+                outstream.write(')')
+            outstring += ")"
         #                outstream.write(bytes(')', "ascii"))
         if not node.is_leaf():
             if label_by_name:
-                outstream.write(str(node.name))
+                if as_stream:
+                    outstream.write(str(node.name))
+                outstring += str(node.name)
             #                    outstream.write(bytes(str(node.name), "ascii"))
             elif node.label is not None:
-                outstream.write(str(node.label))
+                if as_stream:
+                    outstream.write(str(node.label))
+                outstring += str(node.label)
         #                    outstream.write(bytes(str(node.label), "ascii"))
 
         if not node.edge_length is None:
-            outstream.write(":" + str(node.edge_length))
-
+            if as_stream:
+                outstream.write(":" + str(node.edge_length))
+            outstring += ":" + str(node.edge_length)
     #                outstream.write(bytes(":" + str(node.edge_length), "ascii"))
+        return outstring
 
     def reroot_at_edge(self, node, length):
     # the method provided by dendropy DOESN'T seem to work ...
@@ -367,15 +388,21 @@ class Tree_extend(object):
             name = get_key(self.rankings,i)
             if name is None:
                 self.logger.warning("This tree does not have alternative rooting", str(i))
-            clone_tree = deepcopy(self)
+            name_to_label = {}
+            for node in self.ddpTree.traverse_preorder():
+                name_to_label[node.name] = node.label
+            tree_string = self.tree_as_newick(as_stream=False, label_by_name=True)
+            clone_tree = Tree_extend(ddpTree=read_tree_newick(tree_string))
             opt_node = None
             for node in clone_tree.ddpTree.traverse_preorder():
+                node.name = node.label
+                node.label = name_to_label[node.name]
                 if node.name == name:
                     opt_node = node
-                    break # assume naming is unique
+                    # assume naming is unique
     
             if opt_node is not None:
-                if opt_node is not clone_tree.ddpTree.root:         
+                if opt_node is not clone_tree.ddpTree.root:
                     clone_tree.reroot_at_edge(opt_node,self.x[name])
             else:
                 self.logger.warning(str(name), "was not found as a node name in this tree. The tree has not been rerooted.")
