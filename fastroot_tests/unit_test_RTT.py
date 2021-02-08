@@ -7,7 +7,7 @@ path=dirname(realpath(__file__))
 
 class RTTTestCase(unittest.TestCase):
     """Tests for `FastRoot.py`."""
-'''
+
     def test_RTT_true_trees1(self):
         """Does RTT root true trees 1-10 properly?"""
         #print("Testing RTT for true trees")
@@ -61,7 +61,7 @@ class RTTTestCase(unittest.TestCase):
 
         self.assertTrue(correct_nwk and correct_score and correct_t0 and correct_mu and correct_branches and correct_random_t0, msg="RTT rooting for true trees 1-10 failed.")
 
-        
+        '''
         # Random Trees
         score = score_from_file(path+"/unit_test/RTT/random_trees/score.txt", RTT=True)
         score_test, RTT_test, branches_test = root_trees(path+"/unit_test/RTT/random_trees/input.trees", method='RTT',
@@ -70,7 +70,7 @@ class RTTTestCase(unittest.TestCase):
             self.assertTrue(score[i][0] - score_test[i][0] < EPSILON_SCORE, msg="RTT Rooting for random trees failed: incorrect RTT score.")  # RTT score
             self.assertTrue(score[i][1] - score_test[i][1] < EPSILON_MU, msg="RTT Rooting for random trees failed: incorrect mutation rate.")  # mu
             self.assertTrue(score[i][2] - score_test[i][2] < EPSILON_TIME, msg="RTT Rooting for random trees failed: incorrect initial time.")  # t0
-        
+        '''
 
     def test_RTT_true_trees2(self):
         """Does RTT root true trees 11-20 properly?"""
@@ -281,6 +281,6 @@ class RTTTestCase(unittest.TestCase):
             print("RTT Rooting for random tree of size 5000 failed: incorrect initial time.")
 
         self.assertTrue(correct_score and correct_t0 and correct_mu, msg="RTT rooting for random tree of size 5000 failed.")
-'''
+
 #if __name__ == '__main__':
 #    unittest.main()
