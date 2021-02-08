@@ -6,7 +6,7 @@ path=dirname(realpath(__file__))
 
 class RootingTestCase(unittest.TestCase):
     """Tests for `FastRoot.py`."""
-
+    '''
     def test_OG(self):
         """Does OG root properly?"""
         #print("Testing OG")
@@ -66,7 +66,7 @@ class RootingTestCase(unittest.TestCase):
             print("MP Rooting failed: incorrect branch lengths.")
 
         self.assertTrue(correct_nwk and correct_score and correct_branches, msg="MP rooting failed.")
-
+    '''
     def test_MP_special_trees(self):
         """Does MP root special trees properly?"""
         #print("Testing MP for special trees")
@@ -85,10 +85,10 @@ class RootingTestCase(unittest.TestCase):
         for i, line in enumerate(zip(MP.readlines(), MP_test)):
             types[i+1][1] &= check_two_nwk_str(line[0], line[1])
             correct_nwk &= types[i+1][1]
-        for i,j in enumerate(score):
+        for i,j in enumerate(score_test):
             types[i+1][2] &= abs(score[j] - score_test[j]) < EPSILON_SCORE
             correct_score &= types[i+1][2]
-        for i,j in enumerate(branches):
+        for i,j in enumerate(branches_test):
             types[i + 1][3] &= abs(branches[j][0] - branches_test[j][0]) < EPSILON_BRANCH
             types[i + 1][3] &= abs(branches[j][1] - branches_test[j][1]) < EPSILON_BRANCH
             correct_branches &= types[i + 1][3]
@@ -118,7 +118,7 @@ class RootingTestCase(unittest.TestCase):
             print(*[type for type in errors], sep=", ")
 
         self.assertTrue(correct_nwk and correct_score and correct_branches, msg="MP rooting for special trees failed.")
-
+    '''
     def test_MV(self):
         """Does MV root properly?"""
         #print("Testing MV")
@@ -204,6 +204,6 @@ class RootingTestCase(unittest.TestCase):
             print(*[type for type in errors], sep=", ")
 
         self.assertTrue(correct_nwk and correct_score and correct_branches, msg="MV rooting for special trees failed.")
-
+    '''
 #if __name__ == '__main__':
 #    unittest.main()
