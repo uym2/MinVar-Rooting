@@ -36,7 +36,7 @@ def main():
                         help="Show FastRoot version and exit") 
     parser.add_argument("-x", "--maxIter", required=False, type=int, default=None,
                         help="Maximum number of iterations to run cvxopt")
-    parser.add_argument("-a", "--annotations", default=None,
+    parser.add_argument("-a", "--annotations", action='store_true',
                         help="Adds annotations to the specified tree")
     parser.add_argument("-A", "--alternatives", required=False, type=int, default=1,
                         help="Returns the specified number of alternative tree rootings")

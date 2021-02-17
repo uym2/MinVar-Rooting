@@ -139,13 +139,13 @@ class RTT_Tree(Tree_extend):
 
     def annotate(self):
         # assume that find_rankings has been called before
-        clone_tree = deepcopy(self)
+        clone_tree = Tree_extend(ddpTree=read_tree_newick(self.tree_as_newick(as_stream=False, label_by_name=True)))
         for node in clone_tree.ddpTree.traverse_preorder():
             if node is not clone_tree.get_root():
-                nm = node.name
+                nm = node.label
                 if nm in self.scores and nm in self.rankings and nm in self.x and nm in self.mu and nm in self.t0:
                     lb = node.label if node.label else ''
-                    node.label = lb + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + ", mu=" + str(self.mu[node.name]) + ", t0=" + str(self.t0[node.name]) + "]"
+                    node.label = lb + "[score=" + str(self.scores[nm]) + ", r=" + str(self.rankings[nm]) + ", x=" + str(self.x[nm]) + ", mu=" + str(self.mu[nm]) + ", t0=" + str(self.t0[nm]) + "]"
         return clone_tree.ddpTree.newick()
 
     def opt_score(self):

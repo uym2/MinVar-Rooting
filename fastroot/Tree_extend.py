@@ -366,12 +366,12 @@ class Tree_extend(object):
     def annotate(self):
         # assume that find_rankings has been called before
         #self.find_rankings()
-        clone_tree = deepcopy(self)
+        clone_tree = Tree_extend(ddpTree=read_tree_newick(self.tree_as_newick(as_stream=False, label_by_name=True)))
         for node in clone_tree.ddpTree.traverse_preorder():
             if node is not clone_tree.get_root():
-                if node.name in self.scores and node.name in self.rankings and node.name in self.x:
-                    lb = node.label if node.label else ''
-                    node.label = lb + "[score=" + str(self.scores[node.name]) + ", r=" + str(self.rankings[node.name]) + ", x=" + str(self.x[node.name]) + "]"
+                if node.label in self.scores and node.label in self.rankings and node.label in self.x:
+                    lb = node.label
+                    node.label = lb + "[score=" + str(self.scores[lb]) + ", r=" + str(self.rankings[lb]) + ", x=" + str(self.x[lb]) + "]"
         return clone_tree.ddpTree.newick()    
 
     def alternative_trees(self):
