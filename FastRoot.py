@@ -36,7 +36,7 @@ def main():
                         help="Show FastRoot version and exit") 
     parser.add_argument("-x", "--maxIter", required=False, type=int, default=None,
                         help="Maximum number of iterations to run cvxopt")
-    parser.add_argument("-a", "--annotations", action='store_true',
+    parser.add_argument("-a", "--annotations", default=None,
                         help="Adds annotations to the specified tree")
     parser.add_argument("-A", "--alternatives", required=False, type=int, default=1,
                         help="Returns the specified number of alternative tree rootings")
@@ -106,6 +106,7 @@ def main():
     do_annotations = args.annotations is not None
     if do_annotations:
         fout_ann = open(args.annotations,'w')
+
     # read and root each tree
     for i,line in enumerate(args.input):
         tree = read_tree(line, schema=args.schema.lower())
