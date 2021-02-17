@@ -50,7 +50,7 @@ FastRoot_test.py
 ## Usage
 
 ```bash
-FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE] [-v] [-x MAXITER] [-a] [-A ALTERNATIVES]
+FastRoot.py [-h] [-i INPUT] [-m METHOD] [-g OUTGROUPS] [-t SMPLTIMES] [-o OUTFILE] [-s SCHEMA] [-f INFOFILE] [-v] [-x MAXITER] [-a ANNOTATIONS] [-A ALTERNATIVES]
 ```
 
 optional arguments:
@@ -74,7 +74,8 @@ optional arguments:
   -v, --version         Show FastRoot version and exit
   -x MAXITER, --maxIter MAXITER
                         Maximum number of iterations to run cvxopt
-  -a, --annotations     Adds annotations to the specified tree
+  -a ANNOTATIONS, --annotations ANNOTATIONS
+                        Adds annotations to the specified tree
   -A ALTERNATIVES, --alternatives ALTERNATIVES
                         Returns the specified number of alternative tree rootings
 ```
