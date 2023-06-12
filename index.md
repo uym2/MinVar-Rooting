@@ -12,5 +12,8 @@ Dryad page for [Datasets](https://doi.org/10.6076/D1RW2G)
 
 ## Contact
 Uyen Mai    
-umai@eng.ucsd.edu 
+um6916@princeton.edu
+
+Siavash Mirarab
+smirarabbaygi@eng.ucsd.edu
 
