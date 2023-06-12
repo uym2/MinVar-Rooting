@@ -11,9 +11,7 @@ Github page for [scripts and pipelines](https://github.com/esayyari/simphy-uyen)
 Dryad page for [Datasets](https://doi.org/10.6076/D1RW2G)
 
 ## Contact
-Uyen Mai    
-um6916@princeton.edu
+Uyen Mai um6916@princeton.edu
 
-Siavash Mirarab
-smirarabbaygi@eng.ucsd.edu
+Siavash Mirarab smirarabbaygi@eng.ucsd.edu
 
